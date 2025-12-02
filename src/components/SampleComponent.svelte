@@ -8,7 +8,7 @@
 </script>
 
 <div class="my-component">
-  <h2>Hello, {name}!</h2>
+  <h2>{name}!</h2>
   <p>You have clicked the button {count} times.</p>
   <button onclick={handleClick}>Click Me</button>
 </div>

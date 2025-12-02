@@ -33,7 +33,7 @@ export class KursvaroPlugin extends Plugin {
       id: 'open-sample-modal-simple',
       name: 'Open sample modal (simple)',
       callback: () => {
-        new SampleModal(this.app).open();
+        new SampleModal(this.app, this).open();
       }
     });
     // This adds an editor command that can perform some operation on the current editor instance
@@ -56,7 +56,7 @@ export class KursvaroPlugin extends Plugin {
           // If checking is true, we're simply "checking" if the command can be run.
           // If checking is false, then we want to actually perform the operation.
           if (!checking) {
-            new SampleModal(this.app).open();
+            new SampleModal(this.app, this).open();
           }
 
           // This command will only show up in Command Palette when the check function returns true

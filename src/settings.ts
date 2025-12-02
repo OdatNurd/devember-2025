@@ -35,7 +35,6 @@ export class KursvaroSettingTab extends PluginSettingTab {
 
   constructor(app: App, plugin: KursvaroPlugin) {
     super(app, plugin);
-    this.plugin = plugin;
   }
 
   display(): void {

@@ -3,7 +3,7 @@
 
 import { App, Modal } from 'obsidian';
 import SampleComponent from '#components/SampleComponent.svelte';
-
+import { type KursvaroPlugin } from '../plugin';
 import { mount, unmount } from 'svelte';
 
 
@@ -12,9 +12,11 @@ import { mount, unmount } from 'svelte';
 
 export class SampleModal extends Modal {
   component: Record<string, unknown> | undefined;
+  plugin: KursvaroPlugin;
 
-  constructor(app: App) {
+  constructor(app: App, plugin: KursvaroPlugin) {
     super(app);
+    this.plugin = plugin;
   }
 
   onOpen() {
@@ -25,7 +27,7 @@ export class SampleModal extends Modal {
     this.component = mount(SampleComponent, {
       target: contentEl,
       props: {
-        name: "Svelte 5 Modal"
+        name: this.plugin.settings.mySetting
       }
     });
   }
