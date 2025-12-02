@@ -1,7 +1,7 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
 import { mount, unmount } from 'svelte';
-import SampleComponent from './SampleComponent.svelte';
+import SampleComponent from '#components/SampleComponent.svelte';
 
 // Remember to rename these classes and interfaces!
 
