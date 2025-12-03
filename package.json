@@ -16,7 +16,8 @@
   "imports": {
     "#components/*": "./src/components/*",
     "#commands/*": "./src/commands/*.ts",
-    "#modals/*": "./src/modals/*.ts"
+    "#modals/*": "./src/modals/*.ts",
+    "#utils/*": "./src/utils/*.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
