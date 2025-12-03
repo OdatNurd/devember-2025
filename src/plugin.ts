@@ -6,6 +6,8 @@ import { Editor, MarkdownView, Notice, Plugin } from 'obsidian';
 import { DEFAULT_SETTINGS, KursvaroSettingTab, type KursvaroSettings } from './settings';
 import { SampleModal } from './modals/sample';
 
+import { SimpleOpenModalCommand } from '#commands/simple_modal';
+
 
 /******************************************************************************/
 
@@ -29,13 +31,8 @@ export class KursvaroPlugin extends Plugin {
     statusBarItemEl.setText('Status Bar Text');
 
     // This adds a simple command that can be triggered anywhere
-    this.addCommand({
-      id: 'open-sample-modal-simple',
-      name: 'Open sample modal (simple)',
-      callback: () => {
-        new SampleModal(this.app, this).open();
-      }
-    });
+    this.addCommand(SimpleOpenModalCommand(this));
+
     // This adds an editor command that can perform some operation on the current editor instance
     this.addCommand({
       id: 'sample-editor-command',

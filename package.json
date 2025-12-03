@@ -14,7 +14,9 @@
     "version": "node tools/version-bump.js"
   },
   "imports": {
-    "#components/*": "./src/components/*"
+    "#components/*": "./src/components/*",
+    "#commands/*": "./src/commands/*.ts",
+    "#modals/*": "./src/modals/*.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
