@@ -5,8 +5,8 @@ import { Editor, MarkdownView, Notice, Plugin } from 'obsidian';
 
 import { DEFAULT_SETTINGS, KursvaroSettingTab, type KursvaroSettings } from './settings';
 
-import { OpenSimpleModalCommand } from '#commands/simple_modal';
 import { createCommand } from '#utils/command_factory';
+import { commands } from '#commands/index';
 
 
 /******************************************************************************/
@@ -23,6 +23,7 @@ export class KursvaroPlugin extends Plugin {
       // Called when the user clicks the icon.
       new Notice('This is a notice!');
     });
+
     // Perform additional things with the ribbon
     ribbonIconEl.addClass('my-plugin-ribbon-class');
 
@@ -30,23 +31,10 @@ export class KursvaroPlugin extends Plugin {
     const statusBarItemEl = this.addStatusBarItem();
     statusBarItemEl.setText('Status Bar Text');
 
-    // This adds a simple command that can be triggered anywhere
-    this.addCommand(createCommand(this, {
-        id: 'open-simple-modal-simple',
-        name: 'Open simple modal (simple)',
-      },
-      OpenSimpleModalCommand));
-
-    // This one is more complex; the command is only visible when the current
-    // view is a markdown file.
-    this.addCommand(createCommand(this, {
-        id: 'open-simple-modal-complex',
-        name: 'Open simple modal (complex)',
-        check: (plugin: Plugin) => {
-          return plugin.app.workspace.getActiveViewOfType(MarkdownView) !== null;
-        }
-      },
-      OpenSimpleModalCommand));
+    // Add in all of our commands.
+    for (const cmd of commands) {
+      this.addCommand(createCommand(this, cmd.config, cmd.handler));
+    }
 
     // This adds an editor command that can perform some operation on the current editor instance
     this.addCommand({
