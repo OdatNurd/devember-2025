@@ -1,7 +1,7 @@
 /******************************************************************************/
 
 
-import { Editor, MarkdownView, Notice, Plugin } from 'obsidian';
+import { Plugin, Notice } from 'obsidian';
 
 import { DEFAULT_SETTINGS, KursvaroSettingTab, type KursvaroSettings } from './settings';
 
@@ -35,16 +35,6 @@ export class KursvaroPlugin extends Plugin {
     for (const cmd of commands) {
       this.addCommand(createCommand(this, cmd.config, cmd.handler));
     }
-
-    // This adds an editor command that can perform some operation on the current editor instance
-    this.addCommand({
-      id: 'sample-editor-command',
-      name: 'Sample editor command',
-      editorCallback: (editor: Editor, _view: MarkdownView) => {
-        console.log(editor.getSelection());
-        editor.replaceSelection('Sample Editor Command');
-      }
-    });
 
     // This adds a settings tab so the user can configure various aspects of the plugin
     this.addSettingTab(new KursvaroSettingTab(this.app, this));

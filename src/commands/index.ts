@@ -1,23 +1,21 @@
 /******************************************************************************/
 
 import { type CommandConfig, type HandlerFunction } from '#utils/command_factory';
+import { type EditorCommandConfig, type EditorHandlerFunction } from '#utils/command_factory';
 
 import { requireMarkdownView } from '#utils/command_checks';
 import { OpenSimpleModalCommand } from '#commands/simple_modal';
+import { DoSimpleInsert } from '#commands/simple_editor';
 
 
 /******************************************************************************/
 
 
-/* Instances of this interface are used to create mappings for commands. */
-export interface CommandDeclaration {
-  /* The configuration object that defines the command properties. */
-  config: CommandConfig
-
-  /* The handler for the command that is the concrete implemenation of its
-   * functionality. */
-  handler: HandlerFunction
-}
+/* Instances of this interface are used to create mappings for commands. It can
+ * define either a standard command or an editor command. */
+export type CommandDeclaration =
+  { config: CommandConfig; handler: HandlerFunction; } |
+  { config: EditorCommandConfig; handler: EditorHandlerFunction; };
 
 
 /******************************************************************************/
@@ -39,6 +37,17 @@ export const commands : CommandDeclaration[] = [
       check: requireMarkdownView
     },
     handler: OpenSimpleModalCommand
+  },
+
+  /****************************************************************************/
+
+  {
+    config: {
+      id: 'sample-editor-command',
+      name: 'Sample editor command',
+      type: 'editor',
+    },
+    handler: DoSimpleInsert
   },
 ]
 
