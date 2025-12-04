@@ -16,15 +16,16 @@ export class KursvaroPlugin extends Plugin {
   settings: KursvaroSettings;
 
   async onload() {
+    // Load our settings and then add a settings tab to allow the user to edit
+    // them.
     await this.loadSettings();
+    this.addSettingTab(new KursvaroSettingTab(this.app, this));
 
-    // This creates an icon in the left ribbon.
+    // This creates an icon in the left ribbon; when it is clicked, the icon
+    // displays.
     const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (_evt: MouseEvent) => {
-      // Called when the user clicks the icon.
       new Notice('This is a notice!');
     });
-
-    // Perform additional things with the ribbon
     ribbonIconEl.addClass('my-plugin-ribbon-class');
 
     // This adds a status bar item to the bottom of the app. Does not work on mobile apps.
@@ -36,17 +37,11 @@ export class KursvaroPlugin extends Plugin {
       this.addCommand(createCommand(this, cmd.config, cmd.handler));
     }
 
-    // This adds a settings tab so the user can configure various aspects of the plugin
-    this.addSettingTab(new KursvaroSettingTab(this.app, this));
-
     // If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
     // Using this function will automatically remove the event listener when this plugin is disabled.
     this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
       console.log('click', evt);
     });
-
-    // When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-    this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
   }
 
   onunload() {
