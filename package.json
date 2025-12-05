@@ -14,10 +14,11 @@
     "version": "node tools/version-bump.js"
   },
   "imports": {
-    "#components/*": "./src/components/*",
     "#commands/*": "./src/commands/*.ts",
+    "#components/*": "./src/components/*",
     "#modals/*": "./src/modals/*.ts",
-    "#utils/*": "./src/utils/*.ts"
+    "#utils/*": "./src/utils/*.ts",
+    "#views/*": "./src/views/*.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
