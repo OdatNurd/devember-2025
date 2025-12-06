@@ -1,7 +1,7 @@
 /******************************************************************************/
 
 
-import { ItemView, WorkspaceLeaf } from 'obsidian';
+import { ItemView, WorkspaceLeaf, type ViewStateResult } from 'obsidian';
 import SampleComponent from '#components/SampleComponent.svelte';
 
 import { type KursvaroPlugin } from '../plugin';
@@ -15,16 +15,43 @@ import { mount, unmount } from 'svelte';
 export const VIEW_TYPE_SAMPLE = 'sample-view';
 
 
+/* This type represents the interface of the Svelte component. */
+interface SampleComponentInstance {
+  /* The component supports a function to set its state. */
+  setComponentState: (data: { count: number }) => void;
+}
+
+
+/* This type represents the data that is saved in our view (and thus in our
+ * underlying Svelte component). This state gets persisted into the Obsidian
+ * workspace. */
+interface SampleViewSavedData {
+  // The number of times the button was clicked in the button in the panel.
+  count: number;
+}
+
+
 /******************************************************************************/
 
 
-export class SampleView extends ItemView {
-  component: Record<string, unknown> | undefined;
+/* This is a sample view that is intended to be used in a sidebar, such as in
+ * the right one. It illustates how to persists data in the workspace so that if
+ * there is anything about the view that needs to be kept between sessions in
+ * the same workspace, that is possible. */
+export class SampleView extends ItemView implements SampleViewSavedData {
+  component: SampleComponentInstance | undefined;
   plugin: KursvaroPlugin;
+
+  // Our saved state variables.
+  count: number;
 
   constructor(leaf: WorkspaceLeaf, plugin: KursvaroPlugin) {
     super(leaf);
     this.plugin = plugin;
+
+    // Initialize the values that are stored; the values here set the default
+    // value for new views that are created.
+    this.count = 69;
   }
 
   getViewType() : string {
@@ -36,31 +63,74 @@ export class SampleView extends ItemView {
   }
 
   getIcon() : string {
-    return 'dice';
+    return 'dice-6';
   }
 
+  /* Called when our view opens. This will attach a Svelte component and pass
+   * that component the state that it needs in order to set itself up, as well
+   * as a callback to invoke when state changes. */
   async onOpen() {
     const container = this.contentEl;
     container.empty();
 
-    // Mount the Svelte component and save the instance
     this.component = mount(SampleComponent, {
       target: container,
       props: {
-        name: this.plugin.settings.mySetting
+        name: this.plugin.settings.mySetting,
+        initialCount: this.count,
+        onNewCount: (count: number) => this.onNewCount(count)
       }
-    });
+    }) as SampleComponentInstance;
   }
 
+  /* Called when our view closes. This unmounts the component so that we don't
+   * cause any memory leaks. */
   async onClose() {
     const container = this.contentEl;
 
-    // Unmount the component to prevent memory leaks
-    if (this.component) {
+    if (this.component !== undefined) {
       unmount(this.component);
     }
 
     container.empty();
+  }
+
+  /* Called by Obsidian to tell us what state we saved in a previous call to
+   * getState() so that we can set ourselves up. This is invoked when the
+   * workspace loads, so that we can put shared state back.
+   *
+   * This only covers the kind of state that is transient to a view; once a
+   * view closes, its saved data is discarded, so this should not be used for
+   * user data. */
+  async setState(state: SampleViewSavedData, result: ViewStateResult): Promise<void> {
+    // Update our internal state, and then pass it off to the component so that
+    // it can update as well.
+    this.count = state.count;
+
+    if (this.component !== undefined) {
+      this.component.setComponentState(state)
+    }
+
+    return super.setState(state, result);
+  }
+
+  /* Called by obsidian to get the state of our view. This only happens when the
+   * state of the workspace is persisted to disk, which happens when layout
+   * changes happen, or when something requests it. */
+  getState(): Record<string, unknown> {
+    return {
+      count: this.count,
+    };
+  }
+
+  /* This is a callback that we pass to the Svelte component in its props; every
+   * time the count changes, it invokes us so that we can persist it. */
+  onNewCount(count: number) {
+    this.count = count;
+
+    // We just request that our workspace save the layout, otherwise getState(
+    // will likely not get called in time to save this change.
+    this.app.workspace.requestSaveLayout();
   }
 }
 

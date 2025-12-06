@@ -1,9 +1,27 @@
 <script lang="ts">
-  let { name }: { name: string } = $props();
-  let count = $state(0);
+  interface PropLayout {
+    name: string;
+    initialCount: number;
+    onNewCount: (newCount: number) => void
+  }
+
+  let { name, initialCount, onNewCount }: PropLayout = $props();
+  let count = $state(initialCount);
+
+  // Ensure that we have a callback; if we were not given one, then we don't
+  // broadcast updates.
+  onNewCount = onNewCount ??= () => {}
 
   function handleClick() {
     count += 1;
+    onNewCount(count);
+  }
+
+  // Set all of our internal state based on the incoming data.
+  export function setComponentState(data: { count: number }) {
+    if (data && typeof data.count === 'number') {
+      count = data.count;
+    }
   }
 </script>
 
