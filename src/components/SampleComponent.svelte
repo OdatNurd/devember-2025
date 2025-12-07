@@ -1,24 +1,20 @@
 <script lang="ts">
-  interface PropLayout {
-    name: string;
-    initialCount: number;
-    onNewCount: (newCount: number) => void
-  }
+  import { type SampleComponentProps, type SampleComponentState } from '#components/SampleComponent.types';
 
-  let { name, initialCount, onNewCount }: PropLayout = $props();
+  let { name, initialCount, onNewCount }: SampleComponentProps = $props();
+
+  // svelte-ignore state_referenced_locally
   let count = $state(initialCount);
-
-  // Ensure that we have a callback; if we were not given one, then we don't
-  // broadcast updates.
-  onNewCount = onNewCount ??= () => {}
 
   function handleClick() {
     count += 1;
-    onNewCount(count);
+    if (onNewCount !== undefined) {
+      onNewCount(count);
+    }
   }
 
   // Set all of our internal state based on the incoming data.
-  export function setComponentState(data: { count: number }) {
+  export function setComponentState(data: SampleComponentState) {
     if (data && typeof data.count === 'number') {
       count = data.count;
     }

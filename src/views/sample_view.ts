@@ -1,11 +1,13 @@
 /******************************************************************************/
 
 
-import { ItemView, WorkspaceLeaf, type ViewStateResult } from 'obsidian';
-import SampleComponent from '#components/SampleComponent.svelte';
-
-import { type KursvaroPlugin } from '../plugin';
 import { mount, unmount } from 'svelte';
+import { ItemView, WorkspaceLeaf, type ViewStateResult } from 'obsidian';
+
+import type { KursvaroPlugin } from '../plugin';
+import type { SampleComponentState, SampleComponentProps } from '#components/SampleComponent.types';
+
+import SampleComponent from '#components/SampleComponent.svelte';
 
 
 /******************************************************************************/
@@ -14,20 +16,10 @@ import { mount, unmount } from 'svelte';
 /* The ID value that uniquely identifies the type of view that we are. */
 export const VIEW_TYPE_SAMPLE = 'sample-view';
 
-
 /* This type represents the interface of the Svelte component. */
 interface SampleComponentInstance {
   /* The component supports a function to set its state. */
-  setComponentState: (data: { count: number }) => void;
-}
-
-
-/* This type represents the data that is saved in our view (and thus in our
- * underlying Svelte component). This state gets persisted into the Obsidian
- * workspace. */
-interface SampleViewSavedData {
-  // The number of times the button was clicked in the button in the panel.
-  count: number;
+  setComponentState: (data: SampleComponentState) => void;
 }
 
 
@@ -38,7 +30,7 @@ interface SampleViewSavedData {
  * the right one. It illustates how to persists data in the workspace so that if
  * there is anything about the view that needs to be kept between sessions in
  * the same workspace, that is possible. */
-export class SampleView extends ItemView implements SampleViewSavedData {
+export class SampleView extends ItemView implements SampleComponentState {
   component: SampleComponentInstance | undefined;
   plugin: KursvaroPlugin;
 
@@ -70,29 +62,28 @@ export class SampleView extends ItemView implements SampleViewSavedData {
    * that component the state that it needs in order to set itself up, as well
    * as a callback to invoke when state changes. */
   async onOpen() {
-    const container = this.contentEl;
-    container.empty();
+    this.contentEl.empty();
+
+    const props: SampleComponentProps = {
+      name: this.plugin.settings.mySetting,
+      initialCount: this.count,
+      onNewCount: (count: number) => this.onNewCount(count)
+    }
 
     this.component = mount(SampleComponent, {
-      target: container,
-      props: {
-        name: this.plugin.settings.mySetting,
-        initialCount: this.count,
-        onNewCount: (count: number) => this.onNewCount(count)
-      }
+      target: this.contentEl,
+      props,
     }) as SampleComponentInstance;
   }
 
   /* Called when our view closes. This unmounts the component so that we don't
    * cause any memory leaks. */
   async onClose() {
-    const container = this.contentEl;
-
     if (this.component !== undefined) {
       unmount(this.component);
     }
 
-    container.empty();
+    this.contentEl.empty();
   }
 
   /* Called by Obsidian to tell us what state we saved in a previous call to
@@ -102,7 +93,7 @@ export class SampleView extends ItemView implements SampleViewSavedData {
    * This only covers the kind of state that is transient to a view; once a
    * view closes, its saved data is discarded, so this should not be used for
    * user data. */
-  async setState(state: SampleViewSavedData, result: ViewStateResult): Promise<void> {
+  async setState(state: SampleComponentState, result: ViewStateResult): Promise<void> {
     // Update our internal state, and then pass it off to the component so that
     // it can update as well.
     this.count = state.count;

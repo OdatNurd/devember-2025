@@ -15,7 +15,8 @@
   },
   "imports": {
     "#commands/*": "./src/commands/*.ts",
-    "#components/*": "./src/components/*",
+    "#components/*.svelte": "./src/components/*.svelte",
+    "#components/*": "./src/components/*.ts",
     "#modals/*": "./src/modals/*.ts",
     "#utils/*": "./src/utils/*.ts",
     "#views/*": "./src/views/*.ts"
