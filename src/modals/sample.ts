@@ -27,7 +27,9 @@ export class SampleModal extends Modal {
     this.component = mount(SampleComponent, {
       target: contentEl,
       props: {
-        name: this.plugin.settings.mySetting
+        name: this.plugin.settings.mySetting,
+        initialCount: 0,
+        onNewCount: () => {}
       }
     });
   }

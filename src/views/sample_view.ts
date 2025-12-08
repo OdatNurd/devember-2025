@@ -64,16 +64,16 @@ export class SampleView extends ItemView implements SampleComponentState {
   async onOpen() {
     this.contentEl.empty();
 
-    const props: SampleComponentProps = {
-      name: this.plugin.settings.mySetting,
-      initialCount: this.count,
-      onNewCount: (count: number) => this.onNewCount(count)
-    }
-
-    this.component = mount(SampleComponent, {
-      target: this.contentEl,
-      props,
-    }) as SampleComponentInstance;
+    this.component = mount<SampleComponentProps, SampleComponentInstance>(SampleComponent ,
+      {
+        target: this.contentEl,
+        props: {
+          name: this.plugin.settings.mySetting,
+          initialCount: this.count,
+          onNewCount: (count: number) => this.onNewCount(count)
+        }
+      });
+    console.log(this.component);
   }
 
   /* Called when our view closes. This unmounts the component so that we don't

@@ -18,7 +18,12 @@
       "ES7"
     ],
     "verbatimModuleSyntax": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "plugins": [
+      {
+        "name": "typescript-svelte-plugin"
+      }
+    ]
   },
   "include": [
     "src/**/*.ts",
