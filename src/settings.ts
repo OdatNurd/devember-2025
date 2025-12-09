@@ -3,7 +3,9 @@
 
 import { App, PluginSettingTab } from 'obsidian';
 import { createSettingsLayout } from '#utils/settings_factory';
-import { type KursvaroPlugin } from './plugin';
+
+import type { SettingsManager, SettingConfig } from '#utils/settings_factory';
+import type { KursvaroPlugin } from './plugin';
 
 
 /******************************************************************************/
@@ -15,6 +17,7 @@ import { type KursvaroPlugin } from './plugin';
 export interface KursvaroSettings {
   mySetting: string;
   myOtherSetting: string;
+  myThirdSetting: number;
 }
 
 
@@ -26,6 +29,7 @@ export interface KursvaroSettings {
 export const DEFAULT_SETTINGS: KursvaroSettings = {
   mySetting: 'default',
   myOtherSetting: 'poop',
+  myThirdSetting: 69,
 }
 
 
@@ -33,50 +37,35 @@ export const DEFAULT_SETTINGS: KursvaroSettings = {
 
 
 export class KursvaroSettingTab extends PluginSettingTab {
-  plugin: KursvaroPlugin;
+  plugin: KursvaroPlugin & SettingsManager<KursvaroSettings>;
+  layout: SettingConfig<KursvaroSettings>[] = [
+    {
+      type: 'heading',
+      name: 'The Heading',
+      cssClass: 'titties',
+      description: 'The heading subtitle',
+    },
+    {
+      type: 'text',
+      name: 'Setting #1',
+      description: "It's a secret",
+      key: 'mySetting',
+    },
+    {
+      type: 'text',
+      name: 'Setting #2',
+      description: "It's not a secret",
+      key: 'myOtherSetting'
+    },
+  ];
 
   constructor(app: App, plugin: KursvaroPlugin) {
     super(app, plugin);
   }
 
-  getSetting(key: keyof KursvaroSettings) : string {
-    return this.plugin.settings[key]
-  }
-
-  async setSetting(key: keyof KursvaroSettings, value: string) : Promise<void> {
-    this.plugin.settings[key] = value;
-    return this.plugin.saveSettings();
-  }
-
   display(): void {
-    createSettingsLayout(this.containerEl, [
-      {
-        name: 'The Heading',
-        description: 'The heading subtitle',
-        type: 'heading',
-        config: {}
-      },
-      {
-        name: 'Setting #1',
-        description: "It's a secret",
-        type: "text",
-        config: {
-          placeholder: 'Enter your secret',
-          get: this.getSetting('mySetting'),
-          set: async (value: string) => this.setSetting('mySetting', value),
-        }
-      },
-      {
-        name: 'Setting #2',
-        description: "It's not a secret",
-        type: "text",
-        config: {
-          placeholder: 'Enter the non-secret',
-          get: this.getSetting('myOtherSetting'),
-          set: async (value: string) => this.setSetting('myOtherSetting', value),
-        }
-      },
-    ]);
+    this.containerEl.empty();
+    createSettingsLayout(this.containerEl, this.plugin, this.layout);
   }
 }
 
