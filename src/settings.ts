@@ -4,7 +4,7 @@
 import { App, PluginSettingTab } from 'obsidian';
 import { createSettingsLayout } from '#utils/settings_factory';
 
-import type { SettingsManager, SettingConfig } from '#utils/settings_factory';
+import type { SettingsManager } from '#utils/settings_factory';
 import type { KursvaroPlugin } from './plugin';
 
 
@@ -38,34 +38,48 @@ export const DEFAULT_SETTINGS: KursvaroSettings = {
 
 export class KursvaroSettingTab extends PluginSettingTab {
   plugin: KursvaroPlugin & SettingsManager<KursvaroSettings>;
-  layout: SettingConfig<KursvaroSettings>[] = [
-    {
-      type: 'heading',
-      name: 'The Heading',
-      cssClass: 'titties',
-      description: 'The heading subtitle',
-    },
-    {
-      type: 'text',
-      name: 'Setting #1',
-      description: "It's a secret",
-      key: 'mySetting',
-    },
-    {
-      type: 'text',
-      name: 'Setting #2',
-      description: "It's not a secret",
-      key: 'myOtherSetting'
-    },
-  ];
 
   constructor(app: App, plugin: KursvaroPlugin) {
     super(app, plugin);
   }
 
   display(): void {
+    // Clear everything from the container; otherwise it may still contain the
+    // settings we defined last time.
     this.containerEl.empty();
-    createSettingsLayout(this.containerEl, this.plugin, this.layout);
+
+    // The main settings group.
+    createSettingsLayout(this.containerEl, this.plugin, [
+      {
+        type: 'text',
+        name: 'Setting #1',
+        description: "It's a secret",
+        key: 'mySetting',
+      },
+      {
+        type: 'text',
+        name: 'Setting #2',
+        description: "It's not a secret",
+        key: 'myOtherSetting'
+      },
+    ]);
+
+    // A secondary item group.
+    createSettingsLayout(this.containerEl, this.plugin, [
+      {
+        type: 'heading',
+        name: 'Otther Settings',
+        description: 'Other things that can be configured',
+        cssClass: 'config-header-spacing',
+      },
+      {
+        type: 'number',
+        name: 'Setting #3',
+        description: "It's a number",
+        key: 'myThirdSetting'
+      },
+    ]);
+
   }
 }
 

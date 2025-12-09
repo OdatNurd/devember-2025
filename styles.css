@@ -1,8 +1,6 @@
-/*
-
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
-
-If your plugin does not need CSS, delete this file.
-
-*/
+/* This can be applied to configuration header objects to space them from the
+ * items that come before them in the flow; good for separation of config
+ * groups. */
+.config-header-spacing {
+  padding-top: 32px;
+}

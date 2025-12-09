@@ -8,7 +8,7 @@ import { Setting } from 'obsidian';
 
 
 /* The various distinct kinds of settings that the settings factory supports. */
-export type SettingType = 'heading' | 'text';
+export type SettingType = 'heading' | 'text' | 'number';
 
 /* This "helper" type extracts from the type defines as T all keys that are of
  * the type V. */
@@ -39,16 +39,27 @@ export interface HeaderSettingConfig extends BaseSettingConfig {
   type: 'heading';
 }
 
-/* The specific configuration for a text value; this contains extra info on how
- * to get and set the value of the setting. */
+/* The specific configuration for a text value; this contains extra info on the
+ * key in the settings object that represents the value, and what the
+ * placeholder would be. */
 export interface TextSettingConfig<T> extends BaseSettingConfig {
   type: 'text';
   key: KeysMatching<T, string>;
   placeholder?: string;
 }
 
+/* The specific configuration for a numericv value; this contains extra info the
+ * key in the settings object that represents the value, and what the
+ * placeholder would be. */
+export interface NumberSettingConfig<T> extends BaseSettingConfig {
+  type: 'number';
+  key: KeysMatching<T, number>;
+  placeholder?: string;
+}
+
 /* Any given setting can be any of the above types. */
-export type SettingConfig<T> = HeaderSettingConfig | TextSettingConfig<T>;
+export type SettingConfig<T> = HeaderSettingConfig | TextSettingConfig<T> |
+                               NumberSettingConfig<T>;
 
 
 /******************************************************************************/
@@ -83,16 +94,32 @@ export function createSettingsLayout<T>(container: HTMLElement,
       continue;
     }
 
-    // Text field?
-    if (item.type === 'text') {
-      setting.addText(text => text
-        .setPlaceholder(item.placeholder ?? '')
-        .setValue(String(manager.settings[item.key] ?? ''))
-        .onChange(async (value: string) => {
-          (manager.settings[item.key] as string) = value;
-          await manager.saveSettings()
-        })
-      );
+    switch (item.type) {
+      case 'text':
+        setting.addText(text => text
+          .setPlaceholder(item.placeholder ?? '')
+          .setValue(String(manager.settings[item.key] ?? ''))
+          .onChange(async (value: string) => {
+            (manager.settings[item.key] as string) = value;
+            await manager.saveSettings()
+          })
+        );
+        break;
+
+      case 'number':
+        setting.addText(text => {
+          text.inputEl.type = 'number';
+          text.setPlaceholder(item.placeholder ?? '')
+          .setValue(String(manager.settings[item.key] ?? '0'))
+          .onChange(async (value: string) => {
+            const num = Number(value);
+            if (isNaN(num) === false) {
+              (manager.settings[item.key] as number) = num;
+              await manager.saveSettings();
+            }
+          })
+        });
+        break;
     }
   }
 }
