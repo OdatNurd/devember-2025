@@ -89,8 +89,13 @@ export function createSettingsLayout<T>(container: HTMLElement,
       setting.setClass(item.cssClass);
     }
 
-    // If this is a heading, then we're done; no more to do here.
+    // If this is a heading, then if there is not already a CSS class set,
+    // specifically include the common one we use for config headers; but that
+    // is all that has to happen here.
     if (item.type === 'heading') {
+      if (item.cssClass === undefined) {
+        setting.setClass('config-header');
+      }
       continue;
     }
 

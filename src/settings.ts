@@ -50,6 +50,7 @@ export class KursvaroSettingTab extends PluginSettingTab {
 
     // The main settings group.
     createSettingsLayout(this.containerEl, this.plugin, [
+      // General Settings
       {
         type: 'text',
         name: 'Setting #1',
@@ -62,15 +63,12 @@ export class KursvaroSettingTab extends PluginSettingTab {
         description: "It's not a secret",
         key: 'myOtherSetting'
       },
-    ]);
 
-    // A secondary item group.
-    createSettingsLayout(this.containerEl, this.plugin, [
+      // Other Settings; a separate group
       {
         type: 'heading',
-        name: 'Otther Settings',
+        name: 'Other Settings',
         description: 'Other things that can be configured',
-        cssClass: 'config-header-spacing',
       },
       {
         type: 'number',

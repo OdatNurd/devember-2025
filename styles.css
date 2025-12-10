@@ -1,6 +1,13 @@
 /* This can be applied to configuration header objects to space them from the
  * items that come before them in the flow; good for separation of config
  * groups. */
-.config-header-spacing {
+.config-header {
   padding-top: 32px;
+  border-top: none;
+}
+
+/* Item names inside of settings that are considered headers should have a
+ * larger font to call them out. */
+.config-header .setting-item-name {
+  font-size: 150%;
 }
