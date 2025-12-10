@@ -1,21 +1,23 @@
 <script lang="ts">
   import type { SampleComponentProps, SampleComponentState } from '#components/SampleComponent.types';
 
-  let { name, initialCount, onNewCount }: SampleComponentProps = $props();
+  let {
+    name = 'Unnamed',
+    initialCount = 0,
+    onNewCount = () => {}
+  }: SampleComponentProps = $props();
 
   // svelte-ignore state_referenced_locally
   let count = $state(initialCount);
 
   function handleClick() {
     count += 1;
-    if (onNewCount !== undefined) {
-      onNewCount(count);
-    }
+    onNewCount(count);
   }
 
   // Set all of our internal state based on the incoming data.
   export function setComponentState(data: SampleComponentState) {
-    if (data && typeof data.count === 'number') {
+    if (typeof data?.count === 'number') {
       count = data.count;
     }
   }

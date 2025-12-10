@@ -95,10 +95,9 @@ export class SampleView extends ItemView implements SampleComponentState {
   async setState(state: SampleComponentState, result: ViewStateResult): Promise<void> {
     // Update our internal state, and then pass it off to the component so that
     // it can update as well.
-    this.count = state.count;
-
-    if (this.component !== undefined) {
-      this.component.setComponentState(state)
+    if (typeof state?.count === 'number') {
+      this.count = state.count;
+      this.component?.setComponentState(state)
     }
 
     return super.setState(state, result);
