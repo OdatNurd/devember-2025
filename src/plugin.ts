@@ -1,12 +1,13 @@
 /******************************************************************************/
 
 
-import { Plugin, Notice, WorkspaceLeaf } from 'obsidian';
+import { Plugin } from 'obsidian';
 
 import type { KursvaroData, KursvaroSettings } from './model';
 import { DEFAULT_DATA, DEFAULT_SETTINGS } from './model';
 
 import { KursvaroSettingTab } from './settings';
+import { OpenSampleViewCommand } from '#commands/open_sample_view';
 
 import { SampleView, VIEW_TYPE_SAMPLE } from '#views/sample_view';
 import { createCommand } from '#utils/command_factory';
@@ -28,10 +29,10 @@ export class KursvaroPlugin extends Plugin {
     // Create the settings tab to advertise to Obsidian that we have settings.
     this.addSettingTab(new KursvaroSettingTab(this));
 
-    // This creates an icon in the left ribbon; when it is clicked, the icon
-    // displays.
+    // This creates an icon in the left ribbon; when it is clicked, the sample
+    // view opens in the sidebar, or focuses if it is already there.
     const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (_evt: MouseEvent) => {
-      this.activateView();
+      OpenSampleViewCommand(this);
     });
     ribbonIconEl.addClass('my-plugin-ribbon-class');
 
@@ -81,34 +82,6 @@ export class KursvaroPlugin extends Plugin {
   /* Persist all of our plugin data, including savings, back to disk. */
   async savePluginData() {
     await this.saveData(this.data);
-  }
-
-  async activateView() {
-    const { workspace } = this.app;
-
-    // Try to find all of the leaves of the particular type that we want to
-    // activate.
-    let leaf: WorkspaceLeaf | null = null;
-    const leaves = workspace.getLeavesOfType(VIEW_TYPE_SAMPLE);
-
-    // If we found any, then use the first one as the view to reveal.
-    if (leaves.length > 0) {
-      leaf = leaves[0];
-    } else {
-      // There isn't one of us in the workspace, so create a new one. It is
-      // important to set the view state type because otherwise Obsidian does
-      // not know what type of view this is.
-      leaf = workspace.getRightLeaf(false);
-      if (leaf !== null) {
-        await leaf.setViewState({ type: VIEW_TYPE_SAMPLE });
-      }
-    }
-
-    // Tell the workspace to reveal it.
-    if (leaf !== null) {
-      new Notice('Activated the view');
-      workspace.revealLeaf(leaf);
-    }
   }
 }
 

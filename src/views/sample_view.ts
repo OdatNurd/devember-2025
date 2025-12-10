@@ -73,7 +73,6 @@ export class SampleView extends ItemView implements SampleComponentState {
           onNewCount: (count: number) => this.onNewCount(count)
         }
       });
-    console.log(this.component);
   }
 
   /* Called when our view closes. This unmounts the component so that we don't
