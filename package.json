@@ -9,8 +9,10 @@
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.js",
-    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.js production",
+    "build": "svelte-check && node esbuild.config.js production",
     "lint": "eslint .",
+    "check": "svelte-check",
+    "validate": "pnpm lint && pnpm check",
     "version": "node tools/version-bump.js"
   },
   "imports": {
