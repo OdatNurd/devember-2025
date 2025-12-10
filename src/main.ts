@@ -1,8 +1,7 @@
 /******************************************************************************/
 
 
-import { KursvaroPlugin } from './plugin';
-export default KursvaroPlugin;
+export { KursvaroPlugin as default } from '#plugin';
 
 
 /******************************************************************************/

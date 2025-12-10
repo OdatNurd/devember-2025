@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type SampleComponentProps, type SampleComponentState } from '#components/SampleComponent.types';
+  import type { SampleComponentProps, SampleComponentState } from '#components/SampleComponent.types';
 
   let { name, initialCount, onNewCount }: SampleComponentProps = $props();
 

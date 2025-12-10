@@ -1,10 +1,10 @@
 /******************************************************************************/
 
 
-import { mount, unmount } from 'svelte';
 import { ItemView, WorkspaceLeaf, type ViewStateResult } from 'obsidian';
+import { mount, unmount } from 'svelte';
+import { type KursvaroPlugin } from '#plugin';
 
-import type { KursvaroPlugin } from '../plugin';
 import type { SampleComponentState, SampleComponentProps } from '#components/SampleComponent.types';
 
 import SampleComponent from '#components/SampleComponent.svelte';

@@ -1,7 +1,8 @@
 /******************************************************************************/
 
 
-import { type KursvaroPlugin } from 'src/plugin';
+import { type KursvaroPlugin } from '#plugin';
+
 import { SampleModal } from '#modals/sample';
 
 

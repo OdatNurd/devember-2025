@@ -2,7 +2,7 @@
 
 
 import { Editor, MarkdownView } from 'obsidian';
-import { type KursvaroPlugin } from 'src/plugin';
+import { type KursvaroPlugin } from '#plugin';
 
 
 /******************************************************************************/

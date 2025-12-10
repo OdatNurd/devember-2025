@@ -1,7 +1,7 @@
 /******************************************************************************/
 
 
-import { type Command, Editor, Plugin, MarkdownView } from 'obsidian';
+import { type Command, Editor, MarkdownView, Plugin } from 'obsidian';
 
 
 /******************************************************************************/

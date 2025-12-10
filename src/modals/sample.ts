@@ -2,9 +2,10 @@
 
 
 import { App, Modal } from 'obsidian';
-import SampleComponent from '#components/SampleComponent.svelte';
-import { type KursvaroPlugin } from '../plugin';
 import { mount, unmount } from 'svelte';
+import { type KursvaroPlugin } from '#plugin';
+
+import SampleComponent from '#components/SampleComponent.svelte';
 
 
 /******************************************************************************/

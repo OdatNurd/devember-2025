@@ -3,13 +3,12 @@
 
 import { Plugin } from 'obsidian';
 
-import type { KursvaroData, KursvaroSettings } from './model';
-import { DEFAULT_DATA, DEFAULT_SETTINGS } from './model';
+import  { type KursvaroData, type KursvaroSettings, DEFAULT_DATA, DEFAULT_SETTINGS } from './model';
 
 import { KursvaroSettingTab } from './settings';
-import { OpenSampleViewCommand } from '#commands/open_sample_view';
-
 import { SampleView, VIEW_TYPE_SAMPLE } from '#views/sample_view';
+
+import { OpenSampleViewCommand } from '#commands/open_sample_view';
 import { createCommand } from '#utils/command_factory';
 import { commands } from '#commands/index';
 

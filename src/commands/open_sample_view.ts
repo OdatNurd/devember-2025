@@ -2,8 +2,8 @@
 
 
 import { Notice, WorkspaceLeaf } from 'obsidian';
+import { type KursvaroPlugin } from '#plugin';
 
-import { type KursvaroPlugin } from 'src/plugin';
 import { VIEW_TYPE_SAMPLE } from '#views/sample_view';
 
 

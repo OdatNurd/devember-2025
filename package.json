@@ -20,6 +20,7 @@
     "#components/*.svelte": "./src/components/*.svelte",
     "#components/*": "./src/components/*.ts",
     "#modals/*": "./src/modals/*.ts",
+    "#plugin": "./src/plugin.ts",
     "#utils/*": "./src/utils/*.ts",
     "#views/*": "./src/views/*.ts"
   },
