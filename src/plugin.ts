@@ -42,7 +42,7 @@ export class KursvaroPlugin extends Plugin {
 
     // Add in all of our commands.
     for (const cmd of commands) {
-      this.addCommand(createCommand(this, cmd.config, cmd.handler));
+      this.addCommand(createCommand(this, cmd));
     }
 
     // Register our view; there could be more than one of these, in theory.
