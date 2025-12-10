@@ -1,36 +1,13 @@
 /******************************************************************************/
 
 
-import { App, PluginSettingTab } from 'obsidian';
+import { PluginSettingTab } from 'obsidian';
+import { type KursvaroSettings } from './model';
 import { createSettingsLayout } from '#utils/settings_factory';
 
 import type { SettingsManager } from '#utils/settings_factory';
 import type { KursvaroPlugin } from './plugin';
 
-
-/******************************************************************************/
-
-
-/* This interface describes the settings that our plugin exposes; these will be
- * persisted into the vault in a data.json file in .obsidian/plugins/plugin-name
- * if any of them are changed from the defaults outlined below. */
-export interface KursvaroSettings {
-  mySetting: string;
-  myOtherSetting: string;
-  myThirdSetting: number;
-}
-
-
-/******************************************************************************/
-
-
-/* This sets the default values for all of our settings; these are used as the
- * source of settings if there is no data.json file. */
-export const DEFAULT_SETTINGS: KursvaroSettings = {
-  mySetting: 'default',
-  myOtherSetting: 'poop',
-  myThirdSetting: 69,
-}
 
 
 /******************************************************************************/
@@ -39,8 +16,8 @@ export const DEFAULT_SETTINGS: KursvaroSettings = {
 export class KursvaroSettingTab extends PluginSettingTab {
   plugin: KursvaroPlugin & SettingsManager<KursvaroSettings>;
 
-  constructor(app: App, plugin: KursvaroPlugin) {
-    super(app, plugin);
+  constructor(plugin: KursvaroPlugin) {
+    super(plugin.app, plugin);
   }
 
   display(): void {

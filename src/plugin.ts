@@ -3,10 +3,12 @@
 
 import { Plugin, Notice, WorkspaceLeaf } from 'obsidian';
 
-import { DEFAULT_SETTINGS, KursvaroSettingTab, type KursvaroSettings } from './settings';
+import type { KursvaroData, KursvaroSettings } from './model';
+import { DEFAULT_DATA, DEFAULT_SETTINGS } from './model';
+
+import { KursvaroSettingTab } from './settings';
 
 import { SampleView, VIEW_TYPE_SAMPLE } from '#views/sample_view';
-
 import { createCommand } from '#utils/command_factory';
 import { commands } from '#commands/index';
 
@@ -15,13 +17,16 @@ import { commands } from '#commands/index';
 
 
 export class KursvaroPlugin extends Plugin {
+  data: KursvaroData;
   settings: KursvaroSettings;
 
   async onload() {
-    // Load our settings and then add a settings tab to allow the user to edit
-    // them.
-    await this.loadSettings();
-    this.addSettingTab(new KursvaroSettingTab(this.app, this));
+    // Before we do anything else, load in our plugin's data file; this sets up
+    // both our cached version of the data as well as the settings information.
+    await this.loadPluginData();
+
+    // Create the settings tab to advertise to Obsidian that we have settings.
+    this.addSettingTab(new KursvaroSettingTab(this));
 
     // This creates an icon in the left ribbon; when it is clicked, the icon
     // displays.
@@ -53,12 +58,29 @@ export class KursvaroPlugin extends Plugin {
 
   }
 
-  async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+  /* This handles the loading of our simple plugin data, which is persisted for
+   * us by Obsidian directly into a file that it allows us to easily save and
+   * load (data.json in the plugin folder inside of .obsidian).
+   *
+   * This holds state that we want to ensure gets synced, including our settings
+   * information. */
+  async loadPluginData() {
+    // Load the raw data from disk.
+    const rawData = await this.loadData();
+
+    // Merge in the defaults with the actual loaded data, and do the same for
+    // the settings. This ensures that the fields are always present and ready
+    // to go.
+    this.data = Object.assign({}, DEFAULT_DATA, rawData);
+    this.data.settings = Object.assign({}, DEFAULT_SETTINGS, rawData?.settings);
+
+    // Alias the inner settings to make external code less frumpy.
+    this.settings = this.data.settings;
   }
 
-  async saveSettings() {
-    await this.saveData(this.settings);
+  /* Persist all of our plugin data, including savings, back to disk. */
+  async savePluginData() {
+    await this.saveData(this.data);
   }
 
   async activateView() {

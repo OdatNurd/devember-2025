@@ -1,0 +1,49 @@
+/******************************************************************************/
+
+
+/* This interface describes the settings that our plugin exposes; these will be
+ * persisted into the vault in a data.json file in .obsidian/plugins/plugin-name
+ * if any of them are changed from the defaults outlined below. */
+export interface KursvaroSettings {
+  mySetting: string;
+  myOtherSetting: string;
+  myThirdSetting: number;
+}
+
+
+/* This interface describes the data that the plugin stores in its data.json
+ * file; this includes not only our settings but any other data that we want to
+ * persist that should definitely be synced between vaults if the user is using
+ * the sync service. */
+export interface KursvaroData {
+  content: string;
+
+  /* This is the saved value for our plugin settings. */
+  settings: KursvaroSettings;
+}
+
+
+/******************************************************************************/
+
+
+/* This sets the default values for all of our settings; these are used as the
+ * source of settings if there is no data.json file. */
+export const DEFAULT_SETTINGS: KursvaroSettings = {
+  mySetting: 'default',
+  myOtherSetting: 'poop',
+  myThirdSetting: 69,
+}
+
+
+/* This sets the default value for our data file, ensuring that all fields are
+ * present within it.
+ *
+ * This is a representation of the data that exists on disk in the data.json
+ * file that lives in our plugin's install folder inside the vault. */
+export const DEFAULT_DATA: KursvaroData = {
+  content: '',
+  settings: DEFAULT_SETTINGS,
+}
+
+
+/******************************************************************************/

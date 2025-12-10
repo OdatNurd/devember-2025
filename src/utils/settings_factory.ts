@@ -20,7 +20,7 @@ type KeysMatching<T, V> = {
  * settings for a specific settings type. */
 export interface SettingsManager<T> {
   settings: T;
-  saveSettings(): Promise<void>
+  savePluginData(): Promise<void>
 }
 
 /* This interface specifies the fields that are common to all configurtion
@@ -106,7 +106,7 @@ export function createSettingsLayout<T>(container: HTMLElement,
           .setValue(String(manager.settings[item.key] ?? ''))
           .onChange(async (value: string) => {
             (manager.settings[item.key] as string) = value;
-            await manager.saveSettings()
+            await manager.savePluginData()
           })
         );
         break;
@@ -120,7 +120,7 @@ export function createSettingsLayout<T>(container: HTMLElement,
             const num = Number(value);
             if (isNaN(num) === false) {
               (manager.settings[item.key] as number) = num;
-              await manager.saveSettings();
+              await manager.savePluginData();
             }
           })
         });
