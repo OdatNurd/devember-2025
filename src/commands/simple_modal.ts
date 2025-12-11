@@ -3,7 +3,7 @@
 
 import { type KursvaroPlugin } from '#plugin';
 
-import { SampleModal } from '#modals/sample';
+import { SampleModal } from '#ui/modals/sample';
 
 
 /******************************************************************************/

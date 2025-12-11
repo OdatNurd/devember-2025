@@ -3,7 +3,7 @@
 
 import { MarkdownView, Plugin } from 'obsidian';
 
-import { VIEW_TYPE_SAMPLE } from '#views/sample_view';
+import { VIEW_TYPE_SAMPLE } from '#ui/views/sample';
 
 
 /******************************************************************************/

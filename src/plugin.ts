@@ -5,8 +5,8 @@ import { Plugin } from 'obsidian';
 
 import  { type KursvaroData, type KursvaroSettings, hydratePluginData } from '#types';
 
-import { KursvaroSettingTab } from './settings';
-import { SampleView, VIEW_TYPE_SAMPLE } from '#views/sample_view';
+import { KursvaroSettingTab } from '#ui/settings';
+import { SampleView, VIEW_TYPE_SAMPLE } from '#ui/views/sample';
 
 import { OpenSampleViewCommand } from '#commands/open_sample_view';
 import { createCommand } from '#factory/commands';

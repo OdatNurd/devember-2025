@@ -23,6 +23,7 @@
     "#modals/*": "./src/modals/*.ts",
     "#types": "./src/types.ts",
     "#plugin": "./src/plugin.ts",
+    "#ui/*": "./src/ui/*.ts",
     "#utils/*": "./src/utils/*.ts",
     "#views/*": "./src/views/*.ts"
   },
