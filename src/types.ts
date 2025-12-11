@@ -28,7 +28,7 @@ export interface KursvaroData {
 
 /* This sets the default values for all of our settings; these are used as the
  * source of settings if there is no data.json file. */
-export const DEFAULT_SETTINGS: KursvaroSettings = {
+const DEFAULT_SETTINGS: KursvaroSettings = {
   mySetting: 'default',
   myOtherSetting: 'poop',
   myThirdSetting: 69,
@@ -40,9 +40,26 @@ export const DEFAULT_SETTINGS: KursvaroSettings = {
  *
  * This is a representation of the data that exists on disk in the data.json
  * file that lives in our plugin's install folder inside the vault. */
-export const DEFAULT_DATA: KursvaroData = {
+const DEFAULT_DATA: KursvaroData = {
   content: '',
   settings: DEFAULT_SETTINGS,
+}
+
+
+/******************************************************************************/
+
+
+/* This function accepts the raw data provided by Obsidian from it's loadData
+ * handler, which loads the data.json file from the plugin root, and returns
+ * back a data object which contains the data.
+ *
+ * This will populate any missing fields in the data, including the nested
+ * settings object, with default values should any of them be missing. */
+export function hydratePluginData(rawData: KursvaroData) : KursvaroData {
+  const data = Object.assign({}, DEFAULT_DATA, rawData);
+  data.settings = Object.assign({}, DEFAULT_SETTINGS, rawData?.settings);
+
+  return data;
 }
 
 

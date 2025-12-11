@@ -3,7 +3,7 @@
 
 import { Plugin } from 'obsidian';
 
-import  { type KursvaroData, type KursvaroSettings, DEFAULT_DATA, DEFAULT_SETTINGS } from './model';
+import  { type KursvaroData, type KursvaroSettings, hydratePluginData } from '#types';
 
 import { KursvaroSettingTab } from './settings';
 import { SampleView, VIEW_TYPE_SAMPLE } from '#views/sample_view';
@@ -68,13 +68,13 @@ export class KursvaroPlugin extends Plugin {
     // Load the raw data from disk.
     const rawData = await this.loadData();
 
-    // Merge in the defaults with the actual loaded data, and do the same for
-    // the settings. This ensures that the fields are always present and ready
-    // to go.
-    this.data = Object.assign({}, DEFAULT_DATA, rawData);
-    this.data.settings = Object.assign({}, DEFAULT_SETTINGS, rawData?.settings);
-
-    // Alias the inner settings to make external code less frumpy.
+    // Get a copy of the loaded data in which all of the data fields and the
+    // nested settings objects are fully filled out, with any of the missing
+    // fields having their defaults in place.
+    //
+    // This also aliases the inner settings to make it clearer in order code
+    // when regular data or when settings are being accessed.
+    this.data = hydratePluginData(rawData);
     this.settings = this.data.settings;
   }
 
