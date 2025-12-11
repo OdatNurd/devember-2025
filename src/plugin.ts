@@ -9,7 +9,7 @@ import { KursvaroSettingTab } from './settings';
 import { SampleView, VIEW_TYPE_SAMPLE } from '#views/sample_view';
 
 import { OpenSampleViewCommand } from '#commands/open_sample_view';
-import { createCommand } from '#utils/command_factory';
+import { createCommand } from '#factory/commands';
 import { commands } from '#commands/index';
 
 

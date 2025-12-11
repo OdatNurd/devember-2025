@@ -5,7 +5,7 @@ import { PluginSettingTab } from 'obsidian';
 import type { KursvaroPlugin } from '#plugin';
 
 import { type KursvaroSettings } from '#types';
-import { type SettingsManager, createSettingsLayout } from '#utils/settings_factory';
+import { type SettingsManager, createSettingsLayout } from '#factory/settings';
 
 
 /******************************************************************************/
