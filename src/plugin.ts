@@ -8,9 +8,10 @@ import  { type KursvaroData, type KursvaroSettings, hydratePluginData } from '#t
 import { KursvaroSettingTab } from '#ui/settings';
 import { SampleView, VIEW_TYPE_SAMPLE } from '#ui/views/sample';
 
-import { OpenSampleViewCommand } from '#commands/open_sample_view';
 import { createCommand } from '#factory/commands';
 import { commands } from '#commands/index';
+
+import { OpenSampleViewCommand } from '#commands/standard/open_view';
 
 
 /******************************************************************************/

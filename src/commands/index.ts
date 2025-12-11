@@ -2,12 +2,12 @@
 
 import { type CommandConfig  } from '#factory/commands';
 
-import { requireMarkdownView, requireExistingSampleView } from '#utils/command_checks';
-import { not } from '#utils/command_combiners';
+import { not } from '#commands/combiners';
+import { requireMarkdownView, requireExistingSampleView } from '#commands/checks';
 
-import { OpenSimpleModalCommand } from '#commands/simple_modal';
-import { DoSimpleInsert } from '#commands/simple_editor';
-import { OpenSampleViewCommand } from '#commands/open_sample_view';
+import { OpenSimpleModalCommand } from '#commands/standard/open_modal';
+import { OpenSampleViewCommand } from '#commands/standard/open_view';
+import { DoSimpleInsert } from '#commands/editor/simple';
 
 
 /******************************************************************************/

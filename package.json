@@ -17,6 +17,10 @@
   },
   "imports": {
     "#commands/*": "./src/commands/*.ts",
+    "#commands/editor/*": "./src/commands/handlers/editor/*.ts",
+    "#commands/standard/*": "./src/commands/handlers/standard/*.ts",
+    "#commands/checks": "./src/commands/checks/index.ts",
+    "#commands/combiners": "./src/commands/combiners/index.ts",
     "#components/*.svelte": "./src/components/*.svelte",
     "#components/*": "./src/components/*.ts",
     "#factory/*": "./src/factory/*.ts",
@@ -24,7 +28,6 @@
     "#types": "./src/types.ts",
     "#plugin": "./src/plugin.ts",
     "#ui/*": "./src/ui/*.ts",
-    "#utils/*": "./src/utils/*.ts",
     "#views/*": "./src/views/*.ts"
   },
   "devDependencies": {
