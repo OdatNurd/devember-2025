@@ -26,4 +26,11 @@ export interface SampleComponentState {
 }
 
 
+/* This type represents the interface of the Svelte component. */
+export interface SampleComponentInstance {
+  /* The component supports a function to set its state. */
+  setComponentState: (data: SampleComponentState) => void;
+}
+
+
 /******************************************************************************/

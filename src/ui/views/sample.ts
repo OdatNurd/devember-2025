@@ -5,7 +5,7 @@ import { ItemView, WorkspaceLeaf, type ViewStateResult } from 'obsidian';
 import { mount, unmount } from 'svelte';
 import { type KursvaroPlugin } from '#plugin';
 
-import type { SampleComponentState, SampleComponentProps } from '#components/SampleComponent.types';
+import type { SampleComponentInstance, SampleComponentState, SampleComponentProps } from '#components/SampleComponent.types';
 
 import SampleComponent from '#components/SampleComponent.svelte';
 
@@ -15,12 +15,6 @@ import SampleComponent from '#components/SampleComponent.svelte';
 
 /* The ID value that uniquely identifies the type of view that we are. */
 export const VIEW_TYPE_SAMPLE = 'sample-view';
-
-/* This type represents the interface of the Svelte component. */
-interface SampleComponentInstance {
-  /* The component supports a function to set its state. */
-  setComponentState: (data: SampleComponentState) => void;
-}
 
 
 /******************************************************************************/
