@@ -20,12 +20,12 @@ export const commands : CommandConfig[] = [
    * used in both places. */
   {
     id: 'open-simple-modal-simple',
-    name: 'Open simple modal (simple)',
+    name: 'Open simple modal (anywhere)',
     handler: OpenSimpleModalCommand,
   },
   {
     id: 'open-simple-modal-complex',
-    name: 'Open simple modal (complex)',
+    name: 'Open simple modal (only markdown)',
     check: requireMarkdownView,
     handler: OpenSimpleModalCommand,
   },
