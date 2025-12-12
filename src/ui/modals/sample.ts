@@ -5,16 +5,16 @@ import { App, Modal } from 'obsidian';
 import { mount, unmount } from 'svelte';
 import { type KursvaroPlugin } from '#plugin';
 
-import type { SampleComponentInstance, SampleComponentProps } from '#components/SampleComponent.types';
+import type { SampleModalInstance, SampleModalProps } from '#components/SampleModal.types';
 
-import SampleComponent from '#components/SampleComponent.svelte';
+import SampleSvelteModal from '#components/SampleModal.svelte';
 
 
 /******************************************************************************/
 
 
 export class SampleModal extends Modal {
-  component: SampleComponentInstance | undefined;
+  component: SampleModalInstance | undefined;
   plugin: KursvaroPlugin;
 
   constructor(app: App, plugin: KursvaroPlugin) {
@@ -27,7 +27,7 @@ export class SampleModal extends Modal {
     contentEl.empty();
 
     // Mount the Svelte component and save the instance
-    this.component = mount<SampleComponentProps, SampleComponentInstance>(SampleComponent ,
+    this.component = mount<SampleModalProps, SampleModalInstance>(SampleSvelteModal ,
       {
         target: contentEl,
         props: {

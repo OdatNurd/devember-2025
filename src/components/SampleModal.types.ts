@@ -3,7 +3,7 @@
 
 /* This type defines the properties that are expected to be passed to the
  * SampleCompionent Svelte component. */
-export interface SampleComponentProps {
+export interface SampleModalProps {
   // The name to populate into the top of the component.
   name: string;
 
@@ -20,16 +20,16 @@ export interface SampleComponentProps {
 /* This type defines the state that is persisted from this component into the
  * Obsidian view that contains it, so that it can restore back between sessions
  * (i.e. quit and restart of Obsidian). */
-export interface SampleComponentState {
+export interface SampleModalState {
   /* The number of times the button was clicked. */
   count: number
 }
 
 
 /* This type represents the interface of the Svelte component. */
-export interface SampleComponentInstance {
+export interface SampleModalInstance {
   /* The component supports a function to set its state. */
-  setComponentState: (data: SampleComponentState) => void;
+  setComponentState: (data: SampleModalState) => void;
 }
 
 

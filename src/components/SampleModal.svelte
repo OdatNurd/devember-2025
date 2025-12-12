@@ -1,11 +1,11 @@
 <script lang="ts">
-  import type { SampleComponentProps, SampleComponentState } from '#components/SampleComponent.types';
+  import type { SampleModalProps, SampleModalState } from '#components/SampleModal.types';
 
   let {
     name = 'Unnamed',
     initialCount = 0,
     onNewCount = () => {}
-  }: SampleComponentProps = $props();
+  }: SampleModalProps = $props();
 
   // svelte-ignore state_referenced_locally
   let count = $state(initialCount);
@@ -16,7 +16,7 @@
   }
 
   // Set all of our internal state based on the incoming data.
-  export function setComponentState(data: SampleComponentState) {
+  export function setComponentState(data: SampleModalState) {
     if (typeof data?.count === 'number') {
       count = data.count;
     }

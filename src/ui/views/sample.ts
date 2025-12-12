@@ -5,9 +5,9 @@ import { ItemView, WorkspaceLeaf, type ViewStateResult } from 'obsidian';
 import { mount, unmount } from 'svelte';
 import { type KursvaroPlugin } from '#plugin';
 
-import type { SampleComponentInstance, SampleComponentState, SampleComponentProps } from '#components/SampleComponent.types';
+import type { SampleModalInstance, SampleModalState, SampleModalProps } from '#components/SampleModal.types';
 
-import SampleComponent from '#components/SampleComponent.svelte';
+import SampleSvelteModal from '#components/SampleModal.svelte';
 
 
 /******************************************************************************/
@@ -24,8 +24,8 @@ export const VIEW_TYPE_SAMPLE = 'sample-view';
  * the right one. It illustates how to persists data in the workspace so that if
  * there is anything about the view that needs to be kept between sessions in
  * the same workspace, that is possible. */
-export class SampleView extends ItemView implements SampleComponentState {
-  component: SampleComponentInstance | undefined;
+export class SampleView extends ItemView implements SampleModalState {
+  component: SampleModalInstance | undefined;
   plugin: KursvaroPlugin;
 
   // Our saved state variables.
@@ -58,7 +58,7 @@ export class SampleView extends ItemView implements SampleComponentState {
   async onOpen() {
     this.contentEl.empty();
 
-    this.component = mount<SampleComponentProps, SampleComponentInstance>(SampleComponent ,
+    this.component = mount<SampleModalProps, SampleModalInstance>(SampleSvelteModal ,
       {
         target: this.contentEl,
         props: {
@@ -86,7 +86,7 @@ export class SampleView extends ItemView implements SampleComponentState {
    * This only covers the kind of state that is transient to a view; once a
    * view closes, its saved data is discarded, so this should not be used for
    * user data. */
-  async setState(state: SampleComponentState, result: ViewStateResult): Promise<void> {
+  async setState(state: SampleModalState, result: ViewStateResult): Promise<void> {
     // Update our internal state, and then pass it off to the component so that
     // it can update as well.
     if (typeof state?.count === 'number') {

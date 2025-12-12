@@ -12,7 +12,7 @@
     "build": "svelte-check && node esbuild.config.js production",
     "lint": "eslint .",
     "check": "svelte-check",
-    "validate": "pnpm lint && pnpm check",
+    "validate": "pnpm check && pnpm lint",
     "version": "node tools/version-bump.js"
   },
   "imports": {
