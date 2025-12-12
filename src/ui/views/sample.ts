@@ -5,7 +5,8 @@ import { ItemView, WorkspaceLeaf, type ViewStateResult } from 'obsidian';
 import { mount, unmount } from 'svelte';
 import { type KursvaroPlugin } from '#plugin';
 
-import type { SampleViewInstance, SampleViewState, SampleViewProps } from '#components/SampleView.types';
+import type { SampleViewInstance, SampleViewProps } from '#components/SampleView.types';
+import { SampleViewState, watch } from '#state/SampleView';
 
 import SampleSvelteView from '#components/SampleView.svelte';
 
@@ -24,9 +25,13 @@ export const VIEW_TYPE_SAMPLE = 'sample-view';
  * the right one. It illustates how to persists data in the workspace so that if
  * there is anything about the view that needs to be kept between sessions in
  * the same workspace, that is possible. */
-export class SampleView extends ItemView implements SampleViewState {
+export class SampleView extends ItemView {
   component: SampleViewInstance | undefined;
   plugin: KursvaroPlugin;
+  cleanup: (() => void) | undefined;
+
+  // The data that we share between us and the component.
+  viewState: SampleViewState | undefined;
 
   // Our saved state variables.
   count: number;
@@ -37,7 +42,7 @@ export class SampleView extends ItemView implements SampleViewState {
 
     // Initialize the values that are stored; the values here set the default
     // value for new views that are created.
-    this.count = 69;
+    this.count = 0;
   }
 
   getViewType() : string {
@@ -58,13 +63,37 @@ export class SampleView extends ItemView implements SampleViewState {
   async onOpen() {
     this.contentEl.empty();
 
+    // Create the state that will be shared between us and the component. The
+    // click count will be stored in the view information and restored from
+    // the workspace layout; the content comes from the plugin data in data.json
+    // and gets stored back there as well.
+    this.viewState = new SampleViewState(this.count, this.plugin.data.content);
+
+    // Set up a watcher that fires whenever the component updates the state of
+    // things.
+    //
+    // TODO: This is currently blasting the data.json file every time the
+    //       count button is clicked, which is suboptimal for our purposes but
+    //       good enough for now.
+    this.cleanup = watch(this.viewState, () => {
+      // Ensure that getState will be called so that things will persist.
+      this.app.workspace.requestSaveLayout();
+
+      console.log(`got a call to watch!`, this.viewState);
+
+      if (this.viewState !== undefined) {
+        this.plugin.data.content = this.viewState.content;
+        this.plugin.savePluginData();
+      }
+    });
+
+    // We can mount the component now.
     this.component = mount<SampleViewProps, SampleViewInstance>(SampleSvelteView ,
       {
         target: this.contentEl,
         props: {
-          name: this.plugin.settings.mySetting,
-          initialCount: this.count,
-          onNewCount: (count: number) => this.onNewCount(count)
+          title: this.plugin.settings.mySetting,
+          sharedState: this.viewState,
         }
       });
   }
@@ -72,6 +101,9 @@ export class SampleView extends ItemView implements SampleViewState {
   /* Called when our view closes. This unmounts the component so that we don't
    * cause any memory leaks. */
   async onClose() {
+    if (this.cleanup !== undefined) {
+      this.cleanup();
+    }
     if (this.component !== undefined) {
       unmount(this.component);
     }
@@ -87,11 +119,14 @@ export class SampleView extends ItemView implements SampleViewState {
    * view closes, its saved data is discarded, so this should not be used for
    * user data. */
   async setState(state: SampleViewState, result: ViewStateResult): Promise<void> {
-    // Update our internal state, and then pass it off to the component so that
-    // it can update as well.
-    if (typeof state?.count === 'number') {
-      this.count = state.count;
-      this.component?.setComponentState(state)
+    console.log(`got a call to setState!`, state);
+
+    this.count = state?.count ?? 0;
+
+    // Update the live state if the view is already open; this will cause the
+    // view to update automagically.
+    if (this.viewState) {
+      this.viewState.count = this.count;
     }
 
     return super.setState(state, result);
@@ -101,8 +136,9 @@ export class SampleView extends ItemView implements SampleViewState {
    * state of the workspace is persisted to disk, which happens when layout
    * changes happen, or when something requests it. */
   getState(): Record<string, unknown> {
+      console.log(`got a call to getState!`, this.viewState);
     return {
-      count: this.count,
+      count: this.viewState?.count ?? 0,
     };
   }
 

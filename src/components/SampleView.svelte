@@ -1,39 +1,42 @@
 <script lang="ts">
-  import type { SampleViewProps, SampleViewState } from '#components/SampleView.types';
+  import { untrack } from 'svelte';
+  import { type SampleViewProps } from '#components/SampleView.types';
 
-  let {
-    name = 'Unnamed',
-    initialCount = 0,
-    onNewCount = () => {}
-  }: SampleViewProps = $props();
+  // The incoming state object that contains the data that we share with the
+  // code upstream of us; they will be notified when things here change.
+  let { title = 'Untitled', sharedState } : SampleViewProps = $props();
 
-  // svelte-ignore state_referenced_locally
-  let count = $state(initialCount);
+  // Grab a copy of the initial value of the shared state; this takes a ride
+  // through untrack to ensure that this does not get updated when the content
+  // changes; this is just setting a static value.
+  let draft = $state(untrack(() => sharedState.content));
+
 
   function handleClick() {
-    count += 1;
-    onNewCount(count);
+    sharedState.count += 1;
   }
 
-  // Set all of our internal state based on the incoming data.
-  export function setComponentState(data: SampleViewState) {
-    if (typeof data?.count === 'number') {
-      count = data.count;
-    }
+  function handleSave() {
+    sharedState.content = draft;
   }
 </script>
 
-<div class="my-component">
-  <h2>{name}! (also beer)</h2>
-  <p>You have clicked the button {count} times.</p>
+<div class="view-thing">
+  <h2>{title}</h2>
+
+  <hr>
+
+  <p>You have clicked the button {sharedState.count} times.</p>
   <button onclick={handleClick}>Click Me</button>
+
+  <hr>
+
+  <textarea bind:value={draft} rows=15></textarea><br>
+  <button onclick={handleSave}>Save</button>
 </div>
 
 <style>
-  .my-component {
-    border: 1px solid var(--text-accent);
-    padding: 1rem;
-    border-radius: 4px;
+  .view-thing {
     margin: 1rem 0;
   }
   h2 {

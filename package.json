@@ -25,8 +25,9 @@
     "#components/*": "./src/components/*.ts",
     "#factory/*": "./src/factory/*.ts",
     "#modals/*": "./src/modals/*.ts",
-    "#types": "./src/types.ts",
     "#plugin": "./src/plugin.ts",
+    "#state/*": "./src/state/*.svelte.ts",
+    "#types": "./src/types.ts",
     "#ui/*": "./src/ui/*.ts",
     "#views/*": "./src/views/*.ts"
   },
