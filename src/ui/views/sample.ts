@@ -5,8 +5,9 @@ import { ItemView, WorkspaceLeaf, type ViewStateResult } from 'obsidian';
 import { mount, unmount } from 'svelte';
 import { type KursvaroPlugin } from '#plugin';
 
-import type { SampleViewInstance, SampleViewProps } from '#components/SampleView.types';
-import { SampleViewState, watch } from '#state/SampleView';
+import { GenericViewState, watch } from '#state/generic';
+
+import type { SampleViewInstance, SampleViewProps, SampleViewSessionData, SampleViewPluginData } from '#components/SampleView.types';
 
 import SampleSvelteView from '#components/SampleView.svelte';
 
@@ -31,7 +32,7 @@ export class SampleView extends ItemView {
   cleanup: (() => void) | undefined;
 
   // The data that we share between us and the component.
-  viewState: SampleViewState | undefined;
+  viewState: GenericViewState<SampleViewSessionData, SampleViewPluginData>;
 
   // Our saved state variables.
   count: number;
@@ -67,23 +68,29 @@ export class SampleView extends ItemView {
     // click count will be stored in the view information and restored from
     // the workspace layout; the content comes from the plugin data in data.json
     // and gets stored back there as well.
-    this.viewState = new SampleViewState(this.count, this.plugin.data.content);
+    console.log('plugin data at start: ', this.plugin.data);
+    this.viewState = new GenericViewState<SampleViewSessionData, SampleViewPluginData>(
+     { count: this.count },
+     { content: this.plugin.data.content },
+    );
+    console.log('viewState at start: ', this.viewState);
 
     // Set up a watcher that fires whenever the component updates the state of
     // things.
-    //
-    // TODO: This is currently blasting the data.json file every time the
-    //       count button is clicked, which is suboptimal for our purposes but
-    //       good enough for now.
-    this.cleanup = watch(this.viewState, () => {
-      // Ensure that getState will be called so that things will persist.
-      this.app.workspace.requestSaveLayout();
+    this.cleanup = watch(this.viewState, {
+      // When session data changes, ask Obsidian to save the layout; this causes
+      // it to call our getData(), which will pluck the data that it needs
+      // directly from the session data.
+      onSessionChange: (session: SampleViewSessionData) => {
+        console.log('session data has changed:', session);
+        this.app.workspace.requestSaveLayout();
+      },
 
-      console.log(`got a call to watch!`, this.viewState);
-
-      if (this.viewState !== undefined) {
-        console.log('updating saved plugin data');
-        this.plugin.data.content = this.viewState.content;
+      // When plugin related data updates, cache the change in the actual plugin
+      // data and then persist it to disk.
+      onDataChange: (data: SampleViewPluginData) => {
+        console.log('plugin data has changed', data);
+        this.plugin.data.content = data.content;
         this.plugin.savePluginData();
       }
     });
@@ -119,7 +126,7 @@ export class SampleView extends ItemView {
    * This only covers the kind of state that is transient to a view; once a
    * view closes, its saved data is discarded, so this should not be used for
    * user data. */
-  async setState(state: SampleViewState, result: ViewStateResult): Promise<void> {
+  async setState(state: SampleViewSessionData, result: ViewStateResult): Promise<void> {
     console.log(`got a call to setState!`, state);
 
     this.count = state?.count ?? 0;
@@ -127,7 +134,8 @@ export class SampleView extends ItemView {
     // Update the live state if the view is already open; this will cause the
     // view to update automagically.
     if (this.viewState) {
-      this.viewState.count = this.count;
+      console.log('updating session count');
+      this.viewState.session.count = this.count;
     }
 
     return super.setState(state, result);
@@ -137,20 +145,10 @@ export class SampleView extends ItemView {
    * state of the workspace is persisted to disk, which happens when layout
    * changes happen, or when something requests it. */
   getState(): Record<string, unknown> {
-      console.log(`got a call to getState!`, this.viewState);
+    console.log(`got a call to getState!`, this.viewState.session);
     return {
-      count: this.viewState?.count ?? 0,
+      count: this.viewState?.session?.count ?? 0,
     };
-  }
-
-  /* This is a callback that we pass to the Svelte component in its props; every
-   * time the count changes, it invokes us so that we can persist it. */
-  onNewCount(count: number) {
-    this.count = count;
-
-    // We just request that our workspace save the layout, otherwise getState(
-    // will likely not get called in time to save this change.
-    this.app.workspace.requestSaveLayout();
   }
 }
 

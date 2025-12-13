@@ -9,15 +9,15 @@
   // Grab a copy of the initial value of the shared state; this takes a ride
   // through untrack to ensure that this does not get updated when the content
   // changes; this is just setting a static value.
-  let draft = $state(untrack(() => sharedState.content));
+  let draft = $state(untrack(() => sharedState.data.content));
 
 
   function handleClick() {
-    sharedState.count += 1;
+    sharedState.session.count += 1;
   }
 
   function handleSave() {
-    sharedState.content = draft;
+    sharedState.data.content = draft;
   }
 </script>
 
@@ -26,7 +26,7 @@
 
   <hr>
 
-  <p>You have clicked the button {sharedState.count} times.</p>
+  <p>You have clicked the button {sharedState.session.count} times.</p>
   <button onclick={handleClick}>Click Me</button>
 
   <hr>

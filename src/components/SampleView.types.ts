@@ -1,11 +1,19 @@
 /******************************************************************************/
 
 
-import { type SampleViewState } from '#state/SampleView';
+import { type GenericViewState } from '#state/generic';
 
 
 /******************************************************************************/
 
+
+export interface SampleViewSessionData {
+  count: number;
+}
+
+export interface SampleViewPluginData {
+  content: string;
+}
 
 /* This type defines the properties that are expected to be passed to the
  * SampleCompionent Svelte component. */
@@ -15,7 +23,7 @@ export interface SampleViewProps {
 
   // The state that is shared between instances of this component and the things
   // that are mounting them.
-  sharedState: SampleViewState;
+  sharedState: GenericViewState<SampleViewSessionData, SampleViewPluginData>;
 }
 
 
