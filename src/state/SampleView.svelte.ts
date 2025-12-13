@@ -38,8 +38,8 @@ export function watch(state: SampleViewState, callback: () => void) {
     $effect(() => {
       // This apparently ensures that these two values are effectively  our
       // dependencies, so that when they change we get called.
-      state.count;
-      state.content;
+      void state.count;
+      void state.content;
 
       // Let the listener know when state changes. */
       untrack(() => callback());

@@ -82,6 +82,7 @@ export class SampleView extends ItemView {
       console.log(`got a call to watch!`, this.viewState);
 
       if (this.viewState !== undefined) {
+        console.log('updating saved plugin data');
         this.plugin.data.content = this.viewState.content;
         this.plugin.savePluginData();
       }

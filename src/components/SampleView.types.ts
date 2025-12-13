@@ -20,6 +20,7 @@ export interface SampleViewProps {
 
 
 /* This type represents the interface of the Svelte component. */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface SampleViewInstance {
   // This space intentionally blank.
 }
