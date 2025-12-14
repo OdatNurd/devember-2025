@@ -16,18 +16,20 @@ import { untrack } from 'svelte';
 export class GenericSavedState<S = undefined, D = undefined> {
   /* This stores the state for data that is intended for persisting into the
    * Obsidian session storage. */
-  session = $state() as S | undefined;
+  session = $state() as S;
 
   /* This stores the state for data that is intended for persisting into the
    * Obsidian data.json data file associated with the plugin. */
-  data = $state() as D | undefined;
+  data = $state() as D;
 
   /* Construct an instance; session and data are both optional, although one
    * assumes that you would use at least one, otherwise why are you creating
    * this instance. */
   constructor(config: { session?: S, data?: D}) {
-    this.session = config.session;
-    this.data = config.data;
+    // These are both cast explicitly to the type; this makes them only be
+    // undefined when they're not actually used, which works better.
+    this.session = config.session as S;
+    this.data = config.data as D;
   }
 }
 

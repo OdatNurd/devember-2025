@@ -134,7 +134,7 @@ export class SampleView extends ItemView {
 
     // Update the live state if the view is already open; this will cause the
     // view to update automagically.
-    if (this.viewState && this.viewState.session) {
+    if (this.viewState !== undefined) {
       console.log('updating session count');
       this.viewState.session.count = this.count;
     }
@@ -148,7 +148,7 @@ export class SampleView extends ItemView {
   getState(): Record<string, unknown> {
     console.log(`got a call to getState!`, JSON.stringify(this.viewState.session));
     return {
-      count: this.viewState?.session?.count ?? 0,
+      count: this.viewState?.session.count ?? 0,
     };
   }
 }
