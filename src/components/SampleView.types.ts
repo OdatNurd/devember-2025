@@ -1,7 +1,7 @@
 /******************************************************************************/
 
 
-import { type GenericViewState } from '#state/generic';
+import { type GenericSavedState } from '#state/generic';
 
 
 /******************************************************************************/
@@ -23,7 +23,7 @@ export interface SampleViewProps {
 
   // The state that is shared between instances of this component and the things
   // that are mounting them.
-  sharedState: GenericViewState<SampleViewSessionData, SampleViewPluginData>;
+  sharedState: GenericSavedState<SampleViewSessionData, SampleViewPluginData>;
 }
 
 

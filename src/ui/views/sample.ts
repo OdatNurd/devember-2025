@@ -5,7 +5,7 @@ import { ItemView, WorkspaceLeaf, type ViewStateResult } from 'obsidian';
 import { mount, unmount } from 'svelte';
 import { type KursvaroPlugin } from '#plugin';
 
-import { GenericViewState, watch } from '#state/generic';
+import { GenericSavedState, watch } from '#state/generic';
 
 import type { SampleViewInstance, SampleViewProps, SampleViewSessionData, SampleViewPluginData } from '#components/SampleView.types';
 
@@ -32,7 +32,7 @@ export class SampleView extends ItemView {
   cleanup: (() => void) | undefined;
 
   // The data that we share between us and the component.
-  viewState: GenericViewState<SampleViewSessionData, SampleViewPluginData>;
+  viewState: GenericSavedState<SampleViewSessionData, SampleViewPluginData>;
 
   // Our saved state variables.
   count: number;
@@ -69,10 +69,11 @@ export class SampleView extends ItemView {
     // the workspace layout; the content comes from the plugin data in data.json
     // and gets stored back there as well.
     console.log('plugin data at start: ', this.plugin.data);
-    this.viewState = new GenericViewState<SampleViewSessionData, SampleViewPluginData>(
-     { count: this.count },
-     { content: this.plugin.data.content },
-    );
+    this.viewState = new GenericSavedState<SampleViewSessionData, SampleViewPluginData>(
+      {
+        session: { count: this.count },
+        data: { content: this.plugin.data.content },
+      });
     console.log('viewState at start: ', this.viewState);
 
     // Set up a watcher that fires whenever the component updates the state of
@@ -133,7 +134,7 @@ export class SampleView extends ItemView {
 
     // Update the live state if the view is already open; this will cause the
     // view to update automagically.
-    if (this.viewState) {
+    if (this.viewState && this.viewState.session) {
       console.log('updating session count');
       this.viewState.session.count = this.count;
     }
