@@ -82,14 +82,14 @@ export class SampleView extends ItemView {
       // it to call our getData(), which will pluck the data that it needs
       // directly from the session data.
       onSessionChange: (session: SampleViewSessionData) => {
-        console.log('session data has changed:', session);
+        console.log('session data has changed:', JSON.stringify(session));
         this.app.workspace.requestSaveLayout();
       },
 
       // When plugin related data updates, cache the change in the actual plugin
       // data and then persist it to disk.
       onDataChange: (data: SampleViewPluginData) => {
-        console.log('plugin data has changed', data);
+        console.log('plugin data has changed', JSON.stringify(data));
         this.plugin.data.content = data.content;
         this.plugin.savePluginData();
       }
@@ -145,7 +145,7 @@ export class SampleView extends ItemView {
    * state of the workspace is persisted to disk, which happens when layout
    * changes happen, or when something requests it. */
   getState(): Record<string, unknown> {
-    console.log(`got a call to getState!`, this.viewState.session);
+    console.log(`got a call to getState!`, JSON.stringify(this.viewState.session));
     return {
       count: this.viewState?.session?.count ?? 0,
     };
