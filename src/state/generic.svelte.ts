@@ -36,22 +36,40 @@ interface WatchHandlers<S, D> {
 export function watch<S, D>(state: GenericViewState<S, D>, handlers: WatchHandlers<S, D>) {
   return $effect.root(() => {
     // This effect triggers when any field inside of the session state changes.
+    // We want to skip the first one because the effect seems to run as soon as
+    // it is created.
+    let sessionInitialized = false;
     $effect(() => {
+      console.log('running effect for stored session data');
       // Access the session value to trigger an update.
       void JSON.stringify(state.session);
 
       // Let the listener know when state changes.
-      untrack(() => handlers.onSessionChange(state.session));
+      untrack(() => {
+        if (sessionInitialized === false) {
+            sessionInitialized = true;
+            return;
+        }
+        handlers.onSessionChange(state.session);
+      });
     });
 
     // As above, but this one is related to the plugin data and not the session
     // data.
+    let dataInitialized = false;
     $effect(() => {
-      // Access the session value to trigger an update.
+      console.log('running effect for stored plugin data');
+      // Access the data value to trigger an update.
       void JSON.stringify(state.data);
 
       // Let the listener know when state changes.
-      untrack(() => handlers.onDataChange(state.data));
+      untrack(() => {
+        if (dataInitialized === false) {
+            dataInitialized = true;
+            return;
+        }
+        handlers.onDataChange(state.data);
+      });
     });
   });
 }
