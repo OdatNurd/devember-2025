@@ -41,7 +41,7 @@ export class GenericSavedState<S = undefined, D = undefined> {
  * In the interface, both handlers are optional because it's not enforced that
  * you need to watch for changes in both at the same time in any given Svelte
  * component. */
-interface WatchHandlers<S, D> {
+export interface WatchHandlers<S, D> {
   onSessionChange?: (session: S) => void;
   onDataChange?: (data: D) => void;
 };
