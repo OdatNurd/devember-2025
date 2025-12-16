@@ -10,7 +10,7 @@ export interface SampleModalProps {
 
 /* This type represents the interface of the Svelte component. */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface SampleModalInstance {
+export interface SampleModalInstance extends Record<string, unknown> {
   // This space intentialy blank.
 }
 

@@ -29,7 +29,7 @@ export interface SampleViewProps {
 
 /* This type represents the interface of the Svelte component. */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface SampleViewInstance {
+export interface SampleViewInstance extends Record<string, unknown> {
   // This space intentionally blank.
 }
 

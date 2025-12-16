@@ -66,7 +66,6 @@ export function watch<S, D>(state: GenericSavedState<S, D>, handlers: WatchHandl
       // it is created.
       let sessionInitialized = false;
       $effect(() => {
-        console.log('running effect for stored session data');
         // Access the session value to trigger an update.
         void JSON.stringify(state.session);
         untrack(() => {
@@ -86,7 +85,6 @@ export function watch<S, D>(state: GenericSavedState<S, D>, handlers: WatchHandl
     if (state.data !== undefined && handlers.onDataChange !== undefined) {
       let dataInitialized = false;
       $effect(() => {
-        console.log('running effect for stored plugin data');
         // Access the data value to trigger an update.
         void JSON.stringify(state.data);
 

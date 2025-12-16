@@ -1,11 +1,11 @@
 /******************************************************************************/
 
 
-import { ItemView, WorkspaceLeaf, type ViewStateResult } from 'obsidian';
-import { mount, unmount } from 'svelte';
+import { WorkspaceLeaf } from 'obsidian';
+import { type Component } from 'svelte';
 import { type KursvaroPlugin } from '#plugin';
 
-import { GenericSavedState, watch } from '#state/generic';
+import { BaseSvelteItemView } from '#ui/views/base';
 
 import type { SampleViewInstance, SampleViewProps, SampleViewSessionData, SampleViewPluginData } from '#components/SampleView.types';
 
@@ -26,24 +26,12 @@ export const VIEW_TYPE_SAMPLE = 'sample-view';
  * the right one. It illustates how to persists data in the workspace so that if
  * there is anything about the view that needs to be kept between sessions in
  * the same workspace, that is possible. */
-export class SampleView extends ItemView {
-  component: SampleViewInstance | undefined;
-  plugin: KursvaroPlugin;
-  cleanup: (() => void) | undefined;
-
-  // The data that we share between us and the component.
-  viewState: GenericSavedState<SampleViewSessionData, SampleViewPluginData>;
-
-  // Our saved state variables.
-  count: number;
-
+export class SampleView
+  extends BaseSvelteItemView<KursvaroPlugin,
+                             SampleViewSessionData, SampleViewPluginData,
+                             SampleViewProps, SampleViewInstance> {
   constructor(leaf: WorkspaceLeaf, plugin: KursvaroPlugin) {
-    super(leaf);
-    this.plugin = plugin;
-
-    // Initialize the values that are stored; the values here set the default
-    // value for new views that are created.
-    this.count = 0;
+    super(leaf, plugin);
   }
 
   getViewType() : string {
@@ -58,98 +46,45 @@ export class SampleView extends ItemView {
     return 'dice-6';
   }
 
-  /* Called when our view opens. This will attach a Svelte component and pass
-   * that component the state that it needs in order to set itself up, as well
-   * as a callback to invoke when state changes. */
-  async onOpen() {
-    this.contentEl.empty();
+  /* Return the Svelte component that should be mounted within this view. */
+  getComponent() : Component<SampleViewProps, SampleViewInstance> {
+    return SampleSvelteView
+  };
 
-    // Create the state that will be shared between us and the component. The
-    // click count will be stored in the view information and restored from
-    // the workspace layout; the content comes from the plugin data in data.json
-    // and gets stored back there as well.
-    console.log('plugin data at start: ', this.plugin.data);
-    this.viewState = new GenericSavedState<SampleViewSessionData, SampleViewPluginData>(
-      {
-        session: { count: this.count },
-        data: { content: this.plugin.data.content },
-      });
-    console.log('viewState at start: ', this.viewState);
-
-    // Set up a watcher that fires whenever the component updates the state of
-    // things.
-    this.cleanup = watch(this.viewState, {
-      // When session data changes, ask Obsidian to save the layout; this causes
-      // it to call our getData(), which will pluck the data that it needs
-      // directly from the session data.
-      onSessionChange: (session: SampleViewSessionData) => {
-        console.log('session data has changed:', JSON.stringify(session));
-        this.app.workspace.requestSaveLayout();
-      },
-
-      // When plugin related data updates, cache the change in the actual plugin
-      // data and then persist it to disk.
-      onDataChange: (data: SampleViewPluginData) => {
-        console.log('plugin data has changed', JSON.stringify(data));
-        this.plugin.data.content = data.content;
-        this.plugin.savePluginData();
-      }
-    });
-
-    // We can mount the component now.
-    this.component = mount<SampleViewProps, SampleViewInstance>(SampleSvelteView ,
-      {
-        target: this.contentEl,
-        props: {
-          title: this.plugin.settings.mySetting,
-          sharedState: this.viewState,
-        }
-      });
-  }
-
-  /* Called when our view closes. This unmounts the component so that we don't
-   * cause any memory leaks. */
-  async onClose() {
-    if (this.cleanup !== undefined) {
-      this.cleanup();
-    }
-    if (this.component !== undefined) {
-      unmount(this.component);
-    }
-
-    this.contentEl.empty();
-  }
-
-  /* Called by Obsidian to tell us what state we saved in a previous call to
-   * getState() so that we can set ourselves up. This is invoked when the
-   * workspace loads, so that we can put shared state back.
-   *
-   * This only covers the kind of state that is transient to a view; once a
-   * view closes, its saved data is discarded, so this should not be used for
-   * user data. */
-  async setState(state: SampleViewSessionData, result: ViewStateResult): Promise<void> {
-    console.log(`got a call to setState!`, state);
-
-    this.count = state?.count ?? 0;
-
-    // Update the live state if the view is already open; this will cause the
-    // view to update automagically.
-    if (this.viewState !== undefined) {
-      console.log('updating session count');
-      this.viewState.session.count = this.count;
-    }
-
-    return super.setState(state, result);
-  }
-
-  /* Called by obsidian to get the state of our view. This only happens when the
-   * state of the workspace is persisted to disk, which happens when layout
-   * changes happen, or when something requests it. */
-  getState(): Record<string, unknown> {
-    console.log(`got a call to getState!`, JSON.stringify(this.viewState.session));
+  /* Return the properties to be used when the component is mounted. */
+  getComponentProps(): SampleViewProps {
     return {
-      count: this.viewState?.session.count ?? 0,
-    };
+      title: this.plugin.settings.mySetting,
+    } as SampleViewProps;
+    // TODO: This is janky; the sharedState property is injected elsewhere, so
+    //       this needs a better annotation of some sort to resolve the problem
+    //       without a cast.
+  }
+
+  /* Return the default data to be shared into the shared state that our
+   * integration creates; this ultimately turns into a part of the properties
+   * that are given to the component. */
+  getPluginData() : SampleViewPluginData {
+    return {
+      content: this.plugin.data.content
+    }
+  }
+
+  /* Return the default data to be used to set up the mounted view. This is used
+   * as the initial session data object when a view is first created. */
+  getDefaultSessionState() : SampleViewSessionData {
+    return {
+      count: 69,
+    }
+  }
+
+  /* This is triggered whenever any shared plugin data is altered; there is no
+   * default implementation here since all handling is subject to code control;
+   * at a minimum this should update at least one field in the data and then
+   * trigger a plugin data save. */
+  onDataChange(data: SampleViewPluginData) {
+    this.plugin.data.content = data.content;
+    this.plugin.savePluginData();
   }
 }
 
