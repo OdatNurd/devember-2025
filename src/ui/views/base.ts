@@ -1,7 +1,7 @@
 /******************************************************************************/
 
 
-import { ItemView, Plugin, WorkspaceLeaf } from 'obsidian';
+import { type ViewStateResult, ItemView, Plugin, WorkspaceLeaf } from 'obsidian';
 import { type Component } from "svelte";
 
 import { GenericSavedState } from "#state/generic";
@@ -22,6 +22,7 @@ export abstract class BaseSvelteItemView<P extends Plugin, S, D,
                                          CI extends Record<string, unknown>> extends ItemView {
   plugin: P;
   integration: SvelteIntegration<S, D, CP, CI>;
+  loadedSessionState: Partial<S> | undefined;
 
   constructor(leaf: WorkspaceLeaf, plugin: P) {
     super(leaf);
@@ -40,14 +41,15 @@ export abstract class BaseSvelteItemView<P extends Plugin, S, D,
    * that are given to the component. */
   abstract getPluginData() : D;
 
-  /* Return the properties to be used when the component is mounted. */
-  getComponentProps(): CP {
-    return {} as CP;
-  }
+  /* Return the default data to be used to set up the mounted view. This is used
+   * as the initial session data object when a view is first created. */
+  abstract getDefaultSessionState(): S;
 
-  getInitialSession(): S {
-    return {} as S;
-  }
+  /* This is triggered whenever any shared plugin data is altered; there is no
+   * default implementation here since all handling is subject to code control;
+   * at a minimum this should update at least one field in the data and then
+   * trigger a plugin data save. */
+  abstract onDataChange(data: D) : void;
 
   /* This is triggered whenever any shared session state is altered; the default
    * implementation requests that the application save its layout, which will
@@ -57,11 +59,10 @@ export abstract class BaseSvelteItemView<P extends Plugin, S, D,
     this.app.workspace.requestSaveLayout();
   }
 
-  /* This is triggered whenever any shared plugin data is altered; there is no
-   * default implementation here since all handling is subject to code control;
-   * at a minimum this should update at least one field in the data and then
-   * trigger a plugin data save. */
-  abstract onDataChange(data: D) : void;
+  /* Return the properties to be used when the component is mounted. */
+  getComponentProps(): CP {
+    return {} as CP;
+  }
 
   /* Called when our view opens. This will attach a Svelte component and pass
    * that component the state that it needs in order to set itself up, as well
@@ -71,8 +72,12 @@ export abstract class BaseSvelteItemView<P extends Plugin, S, D,
     // then mount the component in, invoking other methods as needed to gather
     // the data needed.
     this.contentEl.empty();
+    const initialSessionData = {
+      ...(this.getDefaultSessionState() ?? {}),
+      ...(this.loadedSessionState ?? {})
+    } as S;
     this.integration.mount(this.getComponent(), this.contentEl,
-      this.getComponentProps(), this.getInitialSession(), this.getPluginData(), {
+      this.getComponentProps(), initialSessionData, this.getPluginData(), {
       onSessionChange: (session) => this.onSessionChange(session),
       onDataChange: (data: D) => this.onDataChange(data),
     });
@@ -85,6 +90,42 @@ export abstract class BaseSvelteItemView<P extends Plugin, S, D,
       this.integration.unmount();
     }
     this.contentEl.empty();
+  }
+
+
+  /* Called by Obsidian to tell us what state we saved in a previous call to
+   * getState() so that we can set ourselves up. This is invoked when the
+   * workspace loads, so that we can put shared state back.
+   *
+   * This only covers the kind of state that is transient to a view; once a
+   * view closes, its saved data is discarded, so this should not be used for
+   * user data. */
+  async setState(state: S, result: ViewStateResult): Promise<void> {
+    // Store the state that we were given, then update the session information
+    // in the integration.
+    this.loadedSessionState = state;
+    this.integration.updateSession(state);
+
+    // Let the super do what it do
+    return super.setState(state, result);
+  }
+
+  /* Called by Obsidian to get the state of our view. This only happens when the
+   * state of the workspace is persisted to disk, which happens when layout
+   * changes happen, or when something requests it. */
+  getState(): Record<string, unknown> {
+    // If our integration is set up, then use the session state as the state to
+    // return.
+    if (this.integration.state !== undefined) {
+        return this.integration.state.session as Record<string, unknown>;
+    }
+
+    // When there is no integration, use what srtState gave us last time, if
+    // anything; this is the placeholder that will be used to hold the value in
+    // case setState() gets called before onOpen. This does not seem likely or
+    // possible based on testing, but various places on the internet seem to
+    // think it is, so maybe it is a version thing or something.
+    return (this.loadedSessionState as Record<string, unknown>) ?? {};
   }
 }
 

@@ -18,7 +18,9 @@ import { type WatchHandlers, GenericSavedState, watch } from "#state/generic";
  * data in the component changes, so that code within the plugin can act upon it
  * as needed. This communication also goes two ways; changes to data in the
  * plugin code will cause updates in the mounted Svelte component. */
-export class SvelteIntegration<S, D, P extends { sharedState: GenericSavedState<S, D> }, C extends Record<string, unknown>> {
+export class SvelteIntegration<S, D,
+                               P extends { sharedState: GenericSavedState<S, D> },
+                               C extends Record<string, unknown>> {
   // The underlying mounted Svelte component that we're using as a visualizer.
   component: C | undefined;
 
@@ -74,6 +76,15 @@ export class SvelteIntegration<S, D, P extends { sharedState: GenericSavedState<
     }
 
     this.state = undefined;
+  }
+
+  /* Update the session information that is stored in the current integration
+   * instance with the session information provided. This is safe to call if
+   * the integration has not been initialized yet. */
+  updateSession(session: Partial<S>): void {
+    if (this.state !== undefined) {
+      Object.assign(this.state.session as object, session);
+    }
   }
 }
 
