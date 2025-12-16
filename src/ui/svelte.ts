@@ -39,7 +39,7 @@ export class SvelteIntegration<S, D,
    * be invoked whenever the state changes. */
   mount(component: Component<P, C>,
         target: HTMLElement,
-        props: P,
+        props: Omit<P, 'sharedState'>,
         session: S,
         data: D,
         handlers: WatchHandlers<S, D>) {

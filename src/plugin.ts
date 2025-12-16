@@ -1,7 +1,7 @@
 /******************************************************************************/
 
 
-import { Plugin } from 'obsidian';
+import { Plugin, WorkspaceLeaf, MarkdownView } from 'obsidian';
 
 import  { type KursvaroData, type KursvaroSettings, hydratePluginData } from '#types';
 
@@ -13,6 +13,10 @@ import { commands } from '#commands/index';
 
 import { OpenSampleViewCommand } from '#commands/standard/open_view';
 
+import type { StatusBarInstance, StatusBarProps, StatusBarSessionData, StatusBarPluginData } from '#components/StatusBar.types';
+import StatusBarComponent from '#components/StatusBar.svelte';
+import { SvelteIntegration } from '#ui/svelte';
+
 
 /******************************************************************************/
 
@@ -20,6 +24,8 @@ import { OpenSampleViewCommand } from '#commands/standard/open_view';
 export class KursvaroPlugin extends Plugin {
   data: KursvaroData;
   settings: KursvaroSettings;
+
+  statusBarIntegration: SvelteIntegration<StatusBarSessionData, StatusBarPluginData, StatusBarProps, StatusBarInstance>;
 
   async onload() {
     // Before we do anything else, load in our plugin's data file; this sets up
@@ -38,7 +44,30 @@ export class KursvaroPlugin extends Plugin {
 
     // This adds a status bar item to the bottom of the app. Does not work on mobile apps.
     const statusBarItemEl = this.addStatusBarItem();
-    statusBarItemEl.setText('Status Bar Text');
+    statusBarItemEl.empty();
+
+    // Create our Svelte integration for the new component and mount it
+    this.statusBarIntegration = new SvelteIntegration();
+    this.statusBarIntegration.mount(StatusBarComponent, statusBarItemEl,
+                                    {}, { activeLeafName: 'None?' }, {}, {})
+
+    // Register an event that will notice when the active leaf node changes, and
+    // the new active leaf is a markdown view, and display the name of the view
+    // into the console. This does not currently catch renames however.
+    //
+    // Note that the call to registerEvent has to wrap the event so that it will
+    // get cleaned up, otherwise it exists forever.
+    this.registerEvent(
+      this.app.workspace.on('active-leaf-change', (leaf: WorkspaceLeaf) => {
+        let name = 'None';
+        if (leaf !== null && leaf.view instanceof MarkdownView) {
+          name = leaf.getDisplayText();
+        }
+
+        console.log(`Leaf change notification: ${name}`);
+        this.statusBarIntegration.updateSession({ activeLeafName: name})
+      })
+    );
 
     // Add in all of our commands.
     for (const cmd of commands) {
