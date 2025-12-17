@@ -47,9 +47,14 @@ export class KursvaroPlugin extends Plugin {
     statusBarItemEl.empty();
 
     // Create our Svelte integration for the new component and mount it
-    this.statusBarIntegration = new SvelteIntegration();
-    this.statusBarIntegration.mount(StatusBarComponent, statusBarItemEl,
-                                    {}, { activeLeafName: 'None?' }, {}, {})
+    this.statusBarIntegration = new SvelteIntegration({
+      component: StatusBarComponent,
+      target: statusBarItemEl,
+      props: {},
+      session: { activeLeafName: 'None?' },
+      data: {},
+      handlers: {}
+    });
 
     // Register an event that will notice when the active leaf node changes, and
     // the new active leaf is a markdown view, and display the name of the view

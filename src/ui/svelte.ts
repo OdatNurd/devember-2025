@@ -9,6 +9,24 @@ import { type WatchHandlers, GenericSavedState, watch } from "#state/generic";
 /******************************************************************************/
 
 
+/* This interface defines the arguments that are provided to mount function in
+ * the SvelteIntegration class; this allows either bundling the arguments into
+ * an object, OR calling it with direct objects. */
+export interface MountOptions<S, D,
+                              P extends { sharedState: GenericSavedState<S, D> },
+                              C extends Record<string, unknown>> {
+  component: Component<P, C>,
+  target: HTMLElement;
+  props: Omit<P, 'sharedState'>;
+  session: S;
+  data: D;
+  handlers: WatchHandlers<S, D>;
+}
+
+
+/******************************************************************************/
+
+
 /* This class is a wrapper around the core code needed to mount a Svelte
  * component into a content element somewhere within the Obsidian UI structure
  * and tie a set of data fields for both the session data and the persisted
@@ -30,6 +48,23 @@ export class SvelteIntegration<S, D,
 
   // The function that cleans up our effects when we're done.
   cleanup: (() => void) | undefined;
+
+  /* Construct the instance; if we get an options object, then this will also
+   * automatically mount the component at construction time, which is a useful
+   * shortcut for components that are not bound to views or which can be mounted
+   * right away. */
+  constructor(options?: MountOptions<S, D, P, C>) {
+    if (options !== undefined) {
+      this.mount(
+        options.component,
+        options.target,
+        options.props,
+        options.session,
+        options.data,
+        options.handlers,
+      )
+    }
+  }
 
   /* Mount given component onto the provided element, giving it the props here
    * during the mount process.
