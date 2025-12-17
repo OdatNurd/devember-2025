@@ -55,16 +55,21 @@ export class SvelteIntegration<S, D,
    * right away. */
   constructor(options?: MountOptions<S, D, P, C>) {
     if (options !== undefined) {
-      this.mount(
-        options.component,
-        options.target,
-        options.props,
-        options.session,
-        options.data,
-        options.handlers,
-      )
+      this.mount(options);
     }
   }
+
+  // Overload 1; mount call that specificaly takes an options object and mounts
+  // using that.
+  mount(options: MountOptions<S, D, P, C>) : void;
+
+  // Overload 2; mount call that takes individual arguments and mounts that way.
+  mount(component: Component<P, C>,
+        target: HTMLElement,
+        props: Omit<P, 'sharedState'>,
+        session: S,
+        data: D,
+        handlers: WatchHandlers<S, D>) : void;
 
   /* Mount given component onto the provided element, giving it the props here
    * during the mount process.
@@ -72,30 +77,50 @@ export class SvelteIntegration<S, D,
    * The internal state will be created using the session and plugin data values
    * that are provided, and will be connected to the given handlers, which will
    * be invoked whenever the state changes. */
-  mount(component: Component<P, C>,
-        target: HTMLElement,
-        props: Omit<P, 'sharedState'>,
-        session: S,
-        data: D,
-        handlers: WatchHandlers<S, D>) {
+  mount(arg1: MountOptions<S, D, P, C> | Component<P, C>,
+        arg2?: HTMLElement,
+        arg3?: Omit<P, 'sharedState'>,
+        arg4?: S,
+        arg5?: D,
+        arg6?: WatchHandlers<S, D>) {
+
+    // The options that we will use in order to perform the mount.
+    let options: MountOptions<S, D, P, C>;
+
+    // Based on our overloads, only the first argument is strictly required; so
+    // if the second argument is undefined, then we were given options; otherwise
+    // we were given full arguments, and in that case we should construct our
+    // options based on them, so that we have a smoother code path below.
+    if (arg2 === undefined) {
+      options = arg1 as MountOptions<S, D, P, C>;
+    } else {
+      options = {
+        component: arg1 as Component<P, C>,
+        target: arg2,
+        props: arg3 as Omit<P, 'sharedState'>,
+        session: arg4 as S,
+        data: arg5 as D,
+        handlers: arg6 as WatchHandlers<S, D>,
+      }
+    }
 
     // Create a shared state object to track the session data and plugin data
     // that we will be sharing with the mounted component.
     // TODO: The arguments here are optional, so they should be optional for us
     //       as well? This may or may not have ramifications.
-    this.state = new GenericSavedState<S, D>({ session, data });
+    this.state = new GenericSavedState<S, D>({ session: options.session, data: options.data });
 
     // Set up the watches that will get triggered when any state changes in the
     // component.
     this.cleanup = watch(this.state, {
-      onSessionChange: handlers.onSessionChange,
-      onDataChange: handlers.onDataChange,
+      onSessionChange: options.handlers.onSessionChange,
+      onDataChange: options.handlers.onDataChange,
     });
 
     // Mount the component into the passed in element.
-    this.component = mount<P, C>(component, {
-      target,
-      props: { ...props, sharedState: this.state } as P,
+    this.component = mount<P, C>(options.component, {
+      target: options.target,
+      props: { ...options.props, sharedState: this.state } as P,
     });
   }
 
