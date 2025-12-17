@@ -50,10 +50,7 @@ export class KursvaroPlugin extends Plugin {
     this.statusBarIntegration = new SvelteIntegration({
       component: StatusBarComponent,
       target: statusBarItemEl,
-      props: {},
       session: { activeLeafName: 'None?' },
-      data: {},
-      handlers: {}
     });
 
     // Register an event that will notice when the active leaf node changes, and

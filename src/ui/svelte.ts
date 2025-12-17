@@ -17,10 +17,10 @@ export interface MountOptions<S, D,
                               C extends Record<string, unknown>> {
   component: Component<P, C>,
   target: HTMLElement;
-  props: Omit<P, 'sharedState'>;
-  session: S;
-  data: D;
-  handlers: WatchHandlers<S, D>;
+  props?: Omit<P, 'sharedState'>;
+  session?: S;
+  data?: D;
+  handlers?: WatchHandlers<S, D>;
 }
 
 
@@ -66,10 +66,10 @@ export class SvelteIntegration<S, D,
   // Overload 2; mount call that takes individual arguments and mounts that way.
   mount(component: Component<P, C>,
         target: HTMLElement,
-        props: Omit<P, 'sharedState'>,
-        session: S,
-        data: D,
-        handlers: WatchHandlers<S, D>) : void;
+        props?: Omit<P, 'sharedState'>,
+        session?: S,
+        data?: D,
+        handlers?: WatchHandlers<S, D>) : void;
 
   /* Mount given component onto the provided element, giving it the props here
    * during the mount process.
@@ -97,10 +97,10 @@ export class SvelteIntegration<S, D,
       options = {
         component: arg1 as Component<P, C>,
         target: arg2,
-        props: arg3 as Omit<P, 'sharedState'>,
-        session: arg4 as S,
-        data: arg5 as D,
-        handlers: arg6 as WatchHandlers<S, D>,
+        props: arg3 ?? {} as Omit<P, 'sharedState'>,
+        session: arg4 ?? {} as S,
+        data: arg5 ?? {} as D,
+        handlers: arg6 ?? {} as WatchHandlers<S, D>,
       }
     }
 
@@ -113,8 +113,8 @@ export class SvelteIntegration<S, D,
     // Set up the watches that will get triggered when any state changes in the
     // component.
     this.cleanup = watch(this.state, {
-      onSessionChange: options.handlers.onSessionChange,
-      onDataChange: options.handlers.onDataChange,
+      onSessionChange: options.handlers?.onSessionChange,
+      onDataChange: options.handlers?.onDataChange,
     });
 
     // Mount the component into the passed in element.
