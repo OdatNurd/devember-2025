@@ -1,7 +1,7 @@
 /******************************************************************************/
 
 
-import { type Command, Editor, MarkdownView, Plugin } from 'obsidian';
+import { Editor, MarkdownView, Plugin } from 'obsidian';
 
 
 /******************************************************************************/
@@ -80,13 +80,13 @@ export type CommandConfig = StandardCommandConfig | EditorCommandConfig;
 
 /******************************************************************************/
 
-/* The actual factory implementation; create a command either for the command
+/* The actual factory implementation; register a command either for the command
  * palette or as an editor command, depending on the passed in configuration
  * object.
  *
  * This wraps all of the work required to create the command object that is
- * given back to the API. */
-export function createCommand(plugin: Plugin, config: CommandConfig) : Command {
+ * given back to the API and then invoke the registration function for it. */
+export function registerCommand(plugin: Plugin, config: CommandConfig) : void {
   // In the calls to the check callback below, the value of checking determines
   // why the callback is happening:
   //   checking === true
@@ -108,7 +108,7 @@ export function createCommand(plugin: Plugin, config: CommandConfig) : Command {
   // run, or true if it COULD.
   if (config.type === 'editor') {
     const { id, name, check: isEnabled = (() => true), handler } = config;
-    return {
+    plugin.addCommand({
       id, name,
       editorCheckCallback: (checking: boolean, editor: Editor, view: MarkdownView) => {
         if (isEnabled(plugin, editor, view) === false) {
@@ -121,12 +121,13 @@ export function createCommand(plugin: Plugin, config: CommandConfig) : Command {
 
         return true;
       }
-    }
+    });
+    return;
   }
 
   // When we get here, this is a standard command and not an editor command.
   const { id, name, check: isEnabled = (() => true), handler } = config;
-  return {
+  plugin.addCommand({
     id, name,
     checkCallback: (checking: boolean) => {
       if (isEnabled(plugin) === false) {
@@ -139,7 +140,7 @@ export function createCommand(plugin: Plugin, config: CommandConfig) : Command {
 
       return true;
     }
-  }
+  });
 }
 
 

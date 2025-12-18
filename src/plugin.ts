@@ -1,7 +1,7 @@
 /******************************************************************************/
 
 
-import { type MarkdownPostProcessorContext, Plugin, WorkspaceLeaf, MarkdownView } from 'obsidian';
+import { Plugin, WorkspaceLeaf, MarkdownView } from 'obsidian';
 
 import  { type KursvaroData, type KursvaroSettings, hydratePluginData } from '#types';
 
@@ -9,7 +9,7 @@ import { SvelteIntegration } from '#ui/svelte';
 import { KursvaroSettingTab } from '#ui/settings';
 import { SampleView, VIEW_TYPE_SAMPLE } from '#ui/views/sample';
 
-import { createCommand } from '#factory/commands';
+import { registerCommand } from '#factory/commands';
 import { commands } from '#commands/index';
 import { OpenSampleViewCommand } from '#commands/standard/open_view';
 
@@ -18,8 +18,6 @@ import { blocks } from '#blocks/index';
 
 import type { StatusBarInstance, StatusBarProps, StatusBarSessionData, StatusBarPluginData } from '#components/StatusBar.types';
 import StatusBarComponent from '#components/StatusBar.svelte';
-
-import { BoobsBlockRenderChild } from '#blocks/boobs';
 
 
 /******************************************************************************/
@@ -83,7 +81,7 @@ export class KursvaroPlugin extends Plugin {
 
     // Add in all of our commands.
     for (const cmd of commands) {
-      this.addCommand(createCommand(this, cmd));
+      registerCommand(this, cmd);
     }
 
     // Register our view; there could be more than one of these, in theory.
@@ -128,4 +126,3 @@ export class KursvaroPlugin extends Plugin {
 
 
 /******************************************************************************/
-
