@@ -37,9 +37,9 @@ export interface MountOptions<S, D, E,
  * data in the component changes, so that code within the plugin can act upon it
  * as needed. This communication also goes two ways; changes to data in the
  * plugin code will cause updates in the mounted Svelte component. */
-export class SvelteIntegration<S, D, E,
-                               P extends { sharedState: GenericSavedState<S, D, E> },
-                               C extends Record<string, unknown>> {
+export class SvelteIntegration<S = undefined, D = undefined, E = undefined,
+                               P extends { sharedState: GenericSavedState<S, D, E> } = { sharedState: GenericSavedState<S, D, E> },
+                               C extends Record<string, unknown> = Record<string, unknown>> {
   // The underlying mounted Svelte component that we're using as a visualizer.
   component: C | undefined;
 

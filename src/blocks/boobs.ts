@@ -5,8 +5,7 @@ import { type KursvaroPlugin } from '#plugin';
 
 import { SvelteIntegration } from '#ui/svelte';
 
-import type { BoobsBlockSessionData, BoobsBlockPluginData,
-              BoobsBlockProps, BoobsBlockInstance } from '#components/blocks/Boobs.types';
+import type { BoobsBlockPluginData, BoobsBlockProps, BoobsBlockInstance } from '#components/blocks/Boobs.types';
 import BoobsBlockComponent from '#components/blocks/Boobs.svelte';
 
 
@@ -25,7 +24,7 @@ export class BoobsBlockRenderChild extends MarkdownRenderChild {
   plugin: KursvaroPlugin;
   language: string;
   source: string;
-  integration: SvelteIntegration<BoobsBlockSessionData, BoobsBlockPluginData, undefined, BoobsBlockProps, BoobsBlockInstance>;
+  integration: SvelteIntegration<undefined, BoobsBlockPluginData, undefined, BoobsBlockProps, BoobsBlockInstance>;
 
   /* When we are constructed, we get the language that we are being asked to
    * support, the element that we should be updating, and the source of the code

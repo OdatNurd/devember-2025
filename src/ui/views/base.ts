@@ -17,9 +17,10 @@ import { SvelteIntegration } from '#ui/svelte';
  * populate both view session data and plugin data directly into the properties
  * of the Svelte component, and be told whenever those properties change, so as
  * to make the UI reactive without a lot of boilerplate code. */
-export abstract class BaseSvelteItemView<P extends Plugin, S, D, E,
-                                         CP extends { sharedState: GenericSavedState<S, D, E> },
-                                         CI extends Record<string, unknown>> extends ItemView {
+export abstract class BaseSvelteItemView<P extends Plugin,
+                                         S = undefined, D = undefined, E = undefined,
+                                         CP extends { sharedState: GenericSavedState<S, D, E> } = { sharedState: GenericSavedState<S, D, E> },
+                                         CI extends Record<string, unknown> = Record<string, unknown>> extends ItemView {
   plugin: P;
   integration: SvelteIntegration<S, D, E, CP, CI>;
   loadedSessionState: Partial<S> | undefined;
@@ -39,20 +40,20 @@ export abstract class BaseSvelteItemView<P extends Plugin, S, D, E,
   /* Return the default data to be shared into the shared state that our
    * integration creates; this ultimately turns into a part of the properties
    * that are given to the component. */
-  abstract getPluginData() : D;
+  getPluginData() : D { return undefined as unknown as D; }
 
   /* Return the default data to be used to set up the mounted view. This is used
    * as the initial session data object when a view is first created. */
-  abstract getDefaultSessionState(): S;
+  getDefaultSessionState(): S { return undefined as unknown as S; }
 
   /* Return the default data to be used for the ephemeral state. */
-  abstract getDefaultEphemeralState(): E;
+  getDefaultEphemeralState(): E { return undefined as unknown as E; }
 
   /* This is triggered whenever any shared plugin data is altered; there is no
    * default implementation here since all handling is subject to code control;
    * at a minimum this should update at least one field in the data and then
    * trigger a plugin data save. */
-  abstract onDataChange(data: D) : void;
+  onDataChange(_data: D) : void { }
 
   /* This is triggered whenever any shared session state is altered; the default
    * implementation requests that the application save its layout, which will
@@ -63,7 +64,7 @@ export abstract class BaseSvelteItemView<P extends Plugin, S, D, E,
   }
 
   /* This is triggered whenever any shared ephemeral state is altered. */
-  abstract onEphemeralChange(ephemeral: E): void;
+  onEphemeralChange(_ephemeral: E): void { }
 
   /* Return the properties to be used when the component is mounted. */
   getComponentProps(): CP {

@@ -16,7 +16,7 @@ import { OpenSampleViewCommand } from '#commands/standard/open_view';
 import { setupBlockHandler } from '#factory/blocks';
 import { blocks } from '#blocks/index';
 
-import type { StatusBarInstance, StatusBarProps, StatusBarSessionData, StatusBarPluginData } from '#components/StatusBar.types';
+import type { StatusBarInstance, StatusBarProps, StatusBarSessionData } from '#components/StatusBar.types';
 import StatusBarComponent from '#components/StatusBar.svelte';
 
 
@@ -27,7 +27,7 @@ export class KursvaroPlugin extends Plugin {
   data: KursvaroData;
   settings: KursvaroSettings;
 
-  statusBarIntegration: SvelteIntegration<StatusBarSessionData, StatusBarPluginData, undefined, StatusBarProps, StatusBarInstance>;
+  statusBarIntegration: SvelteIntegration<StatusBarSessionData, undefined, undefined, StatusBarProps, StatusBarInstance>;
 
   async onload() {
     // Before we do anything else, load in our plugin's data file; this sets up

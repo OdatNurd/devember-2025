@@ -7,11 +7,6 @@ import { type GenericSavedState } from '#state/generic';
 /******************************************************************************/
 
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface BoobsBlockSessionData {
-  // This space intentialy blank.
-}
-
 export interface BoobsBlockPluginData {
   content: string;
 }
@@ -24,7 +19,7 @@ export interface BoobsBlockProps {
 
   // The state that is shared between instances of this component and the things
   // that are mounting them.
-  sharedState: GenericSavedState<BoobsBlockSessionData, BoobsBlockPluginData, undefined>;
+  sharedState: GenericSavedState<undefined, BoobsBlockPluginData>;
 }
 
 /* This type represents the interface of the Svelte component. */
