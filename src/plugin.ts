@@ -13,6 +13,9 @@ import { createCommand } from '#factory/commands';
 import { commands } from '#commands/index';
 import { OpenSampleViewCommand } from '#commands/standard/open_view';
 
+import { setupBlockHandler } from '#factory/blocks';
+import { blocks } from '#blocks/index';
+
 import type { StatusBarInstance, StatusBarProps, StatusBarSessionData, StatusBarPluginData } from '#components/StatusBar.types';
 import StatusBarComponent from '#components/StatusBar.svelte';
 
@@ -55,15 +58,10 @@ export class KursvaroPlugin extends Plugin {
       session: { activeLeafName: 'None?' },
     });
 
-    // Register a handler for Markdown code blocks with a custom language of
-    // 'boobs'; when such a block is seen, the callback given here will be
-    // invoked, which gets the source of the code block, the element to attach
-    // it to, and the context of the markdown processor. We can use this to
-    // generate a code block for that type of language directly.
-    this.registerMarkdownCodeBlockProcessor('boobs',
-      async (source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
-        ctx.addChild(new BoobsBlockRenderChild(this, el, 'boobs', source));
-      });
+    // Register all of our code block handlers
+    for (const block of blocks) {
+      setupBlockHandler(this, block);
+    }
 
     // Register an event that will notice when the active leaf node changes, and
     // the new active leaf is a markdown view, and display the name of the view

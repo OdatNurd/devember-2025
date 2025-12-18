@@ -17,6 +17,7 @@
   },
   "imports": {
     "#blocks/*": "./src/blocks/*.ts",
+    "#blocks": "./src/blocks/index.ts",
     "#commands/*": "./src/commands/*.ts",
     "#commands/editor/*": "./src/commands/handlers/editor/*.ts",
     "#commands/standard/*": "./src/commands/handlers/standard/*.ts",

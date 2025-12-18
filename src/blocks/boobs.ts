@@ -31,7 +31,6 @@ export class BoobsBlockRenderChild extends MarkdownRenderChild {
    * support, the element that we should be updating, and the source of the code
    * block which is used to determine what the element should look like. */
   constructor(plugin: KursvaroPlugin, containerEl: HTMLElement, language: string, source: string) {
-    console.log(`creating instance of a ${language} block handler`);
     super(containerEl);
     this.plugin = plugin;
     this.language = language;
@@ -45,7 +44,6 @@ export class BoobsBlockRenderChild extends MarkdownRenderChild {
    * DOM in the container element we were given as we see fit given the source
    * data we got in the constructor. */
   async onload() {
-    console.log(`triggering an onload for a ${this.language} block`);
     this.integration.mount({
       component: BoobsBlockComponent,
       target: this.containerEl,

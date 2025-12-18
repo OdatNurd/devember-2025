@@ -9,6 +9,8 @@
 </script>
 
 <div class="code-block-thing">
+  ( • )( • )ԅ(‾⌣‾ԅ)
+  <hr>
   {source}
   <hr>
   {sharedState.data.content}
@@ -19,6 +21,10 @@
     border: 1px solid var(--text-accent);
     padding: 1rem;
     border-radius: 4px;
-    margin: 1rem 0;
+  }
+  .code-block-thing hr {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    border: 1px solid var(--text-accent);
   }
 </style>
