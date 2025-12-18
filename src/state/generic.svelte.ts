@@ -13,7 +13,7 @@ import { untrack } from 'svelte';
  *
  * This is designed such that a view can use either or both mechanisms as
  * desired. */
-export class GenericSavedState<S = undefined, D = undefined> {
+export class GenericSavedState<S = undefined, D = undefined, E = undefined> {
   /* This stores the state for data that is intended for persisting into the
    * Obsidian session storage. */
   session = $state() as S;
@@ -22,14 +22,19 @@ export class GenericSavedState<S = undefined, D = undefined> {
    * Obsidian data.json data file associated with the plugin. */
   data = $state() as D;
 
+  /* This stores the state for data that is intended to be shared between the
+   * component and the view, but is not persisted anywhere. */
+  ephemeral = $state() as E;
+
   /* Construct an instance; session and data are both optional, although one
    * assumes that you would use at least one, otherwise why are you creating
    * this instance. */
-  constructor(config: { session?: S, data?: D}) {
+  constructor(config: { session?: S, data?: D, ephemeral?: E}) {
     // These are both cast explicitly to the type; this makes them only be
     // undefined when they're not actually used, which works better.
     this.session = config.session as S;
     this.data = config.data as D;
+    this.ephemeral = config.ephemeral as E;
   }
 }
 
@@ -41,9 +46,10 @@ export class GenericSavedState<S = undefined, D = undefined> {
  * In the interface, both handlers are optional because it's not enforced that
  * you need to watch for changes in both at the same time in any given Svelte
  * component. */
-export interface WatchHandlers<S, D> {
+export interface WatchHandlers<S, D, E> {
   onSessionChange?: (session: S) => void;
   onDataChange?: (data: D) => void;
+  onEphemeralChange?: (ephemeral: E) => void;
 };
 
 
@@ -53,7 +59,7 @@ export interface WatchHandlers<S, D> {
 
 /* This allows code to register an interest in knowing when the view state in
  * the view changes inside of the Svelte component. */
-export function watch<S, D>(state: GenericSavedState<S, D>, handlers: WatchHandlers<S, D>) {
+export function watch<S, D, E>(state: GenericSavedState<S, D, E>, handlers: WatchHandlers<S, D, E>) {
   return $effect.root(() => {
     // Handle state changes within the session data.
     //
@@ -100,9 +106,29 @@ export function watch<S, D>(state: GenericSavedState<S, D>, handlers: WatchHandl
         });
       });
     }
+
+    // Handle state changes within the ephemeral data; this behaves exactly
+    // as the above.
+    if (state.ephemeral !== undefined && handlers.onEphemeralChange !== undefined) {
+      let ephemeralInitialized = false;
+      $effect(() => {
+        // Access the data value to trigger an update.
+        void JSON.stringify(state.ephemeral);
+
+        // Let the listener know when state changes.
+        untrack(() => {
+          if (ephemeralInitialized === false) {
+              ephemeralInitialized = true;
+              return;
+          }
+          if (state.ephemeral !== undefined && handlers.onEphemeralChange !== undefined) {
+            handlers.onEphemeralChange(state.ephemeral);
+          }
+        });
+      });
+    }
   });
 }
 
 
 /******************************************************************************/
-

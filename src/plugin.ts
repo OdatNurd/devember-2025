@@ -27,7 +27,7 @@ export class KursvaroPlugin extends Plugin {
   data: KursvaroData;
   settings: KursvaroSettings;
 
-  statusBarIntegration: SvelteIntegration<StatusBarSessionData, StatusBarPluginData, StatusBarProps, StatusBarInstance>;
+  statusBarIntegration: SvelteIntegration<StatusBarSessionData, StatusBarPluginData, undefined, StatusBarProps, StatusBarInstance>;
 
   async onload() {
     // Before we do anything else, load in our plugin's data file; this sets up

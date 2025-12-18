@@ -17,11 +17,11 @@ import { SvelteIntegration } from '#ui/svelte';
  * populate both view session data and plugin data directly into the properties
  * of the Svelte component, and be told whenever those properties change, so as
  * to make the UI reactive without a lot of boilerplate code. */
-export abstract class BaseSvelteItemView<P extends Plugin, S, D,
-                                         CP extends { sharedState: GenericSavedState<S, D> },
+export abstract class BaseSvelteItemView<P extends Plugin, S, D, E,
+                                         CP extends { sharedState: GenericSavedState<S, D, E> },
                                          CI extends Record<string, unknown>> extends ItemView {
   plugin: P;
-  integration: SvelteIntegration<S, D, CP, CI>;
+  integration: SvelteIntegration<S, D, E, CP, CI>;
   loadedSessionState: Partial<S> | undefined;
 
   constructor(leaf: WorkspaceLeaf, plugin: P) {
@@ -30,7 +30,7 @@ export abstract class BaseSvelteItemView<P extends Plugin, S, D,
 
     // Create the integration object that will orchestrate our persistence layer
     // and our reactivity layer.
-    this.integration = new SvelteIntegration<S,D,CP,CI>();
+    this.integration = new SvelteIntegration<S, D, E, CP, CI>();
   }
 
   /* Return the Svelte component that should be mounted within this view. */
@@ -45,6 +45,9 @@ export abstract class BaseSvelteItemView<P extends Plugin, S, D,
    * as the initial session data object when a view is first created. */
   abstract getDefaultSessionState(): S;
 
+  /* Return the default data to be used for the ephemeral state. */
+  abstract getDefaultEphemeralState(): E;
+
   /* This is triggered whenever any shared plugin data is altered; there is no
    * default implementation here since all handling is subject to code control;
    * at a minimum this should update at least one field in the data and then
@@ -58,6 +61,9 @@ export abstract class BaseSvelteItemView<P extends Plugin, S, D,
   onSessionChange(_session: S) {
     this.app.workspace.requestSaveLayout();
   }
+
+  /* This is triggered whenever any shared ephemeral state is altered. */
+  abstract onEphemeralChange(ephemeral: E): void;
 
   /* Return the properties to be used when the component is mounted. */
   getComponentProps(): CP {
@@ -77,10 +83,15 @@ export abstract class BaseSvelteItemView<P extends Plugin, S, D,
       ...(this.loadedSessionState ?? {})
     } as S;
     this.integration.mount(this.getComponent(), this.contentEl,
-      this.getComponentProps(), initialSessionData, this.getPluginData(), {
-      onSessionChange: (session) => this.onSessionChange(session),
-      onDataChange: (data: D) => this.onDataChange(data),
-    });
+      this.getComponentProps(),
+      initialSessionData,
+      this.getPluginData(),
+      this.getDefaultEphemeralState(),
+      {
+        onSessionChange: (session) => this.onSessionChange(session),
+        onDataChange: (data: D) => this.onDataChange(data),
+        onEphemeralChange: (ephemeral: E) => this.onEphemeralChange(ephemeral),
+      });
   }
 
   /* Called when our view closes. This unmounts the component so that we don't

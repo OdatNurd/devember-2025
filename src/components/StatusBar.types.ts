@@ -23,7 +23,7 @@ export interface StatusBarPluginData {
 export interface StatusBarProps {
   // The state that is shared between instances of this component and the things
   // that are mounting them.
-  sharedState: GenericSavedState<StatusBarSessionData, StatusBarPluginData>;
+  sharedState: GenericSavedState<StatusBarSessionData, StatusBarPluginData, undefined>;
 }
 
 /* This type represents the interface of the Svelte component. */

@@ -15,6 +15,10 @@ export interface SampleViewPluginData {
   content: string;
 }
 
+export interface SampleViewEphemeralData {
+  toggle: boolean;
+}
+
 /* This type defines the properties that are expected to be passed to the
  * SampleCompionent Svelte component. */
 export interface SampleViewProps {
@@ -23,7 +27,7 @@ export interface SampleViewProps {
 
   // The state that is shared between instances of this component and the things
   // that are mounting them.
-  sharedState: GenericSavedState<SampleViewSessionData, SampleViewPluginData>;
+  sharedState: GenericSavedState<SampleViewSessionData, SampleViewPluginData, SampleViewEphemeralData>;
 }
 
 

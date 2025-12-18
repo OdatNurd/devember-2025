@@ -31,6 +31,15 @@
 
   <hr>
 
+  <p>
+    <label>
+      <input type="checkbox" bind:checked={sharedState.ephemeral.toggle} />
+      Ephemeral Toggle
+    </label>
+  </p>
+
+  <hr>
+
   <textarea bind:value={draft} rows=15></textarea><br>
   <button onclick={handleSave}>Save</button>
 </div>

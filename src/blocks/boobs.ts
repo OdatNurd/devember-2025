@@ -25,7 +25,7 @@ export class BoobsBlockRenderChild extends MarkdownRenderChild {
   plugin: KursvaroPlugin;
   language: string;
   source: string;
-  integration: SvelteIntegration<BoobsBlockSessionData, BoobsBlockPluginData, BoobsBlockProps, BoobsBlockInstance>;
+  integration: SvelteIntegration<BoobsBlockSessionData, BoobsBlockPluginData, undefined, BoobsBlockProps, BoobsBlockInstance>;
 
   /* When we are constructed, we get the language that we are being asked to
    * support, the element that we should be updating, and the source of the code

@@ -24,7 +24,7 @@ export interface BoobsBlockProps {
 
   // The state that is shared between instances of this component and the things
   // that are mounting them.
-  sharedState: GenericSavedState<BoobsBlockSessionData, BoobsBlockPluginData>;
+  sharedState: GenericSavedState<BoobsBlockSessionData, BoobsBlockPluginData, undefined>;
 }
 
 /* This type represents the interface of the Svelte component. */

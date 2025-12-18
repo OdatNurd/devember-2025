@@ -7,7 +7,7 @@ import { type KursvaroPlugin } from '#plugin';
 
 import { BaseSvelteItemView } from '#ui/views/base';
 
-import type { SampleViewInstance, SampleViewProps, SampleViewSessionData, SampleViewPluginData } from '#components/SampleView.types';
+import type { SampleViewInstance, SampleViewProps, SampleViewSessionData, SampleViewPluginData, SampleViewEphemeralData } from '#components/SampleView.types';
 
 import SampleSvelteView from '#components/SampleView.svelte';
 
@@ -28,7 +28,7 @@ export const VIEW_TYPE_SAMPLE = 'sample-view';
  * the same workspace, that is possible. */
 export class SampleView
   extends BaseSvelteItemView<KursvaroPlugin,
-                             SampleViewSessionData, SampleViewPluginData,
+                             SampleViewSessionData, SampleViewPluginData, SampleViewEphemeralData,
                              SampleViewProps, SampleViewInstance> {
   constructor(leaf: WorkspaceLeaf, plugin: KursvaroPlugin) {
     super(leaf, plugin);
@@ -78,6 +78,13 @@ export class SampleView
     }
   }
 
+  /* Return the default ephemeral state. */
+  getDefaultEphemeralState(): SampleViewEphemeralData {
+      return {
+        toggle: false,
+      }
+  }
+
   /* This is triggered whenever any shared plugin data is altered; there is no
    * default implementation here since all handling is subject to code control;
    * at a minimum this should update at least one field in the data and then
@@ -85,6 +92,11 @@ export class SampleView
   onDataChange(data: SampleViewPluginData) {
     this.plugin.data.content = data.content;
     this.plugin.savePluginData();
+  }
+
+  /* This is triggered whenever ephemeral data changes. */
+  onEphemeralChange(ephemeral: SampleViewEphemeralData): void {
+      console.log(`Ephemeral toggle changed to: ${ephemeral.toggle}`);
   }
 }
 

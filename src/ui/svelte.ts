@@ -12,15 +12,16 @@ import { type WatchHandlers, GenericSavedState, watch } from "#state/generic";
 /* This interface defines the arguments that are provided to mount function in
  * the SvelteIntegration class; this allows either bundling the arguments into
  * an object, OR calling it with direct objects. */
-export interface MountOptions<S, D,
-                              P extends { sharedState: GenericSavedState<S, D> },
+export interface MountOptions<S, D, E,
+                              P extends { sharedState: GenericSavedState<S, D, E> },
                               C extends Record<string, unknown>> {
   component: Component<P, C>,
   target: HTMLElement;
   props?: Omit<P, 'sharedState'>;
   session?: S;
   data?: D;
-  handlers?: WatchHandlers<S, D>;
+  ephemeral?: E;
+  handlers?: WatchHandlers<S, D, E>;
 }
 
 
@@ -36,15 +37,15 @@ export interface MountOptions<S, D,
  * data in the component changes, so that code within the plugin can act upon it
  * as needed. This communication also goes two ways; changes to data in the
  * plugin code will cause updates in the mounted Svelte component. */
-export class SvelteIntegration<S, D,
-                               P extends { sharedState: GenericSavedState<S, D> },
+export class SvelteIntegration<S, D, E,
+                               P extends { sharedState: GenericSavedState<S, D, E> },
                                C extends Record<string, unknown>> {
   // The underlying mounted Svelte component that we're using as a visualizer.
   component: C | undefined;
 
   // The state object that is shared between this code and the mounted svelte
   // component.
-  state: GenericSavedState<S, D> | undefined;
+  state: GenericSavedState<S, D, E> | undefined;
 
   // The function that cleans up our effects when we're done.
   cleanup: (() => void) | undefined;
@@ -53,7 +54,7 @@ export class SvelteIntegration<S, D,
    * automatically mount the component at construction time, which is a useful
    * shortcut for components that are not bound to views or which can be mounted
    * right away. */
-  constructor(options?: MountOptions<S, D, P, C>) {
+  constructor(options?: MountOptions<S, D, E, P, C>) {
     if (options !== undefined) {
       this.mount(options);
     }
@@ -61,7 +62,7 @@ export class SvelteIntegration<S, D,
 
   // Overload 1; mount call that specificaly takes an options object and mounts
   // using that.
-  mount(options: MountOptions<S, D, P, C>) : void;
+  mount(options: MountOptions<S, D, E, P, C>) : void;
 
   // Overload 2; mount call that takes individual arguments and mounts that way.
   mount(component: Component<P, C>,
@@ -69,7 +70,8 @@ export class SvelteIntegration<S, D,
         props?: Omit<P, 'sharedState'>,
         session?: S,
         data?: D,
-        handlers?: WatchHandlers<S, D>) : void;
+        ephemeral?: E,
+        handlers?: WatchHandlers<S, D, E>) : void;
 
   /* Mount given component onto the provided element, giving it the props here
    * during the mount process.
@@ -77,30 +79,32 @@ export class SvelteIntegration<S, D,
    * The internal state will be created using the session and plugin data values
    * that are provided, and will be connected to the given handlers, which will
    * be invoked whenever the state changes. */
-  mount(arg1: MountOptions<S, D, P, C> | Component<P, C>,
+  mount(arg1: MountOptions<S, D, E, P, C> | Component<P, C>,
         arg2?: HTMLElement,
         arg3?: Omit<P, 'sharedState'>,
         arg4?: S,
         arg5?: D,
-        arg6?: WatchHandlers<S, D>) {
+        arg6?: E,
+        arg7?: WatchHandlers<S, D, E>) {
 
     // The options that we will use in order to perform the mount.
-    let options: MountOptions<S, D, P, C>;
+    let options: MountOptions<S, D, E, P, C>;
 
     // Based on our overloads, only the first argument is strictly required; so
     // if the second argument is undefined, then we were given options; otherwise
     // we were given full arguments, and in that case we should construct our
     // options based on them, so that we have a smoother code path below.
     if (arg2 === undefined) {
-      options = arg1 as MountOptions<S, D, P, C>;
+      options = arg1 as MountOptions<S, D, E, P, C>;
     } else {
       options = {
         component: arg1 as Component<P, C>,
         target: arg2,
         props: arg3 ?? {} as Omit<P, 'sharedState'>,
-        session: arg4 ?? {} as S,
-        data: arg5 ?? {} as D,
-        handlers: arg6 ?? {} as WatchHandlers<S, D>,
+        session: arg4,
+        data: arg5,
+        ephemeral: arg6,
+        handlers: arg7,
       }
     }
 
@@ -108,13 +112,18 @@ export class SvelteIntegration<S, D,
     // that we will be sharing with the mounted component.
     // TODO: The arguments here are optional, so they should be optional for us
     //       as well? This may or may not have ramifications.
-    this.state = new GenericSavedState<S, D>({ session: options.session, data: options.data });
+    this.state = new GenericSavedState<S, D, E>({
+      session: options.session,
+      data: options.data,
+      ephemeral: options.ephemeral,
+    });
 
     // Set up the watches that will get triggered when any state changes in the
     // component.
     this.cleanup = watch(this.state, {
       onSessionChange: options.handlers?.onSessionChange,
       onDataChange: options.handlers?.onDataChange,
+      onEphemeralChange: options.handlers?.onEphemeralChange,
     });
 
     // Mount the component into the passed in element.
@@ -144,6 +153,15 @@ export class SvelteIntegration<S, D,
   updateSession(session: Partial<S>): void {
     if (this.state !== undefined) {
       Object.assign(this.state.session as object, session);
+    }
+  }
+
+  /* Update the ephemeral information that is stored in the current integration
+   * instance with the ephemeral information provided. This is safe to call if
+   * the integration has not been initialized yet. */
+  updateEphemeral(ephemeral: Partial<E>): void {
+    if (this.state !== undefined) {
+      Object.assign(this.state.ephemeral as object, ephemeral);
     }
   }
 }
