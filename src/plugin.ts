@@ -1,64 +1,22 @@
 /******************************************************************************/
 
 
-import { type MarkdownPostProcessorContext, Plugin, WorkspaceLeaf, MarkdownView, MarkdownRenderChild } from 'obsidian';
+import { type MarkdownPostProcessorContext, Plugin, WorkspaceLeaf, MarkdownView } from 'obsidian';
 
 import  { type KursvaroData, type KursvaroSettings, hydratePluginData } from '#types';
 
+import { SvelteIntegration } from '#ui/svelte';
 import { KursvaroSettingTab } from '#ui/settings';
 import { SampleView, VIEW_TYPE_SAMPLE } from '#ui/views/sample';
 
 import { createCommand } from '#factory/commands';
 import { commands } from '#commands/index';
-
 import { OpenSampleViewCommand } from '#commands/standard/open_view';
 
 import type { StatusBarInstance, StatusBarProps, StatusBarSessionData, StatusBarPluginData } from '#components/StatusBar.types';
 import StatusBarComponent from '#components/StatusBar.svelte';
-import { SvelteIntegration } from '#ui/svelte';
 
-
-/******************************************************************************/
-
-import BoobsBlockComponent from '#components/blocks/Boobs.svelte';
-import type { BoobsBlockSessionData, BoobsBlockPluginData,
-              BoobsBlockProps, BoobsBlockInstance } from '#components/blocks/Boobs.types';
-
-class BoobsBlockRenderChild extends MarkdownRenderChild {
-  plugin: KursvaroPlugin;
-  source: string;
-  integration: SvelteIntegration<BoobsBlockSessionData, BoobsBlockPluginData, BoobsBlockProps, BoobsBlockInstance>;
-
-  constructor(plugin: KursvaroPlugin, containerEl: HTMLElement, source: string) {
-    console.log('creating instance of boobs block handler');
-    super(containerEl);
-    this.plugin = plugin;
-    this.source = source;
-
-    this.integration = new SvelteIntegration();
-  }
-
-  async onload() {
-    console.log('triggering an onload for our boobs block');
-    this.integration.mount({
-      component: BoobsBlockComponent,
-      target: this.containerEl,
-      props: { source: this.source },
-      data: { content: this.plugin.data.content },
-      handlers: {
-        onDataChange: (data: BoobsBlockPluginData) => {
-          console.log('I bet this is not being called', data);
-          // this.plugin.data.content = data.content;
-        }
-      }
-    });
-  }
-
-
-  onunload() {
-    this.integration.unmount();
-  }
-}
+import { BoobsBlockRenderChild } from '#blocks/boobs';
 
 
 /******************************************************************************/
@@ -97,13 +55,14 @@ export class KursvaroPlugin extends Plugin {
       session: { activeLeafName: 'None?' },
     });
 
+    // Register a handler for Markdown code blocks with a custom language of
+    // 'boobs'; when such a block is seen, the callback given here will be
+    // invoked, which gets the source of the code block, the element to attach
+    // it to, and the context of the markdown processor. We can use this to
+    // generate a code block for that type of language directly.
     this.registerMarkdownCodeBlockProcessor('boobs',
       async (source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
-        console.log(`code block for language 'boobs:`);
-        console.log(`source is: "${source}"`);
-        console.log(el);
-        console.log(ctx);
-        ctx.addChild(new BoobsBlockRenderChild(this, el, source));
+        ctx.addChild(new BoobsBlockRenderChild(this, el, 'boobs', source));
       });
 
     // Register an event that will notice when the active leaf node changes, and

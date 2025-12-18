@@ -16,6 +16,7 @@
     "version": "node tools/version-bump.js"
   },
   "imports": {
+    "#blocks/*": "./src/blocks/*.ts",
     "#commands/*": "./src/commands/*.ts",
     "#commands/editor/*": "./src/commands/handlers/editor/*.ts",
     "#commands/standard/*": "./src/commands/handlers/standard/*.ts",
