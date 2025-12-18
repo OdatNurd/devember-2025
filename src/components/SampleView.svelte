@@ -11,7 +11,6 @@
   // changes; this is just setting a static value.
   let draft = $state(untrack(() => sharedState.data.content));
 
-
   function handleClick() {
     sharedState.session.count += 1;
   }
@@ -40,16 +39,30 @@
 
   <hr>
 
-  <textarea bind:value={draft} rows=15></textarea><br>
-  <button onclick={handleSave}>Save</button>
+  <textarea bind:value={draft} rows="5"></textarea><br>
+
+  <button
+    class="mod-cta"
+    onclick={handleSave}
+    disabled={draft === sharedState.data.content}
+  >
+    Save
+  </button>
 </div>
 
 <style>
   .view-thing {
     margin: 1rem 0;
   }
+
   h2 {
     color: var(--text-accent);
     margin-top: 0;
+  }
+
+  textarea {
+    width: 100%;
+    box-sizing: border-box;
+    resize: vertical;
   }
 </style>
