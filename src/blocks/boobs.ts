@@ -5,7 +5,7 @@ import { type KursvaroPlugin } from '#plugin';
 
 import { SvelteIntegration } from '#ui/svelte';
 
-import type { BoobsBlockPluginData, BoobsBlockProps, BoobsBlockInstance } from '#components/blocks/Boobs.types';
+import type { BoobsBlockSchema, BoobsBlockProps, BoobsBlockInstance } from '#components/blocks/Boobs.types';
 import BoobsBlockComponent from '#components/blocks/Boobs.svelte';
 
 
@@ -24,7 +24,7 @@ export class BoobsBlockRenderChild extends MarkdownRenderChild {
   plugin: KursvaroPlugin;
   language: string;
   source: string;
-  integration: SvelteIntegration<undefined, BoobsBlockPluginData, undefined, BoobsBlockProps, BoobsBlockInstance>;
+  integration: SvelteIntegration<BoobsBlockSchema, BoobsBlockProps, BoobsBlockInstance>;
 
   /* When we are constructed, we get the language that we are being asked to
    * support, the element that we should be updating, and the source of the code
@@ -47,6 +47,8 @@ export class BoobsBlockRenderChild extends MarkdownRenderChild {
       component: BoobsBlockComponent,
       target: this.containerEl,
       props: { source: this.source },
+      // TODO: Not sure why, but this is not being enforced like it should be?
+      //       If it is missing, nothing seems to complain.
       data: { content: this.plugin.data.content },
     });
   }

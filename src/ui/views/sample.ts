@@ -7,7 +7,7 @@ import { type KursvaroPlugin } from '#plugin';
 
 import { BaseSvelteItemView } from '#ui/views/base';
 
-import type { SampleViewInstance, SampleViewProps, SampleViewSessionData, SampleViewPluginData, SampleViewEphemeralData } from '#components/SampleView.types';
+import type { SampleViewInstance, SampleViewProps, SampleViewSchema } from '#components/SampleView.types';
 
 import SampleSvelteView from '#components/SampleView.svelte';
 
@@ -28,7 +28,7 @@ export const VIEW_TYPE_SAMPLE = 'sample-view';
  * the same workspace, that is possible. */
 export class SampleView
   extends BaseSvelteItemView<KursvaroPlugin,
-                             SampleViewSessionData, SampleViewPluginData, SampleViewEphemeralData,
+                             SampleViewSchema,
                              SampleViewProps, SampleViewInstance> {
   constructor(leaf: WorkspaceLeaf, plugin: KursvaroPlugin) {
     super(leaf, plugin);
@@ -64,7 +64,7 @@ export class SampleView
   /* Return the default data to be shared into the shared state that our
    * integration creates; this ultimately turns into a part of the properties
    * that are given to the component. */
-  getPluginData() : SampleViewPluginData {
+  getPluginData() : SampleViewSchema['data'] {
     return {
       content: this.plugin.data.content
     }
@@ -72,14 +72,14 @@ export class SampleView
 
   /* Return the default data to be used to set up the mounted view. This is used
    * as the initial session data object when a view is first created. */
-  getDefaultSessionState() : SampleViewSessionData {
+  getDefaultSessionState() : SampleViewSchema['session'] {
     return {
       count: 69,
     }
   }
 
   /* Return the default ephemeral state. */
-  getDefaultEphemeralState(): SampleViewEphemeralData {
+  getDefaultEphemeralState(): SampleViewSchema['ephemeral'] {
       return {
         toggle: false,
       }
@@ -89,13 +89,13 @@ export class SampleView
    * default implementation here since all handling is subject to code control;
    * at a minimum this should update at least one field in the data and then
    * trigger a plugin data save. */
-  onDataChange(data: SampleViewPluginData) {
+  onDataChange(data: SampleViewSchema['data']) {
     this.plugin.data.content = data.content;
     this.plugin.savePluginData();
   }
 
   /* This is triggered whenever ephemeral data changes. */
-  onEphemeralChange(ephemeral: SampleViewEphemeralData): void {
+  onEphemeralChange(ephemeral: SampleViewSchema['ephemeral']): void {
       console.log(`Ephemeral toggle changed to: ${ephemeral.toggle}`);
   }
 }

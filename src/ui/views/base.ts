@@ -4,7 +4,7 @@
 import { type ViewStateResult, ItemView, Plugin, WorkspaceLeaf } from 'obsidian';
 import { type Component } from "svelte";
 
-import { GenericSavedState } from "#state/generic";
+import { GenericSavedState, type StateSchema } from "#state/generic";
 import { SvelteIntegration } from '#ui/svelte';
 
 
@@ -18,12 +18,12 @@ import { SvelteIntegration } from '#ui/svelte';
  * of the Svelte component, and be told whenever those properties change, so as
  * to make the UI reactive without a lot of boilerplate code. */
 export abstract class BaseSvelteItemView<P extends Plugin,
-                                         S = undefined, D = undefined, E = undefined,
-                                         CP extends { sharedState: GenericSavedState<S, D, E> } = { sharedState: GenericSavedState<S, D, E> },
+                                         S extends StateSchema = StateSchema,
+                                         CP extends { sharedState: GenericSavedState<S> } = { sharedState: GenericSavedState<S> },
                                          CI extends Record<string, unknown> = Record<string, unknown>> extends ItemView {
   plugin: P;
-  integration: SvelteIntegration<S, D, E, CP, CI>;
-  loadedSessionState: Partial<S> | undefined;
+  integration: SvelteIntegration<S, CP, CI>;
+  loadedSessionState: Partial<S['session']> | undefined;
 
   constructor(leaf: WorkspaceLeaf, plugin: P) {
     super(leaf);
@@ -31,7 +31,7 @@ export abstract class BaseSvelteItemView<P extends Plugin,
 
     // Create the integration object that will orchestrate our persistence layer
     // and our reactivity layer.
-    this.integration = new SvelteIntegration<S, D, E, CP, CI>();
+    this.integration = new SvelteIntegration<S, CP, CI>();
   }
 
   /* Return the Svelte component that should be mounted within this view. */
@@ -40,31 +40,31 @@ export abstract class BaseSvelteItemView<P extends Plugin,
   /* Return the default data to be shared into the shared state that our
    * integration creates; this ultimately turns into a part of the properties
    * that are given to the component. */
-  getPluginData() : D { return undefined as unknown as D; }
+  getPluginData() : S['data'] { return undefined as unknown as S['data']; }
 
   /* Return the default data to be used to set up the mounted view. This is used
    * as the initial session data object when a view is first created. */
-  getDefaultSessionState(): S { return undefined as unknown as S; }
+  getDefaultSessionState(): S['session'] { return undefined as unknown as S['session']; }
 
   /* Return the default data to be used for the ephemeral state. */
-  getDefaultEphemeralState(): E { return undefined as unknown as E; }
+  getDefaultEphemeralState(): S['ephemeral'] { return undefined as unknown as S['ephemeral']; }
 
   /* This is triggered whenever any shared plugin data is altered; there is no
    * default implementation here since all handling is subject to code control;
    * at a minimum this should update at least one field in the data and then
    * trigger a plugin data save. */
-  onDataChange(_data: D) : void { }
+  onDataChange(_data: S['data']) : void { }
 
   /* This is triggered whenever any shared session state is altered; the default
    * implementation requests that the application save its layout, which will
    * cause the requisite methods for fetching what needs to be persisted to be
    * triggered. */
-  onSessionChange(_session: S) {
+  onSessionChange(_session: S['session']) {
     this.app.workspace.requestSaveLayout();
   }
 
   /* This is triggered whenever any shared ephemeral state is altered. */
-  onEphemeralChange(_ephemeral: E): void { }
+  onEphemeralChange(_ephemeral: S['ephemeral']): void { }
 
   /* Return the properties to be used when the component is mounted. */
   getComponentProps(): CP {
@@ -82,7 +82,8 @@ export abstract class BaseSvelteItemView<P extends Plugin,
     const initialSessionData = {
       ...(this.getDefaultSessionState() ?? {}),
       ...(this.loadedSessionState ?? {})
-    } as S;
+    } as S['session'];
+
     this.integration.mount(this.getComponent(), this.contentEl,
       this.getComponentProps(),
       initialSessionData,
@@ -90,8 +91,8 @@ export abstract class BaseSvelteItemView<P extends Plugin,
       this.getDefaultEphemeralState(),
       {
         onSessionChange: (session) => this.onSessionChange(session),
-        onDataChange: (data: D) => this.onDataChange(data),
-        onEphemeralChange: (ephemeral: E) => this.onEphemeralChange(ephemeral),
+        onDataChange: (data) => this.onDataChange(data),
+        onEphemeralChange: (ephemeral) => this.onEphemeralChange(ephemeral),
       });
   }
 
@@ -112,15 +113,16 @@ export abstract class BaseSvelteItemView<P extends Plugin,
    * This only covers the kind of state that is transient to a view; once a
    * view closes, its saved data is discarded, so this should not be used for
    * user data. */
-  async setState(state: S, result: ViewStateResult): Promise<void> {
+  async setState(state: S['session'], result: ViewStateResult): Promise<void> {
     // Store the state that we were given, then update the session information
     // in the integration.
     this.loadedSessionState = state;
-    this.integration.updateSession(state);
+    this.integration.updateSession(state as Partial<S['session']>);
 
     // Let the super do what it do
     return super.setState(state, result);
   }
+
 
   /* Called by Obsidian to get the state of our view. This only happens when the
    * state of the workspace is persisted to disk, which happens when layout

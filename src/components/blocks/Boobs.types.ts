@@ -7,8 +7,14 @@ import { type GenericSavedState } from '#state/generic';
 /******************************************************************************/
 
 
-export interface BoobsBlockPluginData {
-  content: string;
+export interface BoobsBlockSchema {
+  /* Fields here have their data persisted directly into the stored plugin data
+   * file data.json.
+   *
+   * The other two fields being missing indicates that they are not needed. */
+  data: {
+    content: string;
+  };
 }
 
 /* This type defines the properties that are expected to be passed to the
@@ -19,7 +25,7 @@ export interface BoobsBlockProps {
 
   // The state that is shared between instances of this component and the things
   // that are mounting them.
-  sharedState: GenericSavedState<undefined, BoobsBlockPluginData>;
+  sharedState: GenericSavedState<BoobsBlockSchema>;
 }
 
 /* This type represents the interface of the Svelte component. */

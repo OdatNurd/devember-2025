@@ -7,59 +7,73 @@ import { untrack } from 'svelte';
 /******************************************************************************/
 
 
+/* This interface defines the structure that any state definition must adhere to.
+ * It allows for optional session, data (plugin), and ephemeral state.
+ *
+ * Users of the system should define their own interface that extends this one,
+ * specifying concrete types for the fields they use. */
+export interface StateSchema {
+  session?: unknown;
+  data?: unknown;
+  ephemeral?: unknown;
+}
+
+
+/******************************************************************************/
+
+
 /* This class represents the ability for any generic Svelte component to perist
  * any data it likes into either the Obsidian Session storage or the Plugin
  * storage for the current plugin.
  *
- * This is designed such that a view can use either or both mechanisms as
- * desired. */
-export class GenericSavedState<S = undefined, D = undefined, E = undefined> {
+ * It uses a single generic S to define the schema of the state, reducing
+ * boilerplate. */
+export class GenericSavedState<S extends StateSchema = StateSchema> {
   /* This stores the state for data that is intended for persisting into the
    * Obsidian session storage. */
-  session = $state() as S;
+  session = $state() as S['session'];
 
   /* This stores the state for data that is intended for persisting into the
    * Obsidian data.json data file associated with the plugin. */
-  data = $state() as D;
+  data = $state() as S['data'];
 
   /* This stores the state for data that is intended to be shared between the
    * component and the view, but is not persisted anywhere. */
-  ephemeral = $state() as E;
+  ephemeral = $state() as S['ephemeral'];
 
-  /* Construct an instance; session and data are both optional, although one
-   * assumes that you would use at least one, otherwise why are you creating
-   * this instance. */
-  constructor(config: { session?: S, data?: D, ephemeral?: E}) {
-    // These are both cast explicitly to the type; this makes them only be
+  /* Construct an instance. We cast the config values to the specific types
+   * defined in S. If S defines 'session' as required, then 'config.session'
+   * effectively populates it, avoiding the need for checks later. */
+  constructor(config: { session?: S['session'], data?: S['data'], ephemeral?: S['ephemeral'] }) {
+    // These are all cast explicitly to the type; this makes them only be
     // undefined when they're not actually used, which works better.
-    this.session = config.session as S;
-    this.data = config.data as D;
-    this.ephemeral = config.ephemeral as E;
+    this.session = config.session as S['session'];
+    this.data = config.data as S['data'];
+    this.ephemeral = config.ephemeral as S['ephemeral'];
   }
 }
 
 
-/* This interface is used to association the handlers for knowing when session
- * and plugin data have changed so that the Obsidian plugin code can see when
- * data changes from within a mounted Svelte component.
+/* This interface is used to association the handlers for knowing when data has
+ * changed so that the Obsidian plugin code can see when data changes from
+ * within a mounted Svelte component.
  *
- * In the interface, both handlers are optional because it's not enforced that
- * you need to watch for changes in both at the same time in any given Svelte
- * component. */
-export interface WatchHandlers<S, D, E> {
-  onSessionChange?: (session: S) => void;
-  onDataChange?: (data: D) => void;
-  onEphemeralChange?: (ephemeral: E) => void;
+ * In the interface, all handlers are optional because it's not enforced that
+ * you need to watch for changes in everything at the same time in any given
+ * Svelte component. */
+export interface WatchHandlers<S extends StateSchema> {
+  onSessionChange?: (session: S['session']) => void;
+  onDataChange?: (data: S['data']) => void;
+  onEphemeralChange?: (ephemeral: S['ephemeral']) => void;
 };
 
 
 /******************************************************************************/
 
 
-
 /* This allows code to register an interest in knowing when the view state in
  * the view changes inside of the Svelte component. */
-export function watch<S, D, E>(state: GenericSavedState<S, D, E>, handlers: WatchHandlers<S, D, E>) {
+export function watch<S extends StateSchema>(state: GenericSavedState<S>, handlers: WatchHandlers<S>) {
   return $effect.root(() => {
     // Handle state changes within the session data.
     //

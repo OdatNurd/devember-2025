@@ -7,16 +7,25 @@ import { type GenericSavedState } from '#state/generic';
 /******************************************************************************/
 
 
-export interface SampleViewSessionData {
-  count: number;
-}
+/* The sample plugin view uses all of the possible states. */
+export interface SampleViewSchema {
+  /* Fields here have their data persisted within the Obsidian workspace as long
+   * as the view is open; then it is discarded. */
+  session: {
+    count: number;
+  };
 
-export interface SampleViewPluginData {
-  content: string;
-}
+  /* Fields here have their data persisted directly into the stored plugin data
+   * file data.json. */
+  data: {
+    content: string;
+  };
 
-export interface SampleViewEphemeralData {
-  toggle: boolean;
+  /* Fields here are reactive and shared as long as the view is open, and then
+   * their value is lost. */
+  ephemeral: {
+    toggle: boolean;
+  };
 }
 
 /* This type defines the properties that are expected to be passed to the
@@ -27,7 +36,7 @@ export interface SampleViewProps {
 
   // The state that is shared between instances of this component and the things
   // that are mounting them.
-  sharedState: GenericSavedState<SampleViewSessionData, SampleViewPluginData, SampleViewEphemeralData>;
+  sharedState: GenericSavedState<SampleViewSchema>;
 }
 
 
