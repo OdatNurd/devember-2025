@@ -1,7 +1,7 @@
 /******************************************************************************/
 
 
-import { type GenericSavedState } from '#state/generic';
+import { type GetProps } from '#ui/svelte';
 
 
 /******************************************************************************/
@@ -19,20 +19,17 @@ export interface BoobsBlockSchema {
 
 /* This type defines the properties that are expected to be passed to the
  * BoobsBlock Svelte component. */
-export interface BoobsBlockProps {
-  // The source of the code block that we are rendering.
-  source: string;
+export interface BoobsBlockComponent {
+  props: {
+    // The source of the code block that we are rendering.
+    source: string;
+  };
 
-  // The state that is shared between instances of this component and the things
-  // that are mounting them.
-  sharedState: GenericSavedState<BoobsBlockSchema>;
+  // No exports
 }
 
-/* This type represents the interface of the Svelte component. */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface BoobsBlockInstance extends Record<string, unknown> {
-  // This space intentialy blank.
-}
+/* Helper for the Svelte component script block to type its incoming props */
+export type BoobsBlockProps = GetProps<BoobsBlockSchema, BoobsBlockComponent>;
 
 
 /******************************************************************************/

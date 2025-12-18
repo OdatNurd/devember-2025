@@ -4,8 +4,8 @@
 import { type ViewStateResult, ItemView, Plugin, WorkspaceLeaf } from 'obsidian';
 import { type Component } from "svelte";
 
-import { GenericSavedState, type StateSchema } from "#state/generic";
-import { SvelteIntegration } from '#ui/svelte';
+import { type StateSchema } from "#state/generic";
+import { SvelteIntegration, type ComponentSchema, type GetProps, type GetExports } from '#ui/svelte';
 
 
 /******************************************************************************/
@@ -19,10 +19,11 @@ import { SvelteIntegration } from '#ui/svelte';
  * to make the UI reactive without a lot of boilerplate code. */
 export abstract class BaseSvelteItemView<P extends Plugin,
                                          S extends StateSchema = StateSchema,
-                                         CP extends { sharedState: GenericSavedState<S> } = { sharedState: GenericSavedState<S> },
-                                         CI extends Record<string, unknown> = Record<string, unknown>> extends ItemView {
+                                         C extends ComponentSchema = ComponentSchema,
+                                         Props extends GetProps<S, C> = GetProps<S, C>,
+                                         Exports extends GetExports<C> = GetExports<C>> extends ItemView {
   plugin: P;
-  integration: SvelteIntegration<S, CP, CI>;
+  integration: SvelteIntegration<S, C, Props, Exports>;
   loadedSessionState: Partial<S['session']> | undefined;
 
   constructor(leaf: WorkspaceLeaf, plugin: P) {
@@ -31,11 +32,11 @@ export abstract class BaseSvelteItemView<P extends Plugin,
 
     // Create the integration object that will orchestrate our persistence layer
     // and our reactivity layer.
-    this.integration = new SvelteIntegration<S, CP, CI>();
+    this.integration = new SvelteIntegration<S, C, Props, Exports>();
   }
 
   /* Return the Svelte component that should be mounted within this view. */
-  abstract getComponent() : Component<CP, CI>;
+  abstract getComponent() : Component<Props, Exports>;
 
   /* Return the default data to be shared into the shared state that our
    * integration creates; this ultimately turns into a part of the properties
@@ -67,8 +68,8 @@ export abstract class BaseSvelteItemView<P extends Plugin,
   onEphemeralChange(_ephemeral: S['ephemeral']): void { }
 
   /* Return the properties to be used when the component is mounted. */
-  getComponentProps(): CP {
-    return {} as CP;
+  getComponentProps(): C['props'] {
+    return {} as C['props'];
   }
 
   /* Called when our view opens. This will attach a Svelte component and pass

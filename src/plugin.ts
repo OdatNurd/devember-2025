@@ -16,8 +16,8 @@ import { OpenSampleViewCommand } from '#commands/standard/open_view';
 import { setupBlockHandler } from '#factory/blocks';
 import { blocks } from '#blocks/index';
 
-import type { StatusBarInstance, StatusBarProps, StatusBarSchema } from '#components/StatusBar.types';
-import StatusBarComponent from '#components/StatusBar.svelte';
+import type { StatusBarComponent, StatusBarSchema } from '#components/StatusBar.types';
+import StatusBarComponentView from '#components/StatusBar.svelte';
 
 
 /******************************************************************************/
@@ -27,7 +27,7 @@ export class KursvaroPlugin extends Plugin {
   data: KursvaroData;
   settings: KursvaroSettings;
 
-  statusBarIntegration: SvelteIntegration<StatusBarSchema, StatusBarProps, StatusBarInstance>;
+  statusBarIntegration: SvelteIntegration<StatusBarSchema, StatusBarComponent>;
 
   async onload() {
     // Before we do anything else, load in our plugin's data file; this sets up
@@ -51,7 +51,7 @@ export class KursvaroPlugin extends Plugin {
 
     // Create our Svelte integration for the new component and mount it
     this.statusBarIntegration = new SvelteIntegration({
-      component: StatusBarComponent,
+      component: StatusBarComponentView,
       target: statusBarItemEl,
       session: { activeLeafName: 'None?' },
     });

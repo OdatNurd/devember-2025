@@ -18,6 +18,14 @@
   function handleSave() {
     sharedState.data.content = draft;
   }
+
+  // This function is exported, allowing the plugin code to call it. In a
+  // roundabout way, it gets invoked when the toggle state changes, which shows
+  // that the plugin gets the value update and that the plugin can trigger the
+  // export.
+  export function testMessage() {
+    console.log("SampleView: The ephemeral toggle was switched!");
+  }
 </script>
 
 <div class="view-thing">

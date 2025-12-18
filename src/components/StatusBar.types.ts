@@ -1,7 +1,7 @@
 /******************************************************************************/
 
 
-import { type GenericSavedState } from '#state/generic';
+import { type GetProps } from '#ui/svelte';
 
 
 /******************************************************************************/
@@ -18,19 +18,15 @@ export interface StatusBarSchema {
   }
 }
 
-/* This type defines the properties that are expected to be passed to the
- * component. */
-export interface StatusBarProps {
-  // The state that is shared between instances of this component and the things
-  // that are mounting them.
-  sharedState: GenericSavedState<StatusBarSchema>;
+/* This component schema contains no properties or exports; note that even so
+ * the sharedData prop will be injected by the system. */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface StatusBarComponent {
+  // This space intentionally blank
 }
 
-/* This type represents the interface of the Svelte component. */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface StatusBarInstance extends Record<string, unknown> {
-  // This space intentialy blank.
-}
+/* Helper for the Svelte component script block to type its incoming props */
+export type StatusBarProps = GetProps<StatusBarSchema, StatusBarComponent>;
 
 
 /******************************************************************************/

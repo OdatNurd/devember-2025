@@ -1,7 +1,7 @@
 /******************************************************************************/
 
 
-import { type GenericSavedState } from '#state/generic';
+import { type GetProps } from '#ui/svelte';
 
 
 /******************************************************************************/
@@ -29,22 +29,22 @@ export interface SampleViewSchema {
 }
 
 /* This type defines the properties that are expected to be passed to the
- * SampleCompionent Svelte component. */
-export interface SampleViewProps {
-  // The title to populate into the top of the component.
-  title: string;
+ * SampleCompionent Svelte component and the exports that it provides., */
+export interface SampleViewComponent {
+  props: {
+    // The title to populate into the top of the component.
+    title: string;
+  };
 
-  // The state that is shared between instances of this component and the things
-  // that are mounting them.
-  sharedState: GenericSavedState<SampleViewSchema>;
+  exports: {
+    // Displays a simple message that proves that the exports work every time
+    // the toggle in the component changes values.
+    testMessage: () => void;
+  };
 }
 
-
-/* This type represents the interface of the Svelte component. */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface SampleViewInstance extends Record<string, unknown> {
-  // This space intentionally blank.
-}
+/* Helper for the Svelte component script block to type its incoming props */
+export type SampleViewProps = GetProps<SampleViewSchema, SampleViewComponent>;
 
 
 /******************************************************************************/

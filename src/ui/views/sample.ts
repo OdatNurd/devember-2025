@@ -7,7 +7,7 @@ import { type KursvaroPlugin } from '#plugin';
 
 import { BaseSvelteItemView } from '#ui/views/base';
 
-import type { SampleViewInstance, SampleViewProps, SampleViewSchema } from '#components/SampleView.types';
+import type { SampleViewSchema, SampleViewComponent, SampleViewProps } from '#components/SampleView.types';
 
 import SampleSvelteView from '#components/SampleView.svelte';
 
@@ -29,7 +29,8 @@ export const VIEW_TYPE_SAMPLE = 'sample-view';
 export class SampleView
   extends BaseSvelteItemView<KursvaroPlugin,
                              SampleViewSchema,
-                             SampleViewProps, SampleViewInstance> {
+                             SampleViewComponent>
+{
   constructor(leaf: WorkspaceLeaf, plugin: KursvaroPlugin) {
     super(leaf, plugin);
   }
@@ -47,18 +48,15 @@ export class SampleView
   }
 
   /* Return the Svelte component that should be mounted within this view. */
-  getComponent() : Component<SampleViewProps, SampleViewInstance> {
+  getComponent() : Component<SampleViewProps, SampleViewComponent['exports']> {
     return SampleSvelteView
   };
 
   /* Return the properties to be used when the component is mounted. */
-  getComponentProps(): SampleViewProps {
+  getComponentProps(): SampleViewComponent['props'] {
     return {
       title: this.plugin.settings.mySetting,
-    } as SampleViewProps;
-    // TODO: This is janky; the sharedState property is injected elsewhere, so
-    //       this needs a better annotation of some sort to resolve the problem
-    //       without a cast.
+    };
   }
 
   /* Return the default data to be shared into the shared state that our
@@ -94,9 +92,14 @@ export class SampleView
     this.plugin.savePluginData();
   }
 
-  /* This is triggered whenever ephemeral data changes. */
+  /* When ephemeral data changes, we invoke the component function. */
   onEphemeralChange(ephemeral: SampleViewSchema['ephemeral']): void {
       console.log(`Ephemeral toggle changed to: ${ephemeral.toggle}`);
+
+      // Invoke the exported function on the Svelte component instance. We use
+      // ?. because the component might technically be unmounted when we get
+      // invoked.
+      this.integration.component?.testMessage();
   }
 }
 
