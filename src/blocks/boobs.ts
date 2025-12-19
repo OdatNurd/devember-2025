@@ -49,7 +49,7 @@ export class BoobsBlockRenderChild extends MarkdownRenderChild {
       props: { source: this.source },
       // TODO: Not sure why, but this is not being enforced like it should be?
       //       If it is missing, nothing seems to complain.
-      data: { content: this.plugin.data.content },
+      data: this.plugin.state.data,
     });
   }
 

@@ -1,6 +1,12 @@
 /******************************************************************************/
 
 
+import { type StateSchema } from "#state/generic";
+
+
+/******************************************************************************/
+
+
 /* This interface describes the settings that our plugin exposes; these will be
  * persisted into the vault in a data.json file in .obsidian/plugins/plugin-name
  * if any of them are changed from the defaults outlined below. */
@@ -20,6 +26,15 @@ export interface KursvaroData {
 
   /* This is the saved value for our plugin settings. */
   settings: KursvaroSettings;
+}
+
+
+/* This interface describes the schema for the data that is stored in the
+ * data.json file, but which is reactive and shared within the core plugin to
+ * share with all Svelte components so that they are all reactive against the
+ * plugin data. */
+export interface PluginStateSchema extends StateSchema {
+  data: KursvaroData;
 }
 
 

@@ -3,7 +3,8 @@
 
 import { Plugin, WorkspaceLeaf, MarkdownView } from 'obsidian';
 
-import  { type KursvaroData, type KursvaroSettings, hydratePluginData } from '#types';
+import  { type KursvaroData, type KursvaroSettings, hydratePluginData, type PluginStateSchema } from '#types';
+import { GenericSavedState, watch } from "#state/generic";
 
 import { SvelteIntegration } from '#ui/svelte';
 import { KursvaroSettingTab } from '#ui/settings';
@@ -26,13 +27,31 @@ import StatusBarComponentView from '#components/StatusBar.svelte';
 export class KursvaroPlugin extends Plugin {
   data: KursvaroData;
   settings: KursvaroSettings;
-
+  state: GenericSavedState<PluginStateSchema>;
+  stateCleanup: (() => void) | undefined;
   statusBarIntegration: SvelteIntegration<StatusBarSchema, StatusBarComponent>;
 
   async onload() {
     // Before we do anything else, load in our plugin's data file; this sets up
     // both our cached version of the data as well as the settings information.
-    await this.loadPluginData();
+    this.data = await this.loadPluginData();
+    this.settings = this.data.settings;
+
+    // Now create the master state tracking object for the plugin data; this is
+    // used to ensure that anything that touches the plugin data will see when
+    // everything else touches the plugin data too.
+    //
+    // We also set up a watch on the plugin data changing that causes us to
+    // write it back to disk, so that anything that touches this version of
+    // the data will cause a save to occur.
+    this.state = new GenericSavedState<PluginStateSchema>({ data: this.data })
+    this.stateCleanup = watch(this.state, {
+      onDataChange: (data: PluginStateSchema['data']) => {
+        console.log('saving this mf\'er');
+        this.data = data;
+        this.savePluginData();
+      }
+    });
 
     // Create the settings tab to advertise to Obsidian that we have settings.
     this.addSettingTab(new KursvaroSettingTab(this));
@@ -95,7 +114,10 @@ export class KursvaroPlugin extends Plugin {
   }
 
   onunload() {
-
+    // If there is a state cleanup, we added a watch, so remove it now.
+    if (this.stateCleanup !== undefined) {
+      this.stateCleanup();
+    }
   }
 
   /* This handles the loading of our simple plugin data, which is persisted for
@@ -104,18 +126,14 @@ export class KursvaroPlugin extends Plugin {
    *
    * This holds state that we want to ensure gets synced, including our settings
    * information. */
-  async loadPluginData() {
+  async loadPluginData() : Promise<KursvaroData> {
     // Load the raw data from disk.
     const rawData = await this.loadData();
 
     // Get a copy of the loaded data in which all of the data fields and the
     // nested settings objects are fully filled out, with any of the missing
     // fields having their defaults in place.
-    //
-    // This also aliases the inner settings to make it clearer in order code
-    // when regular data or when settings are being accessed.
-    this.data = hydratePluginData(rawData);
-    this.settings = this.data.settings;
+    return hydratePluginData(rawData);
   }
 
   /* Persist all of our plugin data, including savings, back to disk. */

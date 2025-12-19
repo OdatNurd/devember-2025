@@ -63,9 +63,7 @@ export class SampleView
    * integration creates; this ultimately turns into a part of the properties
    * that are given to the component. */
   getPluginData() : SampleViewSchema['data'] {
-    return {
-      content: this.plugin.data.content
-    }
+    return this.plugin.state.data;
   }
 
   /* Return the default data to be used to set up the mounted view. This is used
@@ -81,15 +79,6 @@ export class SampleView
       return {
         toggle: false,
       }
-  }
-
-  /* This is triggered whenever any shared plugin data is altered; there is no
-   * default implementation here since all handling is subject to code control;
-   * at a minimum this should update at least one field in the data and then
-   * trigger a plugin data save. */
-  onDataChange(data: SampleViewSchema['data']) {
-    this.plugin.data.content = data.content;
-    this.plugin.savePluginData();
   }
 
   /* When ephemeral data changes, we invoke the component function. */
