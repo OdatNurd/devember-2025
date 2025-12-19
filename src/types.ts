@@ -35,6 +35,11 @@ export interface KursvaroData {
  * plugin data. */
 export interface PluginStateSchema extends StateSchema {
   data: KursvaroData;
+
+  // The number of times the button was clicked in the modal.
+  ephemeral: {
+    modalClicks: number;
+  }
 }
 
 

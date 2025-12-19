@@ -44,12 +44,18 @@ export class KursvaroPlugin extends Plugin {
     // We also set up a watch on the plugin data changing that causes us to
     // write it back to disk, so that anything that touches this version of
     // the data will cause a save to occur.
-    this.state = new GenericSavedState<PluginStateSchema>({ data: this.data })
+    this.state = new GenericSavedState<PluginStateSchema>({
+      data: this.data,
+      ephemeral: { modalClicks: 0 }
+    });
     this.stateCleanup = watch(this.state, {
       onDataChange: (data: PluginStateSchema['data']) => {
-        console.log('saving this mf\'er');
+        console.log('saving plugin data due to a change');
         this.data = data;
         this.savePluginData();
+      },
+      onEphemeralChange: (_ephemeral: PluginStateSchema['ephemeral']) => {
+        console.log('the ephemeral data changed!');
       }
     });
 

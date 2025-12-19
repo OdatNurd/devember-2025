@@ -3,18 +3,18 @@
 
   let {
     title = 'Unnamed',
+    sharedState,
   }: SampleModalProps = $props();
 
-  let count = $state(0);
 
   function handleClick() {
-    count += 1;
+    sharedState.ephemeral.modalClicks += 1;
   }
 </script>
 
 <div class="modal-thing">
   <h2>{title}!</h2>
-  <p>You have clicked the button {count} times.</p>
+  <p>You have clicked the button {sharedState.ephemeral.modalClicks} times.</p>
   <button onclick={handleClick}>Click Me</button>
 </div>
 
