@@ -1,11 +1,12 @@
 /******************************************************************************/
 
-import { MarkdownRenderChild } from 'obsidian';
+
+import { type Component } from 'svelte';
 import { type KursvaroPlugin } from '#plugin';
 
-import { SvelteIntegration } from '#ui/svelte';
+import { BaseSvelteRenderChild } from '#blocks//base';
 
-import type { BoobsBlockSchema, BoobsBlockComponent } from '#components/blocks/Boobs.types';
+import type { BoobsBlockSchema, BoobsBlockComponent, BoobsBlockProps } from '#components/blocks/Boobs.types';
 import BoobsBlockComponentView from '#components/blocks/Boobs.svelte';
 
 
@@ -20,42 +21,28 @@ import BoobsBlockComponentView from '#components/blocks/Boobs.svelte';
  * The contract is that we should add something to the container element that we
  * are given. Any changes to the DOM in that element will be realized in real
  * time, as far as I am aware. */
-export class BoobsBlockRenderChild extends MarkdownRenderChild {
-  plugin: KursvaroPlugin;
-  language: string;
-  source: string;
-  integration: SvelteIntegration<BoobsBlockSchema, BoobsBlockComponent>;
+export class BoobsBlockRenderChild
+  extends BaseSvelteRenderChild<KursvaroPlugin,
+                                BoobsBlockSchema,
+                                BoobsBlockComponent> {
 
-  /* When we are constructed, we get the language that we are being asked to
-   * support, the element that we should be updating, and the source of the code
-   * block which is used to determine what the element should look like. */
-  constructor(plugin: KursvaroPlugin, containerEl: HTMLElement, language: string, source: string) {
-    super(containerEl);
-    this.plugin = plugin;
-    this.language = language;
-    this.source = source;
-
-    this.integration = new SvelteIntegration();
+  /* Return the Svelte component that should be mounted within this view. */
+  getComponent() : Component<BoobsBlockProps, BoobsBlockComponent['exports']> {
+    return BoobsBlockComponentView;
   }
 
-  /* The life cycle hook for our processing; this gets invoked when we are
-   * attached to the appropriate element, and is our opportunity to update the
-   * DOM in the container element we were given as we see fit given the source
-   * data we got in the constructor. */
-  async onload() {
-    this.integration.mount({
-      component: BoobsBlockComponentView,
-      target: this.containerEl,
-      props: { source: this.source },
-      // TODO: Not sure why, but this is not being enforced like it should be?
-      //       If it is missing, nothing seems to complain.
-      data: this.plugin.state.data,
-    });
+  /* Return the properties to be used when the component is mounted. */
+  getComponentProps() : BoobsBlockComponent['props'] {
+    return {
+      source: this.source
+    }
   }
 
-
-  onunload() {
-    this.integration.unmount();
+  /* Return the default data to be shared into the shared state that our
+   * integration creates; this ultimately turns into a part of the properties
+   * that are given to the component. */
+  getPluginData() : BoobsBlockSchema['data'] {
+    return this.plugin.state.data;
   }
 }
 

@@ -21,6 +21,7 @@
     border: 1px solid var(--text-accent);
     padding: 1rem;
     border-radius: 4px;
+    white-space: pre-wrap;
   }
   .code-block-thing hr {
     margin-top: 8px;

@@ -25,7 +25,8 @@ export interface BoobsBlockComponent {
     source: string;
   };
 
-  // No exports
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  exports: { };
 }
 
 /* Helper for the Svelte component script block to type its incoming props */
