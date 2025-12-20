@@ -1,12 +1,12 @@
 /******************************************************************************/
 
 
-import { Modal } from 'obsidian';
+import { type Component } from "svelte";
 import { type KursvaroPlugin } from '#plugin';
 
-import { SvelteIntegration } from '#ui/svelte';
+import { BaseSvelteModal } from '#ui/modals/base';
 
-import type { SampleModalSchema, SampleModalComponent, SampleModalProps, SampleModalExports } from '#components/SampleModal.types';
+import type { SampleModalSchema, SampleModalComponent, SampleModalProps } from '#components/SampleModal.types';
 
 import SampleSvelteModal from '#components/SampleModal.svelte';
 
@@ -14,38 +14,22 @@ import SampleSvelteModal from '#components/SampleModal.svelte';
 /******************************************************************************/
 
 
-export class SampleModal extends Modal {
-  plugin: KursvaroPlugin;
-  integration: SvelteIntegration<SampleModalSchema, SampleModalComponent, SampleModalProps, SampleModalExports>;
-  title: string;
-
+export class SampleModal
+  extends BaseSvelteModal<KursvaroPlugin,
+                         SampleModalSchema,
+                         SampleModalComponent> {
   constructor(plugin: KursvaroPlugin, title: string) {
-    super(plugin.app);
-    this.plugin = plugin;
-    this.title = title;
-
-    // Create the integration object that will orchestrate our persistence layer
-    // and our reactivity layer.
-    this.integration = new SvelteIntegration<SampleModalSchema, SampleModalComponent, SampleModalProps, SampleModalExports>();
+    super(plugin, title);
   }
 
-  onOpen() {
-    const { contentEl } = this;
-    contentEl.empty();
+  /* Return the Svelte component that should be mounted within this view. */
+  getComponent() : Component<SampleModalProps, SampleModalComponent['exports']> {
+    return SampleSvelteModal
+  };
 
-    this.integration.mount({
-      component: SampleSvelteModal,
-      target: this.contentEl,
-      props: { title: this.title },
-      ephemeral: this.plugin.state.ephemeral,
-    });
-  }
-
-  onClose() {
-    if (this.integration !== undefined) {
-      this.integration.unmount();
-    }
-    this.contentEl.empty();
+  /* Return the default ephemeral state. */
+  getDefaultEphemeralState(): SampleModalSchema['ephemeral'] {
+      return this.plugin.state.ephemeral;
   }
 }
 

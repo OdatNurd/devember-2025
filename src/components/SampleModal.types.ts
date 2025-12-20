@@ -2,7 +2,7 @@
 
 
 import type { StateSchema } from '#state/generic';
-import type { ComponentSchema, GetExports, GetProps } from '#ui/svelte';
+import type { ComponentSchema, GetProps } from '#ui/svelte';
 
 
 /******************************************************************************/
@@ -19,18 +19,16 @@ export interface SampleModalSchema extends StateSchema {
 /* This type defines the properties that are expected to be passed to the
  * SampleCompionent Svelte component and the exports that it provides., */
 export interface SampleModalComponent extends ComponentSchema {
-  props: {
-    // The name to populate into the top of the component.
-    title: string;
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  props: { };
 
-  // No exports
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  exports: { };
 }
 
 
 /* Helpers for the Svelte component script block to type its incoming props */
 export type SampleModalProps = GetProps<SampleModalSchema, SampleModalComponent>;
-export type SampleModalExports = GetExports<SampleModalComponent>;
 
 
 /******************************************************************************/
