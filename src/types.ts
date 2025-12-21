@@ -14,6 +14,7 @@ export interface KursvaroSettings {
   mySetting: string;
   myOtherSetting: string;
   myThirdSetting: number;
+  myToggleSetting: boolean;
 }
 
 
@@ -52,6 +53,7 @@ const DEFAULT_SETTINGS: KursvaroSettings = {
   mySetting: 'default',
   myOtherSetting: 'poop',
   myThirdSetting: 69,
+  myToggleSetting: true,
 }
 
 

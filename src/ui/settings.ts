@@ -36,7 +36,13 @@ export class KursvaroSettingTab extends PluginSettingTab {
         type: 'text',
         name: 'Setting #2',
         description: "It's not a secret",
-        key: 'myOtherSetting'
+        key: 'myOtherSetting',
+      },
+      {
+        type: 'toggle',
+        name: 'Setting #3',
+        description: "It's totally a toggle",
+        key: 'myToggleSetting',
       },
 
       // Other Settings; a separate group
@@ -49,10 +55,9 @@ export class KursvaroSettingTab extends PluginSettingTab {
         type: 'number',
         name: 'Setting #3',
         description: "It's a number",
-        key: 'myThirdSetting'
+        key: 'myThirdSetting',
       },
     ]);
-
   }
 }
 

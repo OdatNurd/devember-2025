@@ -8,7 +8,7 @@ import { Setting, SettingGroup } from 'obsidian';
 
 
 /* The various distinct kinds of settings that the settings factory supports. */
-export type SettingType = 'heading' | 'text' | 'number';
+export type SettingType = 'heading' | 'text' | 'number' | 'toggle';
 
 /* This "helper" type extracts from the type defines as T all keys that are of
  * the type V. */
@@ -57,9 +57,14 @@ export interface NumberSettingConfig<T> extends BaseSettingConfig {
   placeholder?: string;
 }
 
+export interface ToggleSettingConfig<T> extends BaseSettingConfig {
+  type: 'toggle';
+  key: KeysMatching<T, boolean>;
+}
+
 /* Any given setting can be any of the above types. */
 export type SettingConfig<T> = HeaderSettingConfig | TextSettingConfig<T> |
-                               NumberSettingConfig<T>;
+                               NumberSettingConfig<T> | ToggleSettingConfig<T>;
 
 
 /******************************************************************************/
@@ -148,6 +153,19 @@ export function createSettingsLayout<T>(container: HTMLElement,
               }
             })
           })
+        );
+        break;
+
+      // Toggle Field; a boolean with an on/off in it.
+      case 'toggle':
+        settingGroup.addSetting(setting => setup(setting)
+          .addToggle(toggle => toggle
+            .setValue(Boolean(manager.settings[item.key] ?? false))
+            .onChange(async (value: boolean) => {
+              (manager.settings[item.key] as boolean) = value;
+              await manager.savePluginData()
+            })
+          )
         );
         break;
     }
