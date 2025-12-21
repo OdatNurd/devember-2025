@@ -1,7 +1,7 @@
 /******************************************************************************/
 
 
-import { Setting } from 'obsidian';
+import { Setting, SettingGroup } from 'obsidian';
 
 
 /******************************************************************************/
@@ -73,57 +73,82 @@ export type SettingConfig<T> = HeaderSettingConfig | TextSettingConfig<T> |
 export function createSettingsLayout<T>(container: HTMLElement,
                                         manager: SettingsManager<T>,
                                         settings: SettingConfig<T>[]) : void {
-  // Iterate over all of the settings in the configured list.
+  let settingGroup = null;
+
+  // Iterate over all of the settings in the configured list in order to
+  // construct the settings layout. All settings will go into a SettingGroup
+  // object. An entry in the settings that represents a heading will start a
+  // brand new group and all following settings will inject into that group
+  // until a heading group is defined.
+  //
+  // If the first item isn't group, we will add one.
   for (const item of settings) {
-    const setting = new Setting(container)
-      .setName(item.name)
-      .setDisabled(item.disabled ?? false)
+    // This simple helper will add to any setting the optional portions that are
+    // common to all settings, returning the setting back for chaining purposes.
+    const setup = (setting: Setting) : Setting => {
+      setting.setName(item.name)
+        .setDisabled(item.disabled ?? false);
 
-    // Set a description if one was provided.
-    if (item.description !== undefined) {
-      setting.setDesc(item.description);
+      if (item.description !== undefined) {
+        setting.setDesc(item.description);
+      }
+      if (item.cssClass !== undefined) {
+        setting.setClass(item.cssClass)
+      }
+
+      return setting;
     }
 
-    // Set a css class if one was provided.
-    if (item.cssClass !== undefined) {
-      setting.setClass(item.cssClass);
-    }
-
-    // If this is a heading, then if there is not already a CSS class set,
-    // specifically include the common one we use for config headers; but that
-    // is all that has to happen here.
+    // When an entry is a heading, create an explicit SettingGroup for it and
+    // then we're done.
     if (item.type === 'heading') {
-      if (item.cssClass === undefined) {
-        setting.setClass('config-header');
+      settingGroup = new SettingGroup(container)
+        .setHeading(item.name);
+      if (item.cssClass !== undefined) {
+        settingGroup.addClass(item.cssClass ?? '')
       }
       continue;
     }
 
+    // We are about to process a non-heading setting. If there is not a
+    // SettingGroup yet, make one now so that all settings are contained in a
+    // group.
+    if (settingGroup === null) {
+      settingGroup = new SettingGroup(container)
+    }
+
+    // Based on the type of the setting, insert the setting as appropriate.
     switch (item.type) {
+      // Simple text field.
       case 'text':
-        setting.addText(text => text
-          .setPlaceholder(item.placeholder ?? '')
-          .setValue(String(manager.settings[item.key] ?? ''))
-          .onChange(async (value: string) => {
-            (manager.settings[item.key] as string) = value;
-            await manager.savePluginData()
-          })
+        settingGroup.addSetting(setting => setup(setting)
+          .addText(text => text
+            .setPlaceholder(item.placeholder ?? '')
+            .setValue(String(manager.settings[item.key] ?? ''))
+            .onChange(async (value: string) => {
+              (manager.settings[item.key] as string) = value;
+              await manager.savePluginData()
+            })
+          )
         );
         break;
 
+      // Simple text field, but treated as a number.
       case 'number':
-        setting.addText(text => {
-          text.inputEl.type = 'number';
-          text.setPlaceholder(item.placeholder ?? '')
-          .setValue(String(manager.settings[item.key] ?? '0'))
-          .onChange(async (value: string) => {
-            const num = Number(value);
-            if (isNaN(num) === false) {
-              (manager.settings[item.key] as number) = num;
-              await manager.savePluginData();
-            }
+        settingGroup.addSetting(setting => setup(setting)
+          .addText(text => {
+            text.inputEl.type = 'number';
+            text.setPlaceholder(item.placeholder ?? '')
+            .setValue(String(manager.settings[item.key] ?? '0'))
+            .onChange(async (value: string) => {
+              const num = Number(value);
+              if (isNaN(num) === false) {
+                (manager.settings[item.key] as number) = num;
+                await manager.savePluginData();
+              }
+            })
           })
-        });
+        );
         break;
     }
   }
