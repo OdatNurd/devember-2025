@@ -146,6 +146,22 @@ export class KursvaroPlugin extends Plugin {
   async savePluginData() {
     await this.saveData(this.data);
   }
+
+  /* This gets invoked whenever it is detected that the data.json file has
+   * been changed on disk by some outside task, such as the sync mechanism. */
+  async onExternalSettingsChange() {
+    console.log('data.json has changed on disk; reloading');
+
+    // Load in new data and update our handles to it.
+    const newData = await this.loadPluginData();
+    this.data = newData;
+    this.settings = this.data.settings;
+
+    // Ensure that the state tracking variable is also updated with the data,
+    // which will ensure that any mounted components see the update.
+    // const data = Object.assign({}, DEFAULT_DATA, rawData);
+    Object.assign(this.state.data, this.data);
+  }
 }
 
 
