@@ -37,7 +37,7 @@ importers:
         version: 16.5.0
       obsidian:
         specifier: latest
-        version: 1.10.3(@codemirror/state@6.5.0)(@codemirror/view@6.38.6)
+        version: 1.11.0(@codemirror/state@6.5.0)(@codemirror/view@6.38.6)
       svelte:
         specifier: ^5.45.3
         version: 5.45.3
@@ -673,8 +673,8 @@ packages:
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
 
-  obsidian@1.10.3:
-    resolution: {integrity: sha512-VP+ZSxNMG7y6Z+sU9WqLvJAskCfkFrTz2kFHWmmzis+C+4+ELjk/sazwcTHrHXNZlgCeo8YOlM6SOrAFCynNew==}
+  obsidian@1.11.0:
+    resolution: {integrity: sha512-lVqN9AmDWHzhNATi2tDnjqVgI6WUYKeT+lIsAycAyLt4XCC6zRsWzb+tFCiB7Rn3PpttefjoovilhYwvS4Iqxw==}
     peerDependencies:
       '@codemirror/state': 6.5.0
       '@codemirror/view': 6.38.6
@@ -1504,7 +1504,7 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  obsidian@1.10.3(@codemirror/state@6.5.0)(@codemirror/view@6.38.6):
+  obsidian@1.11.0(@codemirror/state@6.5.0)(@codemirror/view@6.38.6):
     dependencies:
       '@codemirror/state': 6.5.0
       '@codemirror/view': 6.38.6
