@@ -29,8 +29,7 @@ export function createSettingsLayout<T>(container: HTMLElement,
     // This simple helper will add to any setting the optional portions that are
     // common to all settings, returning the setting back for chaining purposes.
     const setup = (setting: Setting) : Setting => {
-      setting.setName(item.name)
-        .setDisabled(item.disabled ?? false);
+      setting.setName(item.name);
 
       if (item.description !== undefined) {
         setting.setDesc(item.description);
@@ -66,6 +65,7 @@ export function createSettingsLayout<T>(container: HTMLElement,
       case 'text':
         settingGroup.addSetting(setting => setup(setting)
           .addText(text => text
+            .setDisabled(item.disabled ?? false)
             .setPlaceholder(item.placeholder ?? '')
             .setValue(String(manager.settings[item.key] ?? ''))
             .onChange(async (value: string) => {
@@ -82,6 +82,7 @@ export function createSettingsLayout<T>(container: HTMLElement,
           .addText(text => {
             text.inputEl.type = 'number';
             text.setPlaceholder(item.placeholder ?? '')
+            .setDisabled(item.disabled ?? false)
             .setValue(String(manager.settings[item.key] ?? '0'))
             .onChange(async (value: string) => {
               const num = Number(value);
@@ -98,6 +99,7 @@ export function createSettingsLayout<T>(container: HTMLElement,
       case 'toggle':
         settingGroup.addSetting(setting => setup(setting)
           .addToggle(toggle => toggle
+            .setDisabled(item.disabled ?? false)
             .setValue(Boolean(manager.settings[item.key] ?? false))
             .onChange(async (value: boolean) => {
               (manager.settings[item.key] as boolean) = value;
@@ -116,7 +118,8 @@ export function createSettingsLayout<T>(container: HTMLElement,
               .onChange(async (value: string) => {
                 (manager.settings[item.key] as string) = value;
                 await manager.savePluginData()
-              });
+              })
+              .setDisabled(item.disabled ?? false);
 
             // Pull the value that this dropdown is supposed to have, and the
             // select element that wraps it.

@@ -69,7 +69,7 @@ export class KursvaroSettingTab extends PluginSettingTab {
         options: {
           'titties': "I prefer titties",
           'boobies': "Clearly boobies are better",
-        }
+        },
       },
       {
         type: 'dropdown',
