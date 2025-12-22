@@ -53,9 +53,32 @@ export class KursvaroSettingTab extends PluginSettingTab {
       },
       {
         type: 'number',
-        name: 'Setting #3',
+        name: 'Setting #4',
         description: "It's a number",
         key: 'myThirdSetting',
+      },
+      {
+        type: 'dropdown',
+        name: 'Setting #5',
+        description: "Tee and/or Hee",
+        key: 'myDropdownSetting',
+        options: {
+          'titties': "I prefer titties",
+          'boobies': "Clearly boobies are better",
+        }
+      },
+      {
+        type: 'dropdown',
+        name: 'Setting #6',
+        description: "Spelling Bee",
+        key: 'myOtherDropdownSetting',
+        loader: async () : Promise<Record<string, string>> => {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          return {
+            'boobies': "It is spelled 'Boobies'",
+            'bewbies': "It is spelled 'Bewbies'",
+          }
+        },
       },
     ]);
   }

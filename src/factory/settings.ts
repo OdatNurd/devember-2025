@@ -8,7 +8,7 @@ import { Setting, SettingGroup } from 'obsidian';
 
 
 /* The various distinct kinds of settings that the settings factory supports. */
-export type SettingType = 'heading' | 'text' | 'number' | 'toggle';
+export type SettingType = 'heading' | 'text' | 'number' | 'toggle' | 'dropdown';
 
 /* This "helper" type extracts from the type defines as T all keys that are of
  * the type V. */
@@ -48,7 +48,7 @@ export interface TextSettingConfig<T> extends BaseSettingConfig {
   placeholder?: string;
 }
 
-/* The specific configuration for a numericv value; this contains extra info the
+/* The specific configuration for a numeric value; this contains extra info the
  * key in the settings object that represents the value, and what the
  * placeholder would be. */
 export interface NumberSettingConfig<T> extends BaseSettingConfig {
@@ -57,14 +57,36 @@ export interface NumberSettingConfig<T> extends BaseSettingConfig {
   placeholder?: string;
 }
 
+/* The specific configuration for a toggle button; this is distinctly boolean;
+ * this contains the key in the settings object that represents the value. */
 export interface ToggleSettingConfig<T> extends BaseSettingConfig {
   type: 'toggle';
   key: KeysMatching<T, boolean>;
 }
 
+/* The specific configuration for a dropdown list; this particular config sets
+ * the settings key and requires that you give it the options to provide in the
+ * list. */
+export interface StaticDropdownSettingConfig<T> extends BaseSettingConfig {
+  type: 'dropdown';
+  key: KeysMatching<T, string>;
+  options: Record<string, string>
+}
+
+/* As above but in this iteration we need to invoke a function in order to
+ * gather the options that we want to populate; this is used for lists that do
+ * not depend on static data. */
+export interface DynamicDropdownSettingsConfig<T> extends BaseSettingConfig {
+  type: 'dropdown',
+  key: KeysMatching<T, string>;
+  loader: () => Promise<Record<string,string>>;
+}
+
 /* Any given setting can be any of the above types. */
 export type SettingConfig<T> = HeaderSettingConfig | TextSettingConfig<T> |
-                               NumberSettingConfig<T> | ToggleSettingConfig<T>;
+                               NumberSettingConfig<T> | ToggleSettingConfig<T> |
+                               StaticDropdownSettingConfig<T> |
+                               DynamicDropdownSettingsConfig<T>;
 
 
 /******************************************************************************/
@@ -166,6 +188,64 @@ export function createSettingsLayout<T>(container: HTMLElement,
               await manager.savePluginData()
             })
           )
+        );
+        break;
+
+      // Dropdown field; this handles both cases
+      case 'dropdown':
+        settingGroup.addSetting(setting => setup(setting)
+          .addDropdown(async (dropdown) => {
+            dropdown
+              .setValue(String(manager.settings[item.key] ?? ''))
+              .onChange(async (value: string) => {
+                (manager.settings[item.key] as string) = value;
+                await manager.savePluginData()
+              });
+
+            // Pull the value that this dropdown is supposed to have, and the
+            // select element that wraps it.
+            const value = (manager.settings[item.key] as string) ?? '';
+            const select = dropdown.selectEl;
+
+            // If there are static options, we can apply them, set the value,
+            // and leave.
+            if ("options" in item) {
+              dropdown.addOptions(item.options);
+              dropdown.setValue(value);
+              return;
+            }
+
+            // The control might be disabled by config choice, but it needs to
+            // also be disabled while we fiddle with it and wait, so store the
+            // current state and then disable it.
+            const wasDisabled = select.disabled;
+            select.disabled = true;
+
+            try {
+              // We need a temporary option to tell the user that the options
+              // are loading.
+              // Add a temporaru option to tell the user that the options are
+              // loading, and then invoke the loader; this can take arbitrary
+              // time.
+              dropdown.addOption('unknown', 'Loading...');
+              const options = await item.loader();
+
+              // Empty the select and then add in our options and put its state
+              // back.
+              select.empty();
+              dropdown.addOptions(options);
+              select.disabled = wasDisabled;
+            } catch (error) {
+              // Say in the console why it failed, then insert a fake entry so
+              // that the user will see it in the UI too.
+              console.error(`unable to load dropdown options: ${error}`);
+              select.empty();
+              dropdown.addOption(value, 'Error loading options');
+            }
+
+            // Set the value now so that it visualized correctly.
+            dropdown.setValue(value)
+          })
         );
         break;
     }
