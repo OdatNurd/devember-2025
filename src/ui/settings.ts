@@ -5,12 +5,16 @@ import { PluginSettingTab } from 'obsidian';
 import type { KursvaroPlugin } from '#plugin';
 
 import { type KursvaroSettings } from '#types';
-import { type SettingsManager, createSettingsLayout } from '#factory/settings';
+import { type SettingsManager } from '#factory/settings.types';
+import { createSettingsLayout } from '#factory/settings';
 
 
 /******************************************************************************/
 
 
+/* An instance of this class is used to construct the settings tab. This uses
+ * our factory pattern to configure the settings largely via a JSON-like
+ * structure. */
 export class KursvaroSettingTab extends PluginSettingTab {
   plugin: KursvaroPlugin & SettingsManager<KursvaroSettings>;
 

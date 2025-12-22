@@ -1,7 +1,7 @@
 /******************************************************************************/
 
 
-import { type BlockConfig } from '#factory/blocks';
+import { type BlockConfig } from '#factory/blocks.types';
 import { BoobsBlockRenderChild } from '#blocks/boobs';
 
 

@@ -1,6 +1,6 @@
 /******************************************************************************/
 
-import { type CommandConfig  } from '#factory/commands';
+import { type CommandConfig  } from '#factory/commands.types';
 
 import { not } from '#commands/combiners';
 import { requireMarkdownView, requireExistingSampleView } from '#commands/checks';
