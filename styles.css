@@ -1,1 +1,7 @@
-/*  This file is currently empty on purpose; it stores plugin global CSS. */
+/* Ensure that all inputs, selects, or things that are disabled in the settings
+ * tab are appropriately shown as being disabled, because Obsidian does not
+ * seem to do that on its own, and it is very disconcerting. */
+input[disabled], select[disabled], .is-disabled {
+  filter: grayscale(1);
+  opacity: 0.5;
+}
