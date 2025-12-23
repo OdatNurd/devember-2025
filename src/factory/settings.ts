@@ -4,6 +4,10 @@
 import { Setting, SettingGroup } from 'obsidian';
 import type { SettingsManager, SettingConfig } from '#factory/settings.types';
 
+import {
+  addTextControl, addNumberControl, addToggleControl, addDropdownControl,
+} from '#factory/settings/index';
+
 
 /******************************************************************************/
 
@@ -63,109 +67,34 @@ export function createSettingsLayout<T>(container: HTMLElement,
     switch (item.type) {
       // Simple text field.
       case 'text':
-        settingGroup.addSetting(setting => setup(setting)
-          .addText(text => text
-            .setDisabled(item.disabled ?? false)
-            .setPlaceholder(item.placeholder ?? '')
-            .setValue(String(manager.settings[item.key] ?? ''))
-            .onChange(async (value: string) => {
-              (manager.settings[item.key] as string) = value;
-              await manager.savePluginData()
-            })
-          )
-        );
+        settingGroup.addSetting(s => {
+          setup(s);
+          addTextControl(s, manager, item);
+        });
         break;
 
       // Simple text field, but treated as a number.
       case 'number':
-        settingGroup.addSetting(setting => setup(setting)
-          .addText(text => {
-            text.inputEl.type = 'number';
-            text.setPlaceholder(item.placeholder ?? '')
-            .setDisabled(item.disabled ?? false)
-            .setValue(String(manager.settings[item.key] ?? '0'))
-            .onChange(async (value: string) => {
-              const num = Number(value);
-              if (isNaN(num) === false) {
-                (manager.settings[item.key] as number) = num;
-                await manager.savePluginData();
-              }
-            })
-          })
-        );
+        settingGroup.addSetting(s => {
+          setup(s);
+          addNumberControl(s, manager, item);
+        });
         break;
 
       // Toggle Field; a boolean with an on/off in it.
       case 'toggle':
-        settingGroup.addSetting(setting => setup(setting)
-          .addToggle(toggle => toggle
-            .setDisabled(item.disabled ?? false)
-            .setValue(Boolean(manager.settings[item.key] ?? false))
-            .onChange(async (value: boolean) => {
-              (manager.settings[item.key] as boolean) = value;
-              await manager.savePluginData()
-            })
-          )
-        );
+        settingGroup.addSetting(s => {
+          setup(s);
+          addToggleControl(s, manager, item);
+        });
         break;
 
       // Dropdown field; this handles both cases
       case 'dropdown':
-        settingGroup.addSetting(setting => setup(setting)
-          .addDropdown(async (dropdown) => {
-            dropdown
-              .setValue(String(manager.settings[item.key] ?? ''))
-              .onChange(async (value: string) => {
-                (manager.settings[item.key] as string) = value;
-                await manager.savePluginData()
-              })
-              .setDisabled(item.disabled ?? false);
-
-            // Pull the value that this dropdown is supposed to have, and the
-            // select element that wraps it.
-            const value = (manager.settings[item.key] as string) ?? '';
-            const select = dropdown.selectEl;
-
-            // If there are static options, we can apply them, set the value,
-            // and leave.
-            if ("options" in item) {
-              dropdown.addOptions(item.options);
-              dropdown.setValue(value);
-              return;
-            }
-
-            // The control might be disabled by config choice, but it needs to
-            // also be disabled while we fiddle with it and wait, so store the
-            // current state and then disable it.
-            const wasDisabled = select.disabled;
-            select.disabled = true;
-
-            try {
-              // We need a temporary option to tell the user that the options
-              // are loading.
-              // Add a temporaru option to tell the user that the options are
-              // loading, and then invoke the loader; this can take arbitrary
-              // time.
-              dropdown.addOption('unknown', 'Loading...');
-              const options = await item.loader();
-
-              // Empty the select and then add in our options and put its state
-              // back.
-              select.empty();
-              dropdown.addOptions(options);
-              select.disabled = wasDisabled;
-            } catch (error) {
-              // Say in the console why it failed, then insert a fake entry so
-              // that the user will see it in the UI too.
-              console.error(`unable to load dropdown options: ${error}`);
-              select.empty();
-              dropdown.addOption(value, 'Error loading options');
-            }
-
-            // Set the value now so that it visualized correctly.
-            dropdown.setValue(value)
-          })
-        );
+        settingGroup.addSetting(s => {
+          setup(s);
+          addDropdownControl(s, manager, item);
+        });
         break;
     }
   }
