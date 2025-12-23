@@ -2,7 +2,7 @@
 
 
 /* The various distinct kinds of settings that the settings factory supports. */
-export type SettingType = 'heading' | 'text' | 'number' | 'toggle' | 'dropdown';
+export type SettingType = 'heading' | 'text' | 'textarea' | 'number' | 'toggle' | 'dropdown';
 
 /* This "helper" type extracts from the type defines as T all keys that are of
  * the type V. */
@@ -42,6 +42,15 @@ export interface TextSettingConfig<T> extends BaseSettingConfig {
   placeholder?: string;
 }
 
+/* The specific configuration for a textarea value; this contains extra info on
+ * the key in the settings object that represents the value, and what the
+ * placeholder would be. */
+export interface TextAreaSettingConfig<T> extends BaseSettingConfig {
+  type: 'textarea';
+  key: KeysMatching<T, string>;
+  placeholder?: string;
+}
+
 /* The specific configuration for a numeric value; this contains extra info the
  * key in the settings object that represents the value, and what the
  * placeholder would be. */
@@ -77,7 +86,8 @@ export interface DynamicDropdownSettingsConfig<T> extends BaseSettingConfig {
 }
 
 /* Any given setting can be any of the above types. */
-export type SettingConfig<T> = HeaderSettingConfig | TextSettingConfig<T> |
+export type SettingConfig<T> = HeaderSettingConfig |
+                               TextSettingConfig<T> | TextAreaSettingConfig<T> |
                                NumberSettingConfig<T> | ToggleSettingConfig<T> |
                                StaticDropdownSettingConfig<T> |
                                DynamicDropdownSettingsConfig<T>;

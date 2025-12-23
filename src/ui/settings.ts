@@ -37,7 +37,7 @@ export class KursvaroSettingTab extends PluginSettingTab {
         key: 'mySetting',
       },
       {
-        type: 'text',
+        type: 'textarea',
         name: 'Setting #2',
         description: "It's not a secret",
         key: 'myOtherSetting',

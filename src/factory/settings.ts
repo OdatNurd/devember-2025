@@ -5,7 +5,8 @@ import { SettingGroup } from 'obsidian';
 import type { SettingsManager, SettingConfig } from '#factory/settings.types';
 
 import {
-  addTextControl, addNumberControl, addToggleControl, addDropdownControl,
+  addTextControl, addTextAreaControl, addNumberControl, addToggleControl,
+  addDropdownControl,
 } from '#factory/settings/index';
 
 
@@ -67,6 +68,11 @@ export function createSettingsLayout<T>(container: HTMLElement,
         // Simple text field.
         case 'text':
           addTextControl(setting, manager, item);
+          break;
+
+        // Simple textarea field.
+        case 'textarea':
+          addTextAreaControl(setting, manager, item);
           break;
 
         // Simple text field, but treated as a number.
