@@ -34,12 +34,14 @@ export class KursvaroSettingTab extends PluginSettingTab {
         type: 'text',
         name: 'Setting #1',
         description: "It's a secret",
+        placeholder: 'The secret goes here',
         key: 'mySetting',
       },
       {
         type: 'textarea',
         name: 'Setting #2',
         description: "It's not a secret",
+        placeholder: 'The non-secret goes here',
         key: 'myOtherSetting',
       },
       {
@@ -59,6 +61,7 @@ export class KursvaroSettingTab extends PluginSettingTab {
         type: 'number',
         name: 'Setting #4',
         description: "It's a number",
+        placeholder: "I recommend 69; it's nice",
         key: 'myThirdSetting',
       },
       {
