@@ -2,7 +2,7 @@
 
 
 import { Setting } from 'obsidian';
-import type { SettingsManager, NumberSettingConfig } from '#factory/settings.types';
+import type { SettingsManager, IntegerSettingConfig, FloatSettingConfig } from '#factory/settings.types';
 
 
 /******************************************************************************/
@@ -12,14 +12,19 @@ import type { SettingsManager, NumberSettingConfig } from '#factory/settings.typ
  * options; this is just a text control but with some additional flavour to
  * ensure that it is treated as a number.
  *
+ * This handles both integer and float types. For integers, it installs extra
+ * event handling to prevent the user from entering or pasting decimal points.
+ *
  * The items common to all settings (name, description, cssClass) will have been
  * added to the setting prior to it being passed here, so this only needs to do
  * the work to handle the specific setting field. */
 export function addNumberControl<T>(setting: Setting,
                                     manager: SettingsManager<T>,
-                                    config: NumberSettingConfig<T>) {
+                                    config: IntegerSettingConfig<T> | FloatSettingConfig<T>) {
   setting.addText(text => {
-    text.inputEl.type = 'number';
+    const input = text.inputEl;
+
+    input.type = 'number';
     text.setPlaceholder(config.placeholder ?? '')
     .setDisabled(config.disabled ?? false)
     .setValue(String(manager.settings[config.key] ?? '0'))
@@ -29,7 +34,51 @@ export function addNumberControl<T>(setting: Setting,
         (manager.settings[config.key] as number) = num;
         await manager.savePluginData();
       }
-    })
+    });
+
+    // If this is not an integer, then we can skip the rest of this; the code
+    // above handles floating point by default.
+    if (config.type === 'float') {
+      return;
+    }
+
+    // Attach an event handler that blocks entering a period into the input, so
+    // that the input can only be an integer.
+    input.addEventListener('keypress', (evt: KeyboardEvent) => {
+      // We block anything that is not a digit (0-9) or a sign (+/-) in order to
+      // keep to purely integral values.
+      if (/[^0-9+-]/.test(evt.key)) {
+        evt.preventDefault();
+      }
+    });
+
+    // Block a paste operation that would make a float too. I'm not sure if it
+    // is HTML, Electron, or Obsidian, but pasting a non-number into a number
+    // field strips all non-numbers. So here we do the same to strip away all
+    // non-digits.
+    input.addEventListener('paste', (evt: ClipboardEvent) => {
+      // Prevent the default paste behavior so we can handle it manually.
+      evt.preventDefault();
+
+      // Get the text from the clipboard.
+      const data = evt.clipboardData?.getData('text');
+      if (data === undefined) {
+        return;
+      }
+
+      // Strip out anything that is not a digit or a sign.
+      const cleaned = data.replace(/[^0-9+-]/g, '');
+
+      // If there is nothing left, we don't need to do anything.
+      if (cleaned === '') {
+        return;
+      }
+
+      // Insert the cleaned text; this is deprecated, but we'll worry about that
+      // later.
+      document.execCommand('insertText', false, cleaned);
+    });
+
   });
 }
 

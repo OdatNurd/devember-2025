@@ -76,7 +76,8 @@ export function createSettingsLayout<T>(container: HTMLElement,
           break;
 
         // Simple text field, but treated as a number.
-        case 'number':
+        case 'integer':
+        case 'float':
           addNumberControl(setting, manager, item);
           break;
 

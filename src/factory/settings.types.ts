@@ -2,7 +2,8 @@
 
 
 /* The various distinct kinds of settings that the settings factory supports. */
-export type SettingType = 'heading' | 'text' | 'textarea' | 'number' | 'toggle' | 'dropdown';
+export type SettingType = 'heading' | 'text' | 'textarea' | 'integer' | 'float' |
+                          'toggle' | 'dropdown';
 
 /* This "helper" type extracts from the type defines as T all keys that are of
  * the type V. */
@@ -51,11 +52,20 @@ export interface TextAreaSettingConfig<T> extends BaseSettingConfig {
   placeholder?: string;
 }
 
-/* The specific configuration for a numeric value; this contains extra info the
- * key in the settings object that represents the value, and what the
+/* The specific configuration for a numeric integer value; this contains extra
+ * info the key in the settings object that represents the value, and what the
  * placeholder would be. */
-export interface NumberSettingConfig<T> extends BaseSettingConfig {
-  type: 'number';
+export interface IntegerSettingConfig<T> extends BaseSettingConfig {
+  type: 'integer';
+  key: KeysMatching<T, number>;
+  placeholder?: string;
+}
+
+/* The specific configuration for a numeric float value; this contains extra
+ * info the key in the settings object that represents the value, and what the
+ * placeholder would be. */
+export interface FloatSettingConfig<T> extends BaseSettingConfig {
+  type: 'float';
   key: KeysMatching<T, number>;
   placeholder?: string;
 }
@@ -98,7 +108,8 @@ export interface DynamicDropdownSettingsConfig<T> extends BaseSettingConfig {
 /* Any given setting can be any of the above types. */
 export type SettingConfig<T> = HeaderSettingConfig |
                                TextSettingConfig<T> | TextAreaSettingConfig<T> |
-                               NumberSettingConfig<T> | ToggleSettingConfig<T> |
+                               IntegerSettingConfig<T> | FloatSettingConfig<T> |
+                               ToggleSettingConfig<T> |
                                StaticDropdownSettingConfig<T> |
                                DynamicDropdownSettingsConfig<T>;
 

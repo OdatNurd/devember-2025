@@ -59,15 +59,22 @@ export class KursvaroSettingTab extends PluginSettingTab {
         description: 'Other things that can be configured',
       },
       {
-        type: 'number',
+        type: 'integer',
         name: 'Setting #4',
         description: "It's a number",
         placeholder: "I recommend 69; it's nice",
         key: 'myThirdSetting',
       },
       {
-        type: 'dropdown',
+        type: 'float',
         name: 'Setting #5',
+        description: "It's a number",
+        placeholder: "I recommend 4.20",
+        key: 'myFloatSetting',
+      },
+      {
+        type: 'dropdown',
+        name: 'Setting #6',
         description: "Tee and/or Hee",
         key: 'myDropdownSetting',
         options: {
@@ -77,7 +84,7 @@ export class KursvaroSettingTab extends PluginSettingTab {
       },
       {
         type: 'dropdown',
-        name: 'Setting #6',
+        name: 'Setting #7',
         description: "Spelling Bee",
         key: 'myOtherDropdownSetting',
         loader: async () : Promise<Record<string, string>> => {

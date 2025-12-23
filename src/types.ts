@@ -14,6 +14,7 @@ export interface KursvaroSettings {
   mySetting: string;
   myOtherSetting: string;
   myThirdSetting: number;
+  myFloatSetting: number;
   myToggleSetting: boolean;
   myDropdownSetting: string;
   myOtherDropdownSetting: string;
@@ -55,6 +56,7 @@ const DEFAULT_SETTINGS: KursvaroSettings = {
   mySetting: 'default',
   myOtherSetting: 'poop',
   myThirdSetting: 69,
+  myFloatSetting: 4.20,
   myToggleSetting: true,
   myDropdownSetting: 'titties',
   myOtherDropdownSetting: 'boobies',
