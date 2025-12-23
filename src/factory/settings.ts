@@ -1,7 +1,7 @@
 /******************************************************************************/
 
 
-import { Setting, SettingGroup } from 'obsidian';
+import { SettingGroup } from 'obsidian';
 import type { SettingsManager, SettingConfig } from '#factory/settings.types';
 
 import {
@@ -30,26 +30,11 @@ export function createSettingsLayout<T>(container: HTMLElement,
   //
   // If the first item isn't group, we will add one.
   for (const item of settings) {
-    // This simple helper will add to any setting the optional portions that are
-    // common to all settings, returning the setting back for chaining purposes.
-    const setup = (setting: Setting) : Setting => {
-      setting.setName(item.name);
-
-      if (item.description !== undefined) {
-        setting.setDesc(item.description);
-      }
-      if (item.cssClass !== undefined) {
-        setting.setClass(item.cssClass)
-      }
-
-      return setting;
-    }
-
     // When an entry is a heading, create an explicit SettingGroup for it and
     // then we're done.
     if (item.type === 'heading') {
-      settingGroup = new SettingGroup(container)
-        .setHeading(item.name);
+      settingGroup = new SettingGroup(container).setHeading(item.name);
+
       if (item.cssClass !== undefined) {
         settingGroup.addClass(item.cssClass ?? '')
       }
@@ -63,40 +48,43 @@ export function createSettingsLayout<T>(container: HTMLElement,
       settingGroup = new SettingGroup(container)
     }
 
-    // Based on the type of the setting, insert the setting as appropriate.
-    switch (item.type) {
-      // Simple text field.
-      case 'text':
-        settingGroup.addSetting(s => {
-          setup(s);
-          addTextControl(s, manager, item);
-        });
-        break;
+    // This entry represents a setting; so create a setting for it and then add
+    // in the required controls.
+    settingGroup.addSetting(setting => {
+      // Set the setting name and description.
+      setting
+        .setName(item.name)
+        .setDesc(item.description ?? '')
 
-      // Simple text field, but treated as a number.
-      case 'number':
-        settingGroup.addSetting(s => {
-          setup(s);
-          addNumberControl(s, manager, item);
-        });
-        break;
+      // Include the CSS; this strictly requires a non-empty string so we can't
+      // coalesce in a default.
+      if (item.cssClass !== undefined) {
+        setting.setClass(item.cssClass)
+      }
 
-      // Toggle Field; a boolean with an on/off in it.
-      case 'toggle':
-        settingGroup.addSetting(s => {
-          setup(s);
-          addToggleControl(s, manager, item);
-        });
-        break;
+      // Based on the type of the setting, insert the appropriate control.
+      switch (item.type) {
+        // Simple text field.
+        case 'text':
+          addTextControl(setting, manager, item);
+          break;
 
-      // Dropdown field; this handles both cases
-      case 'dropdown':
-        settingGroup.addSetting(s => {
-          setup(s);
-          addDropdownControl(s, manager, item);
-        });
-        break;
-    }
+        // Simple text field, but treated as a number.
+        case 'number':
+          addNumberControl(setting, manager, item);
+          break;
+
+        // Toggle Field; a boolean with an on/off in it.
+        case 'toggle':
+          addToggleControl(setting, manager, item);
+          break;
+
+        // Dropdown field; this handles both a static and a dynamic control.
+        case 'dropdown':
+          addDropdownControl(setting, manager, item);
+          break;
+      }
+    });
   }
 }
 
