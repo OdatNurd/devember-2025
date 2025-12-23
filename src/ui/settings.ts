@@ -48,6 +48,7 @@ export class KursvaroSettingTab extends PluginSettingTab {
         type: 'toggle',
         name: 'Setting #3',
         description: "It's totally a toggle",
+        tooltip: ['when on, the setting is on', 'when off, the setting is off'],
         key: 'myToggleSetting',
       },
 

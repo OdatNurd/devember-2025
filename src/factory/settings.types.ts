@@ -60,11 +60,21 @@ export interface NumberSettingConfig<T> extends BaseSettingConfig {
   placeholder?: string;
 }
 
+/* When declaring the tooltip for a toggle button, the tooltip can be either a
+ * two element array of strings to specify the value to use when the toggle is
+ * true and when the toggle is false, or it can be a string that represents the
+ * tooltip to use regardless of the current state. */
+type ToggleTooltipType = [trueValue: string, falseValue: string] | string;
+
 /* The specific configuration for a toggle button; this is distinctly boolean;
  * this contains the key in the settings object that represents the value. */
 export interface ToggleSettingConfig<T> extends BaseSettingConfig {
   type: 'toggle';
   key: KeysMatching<T, boolean>;
+
+  // This tooltip is the "catch-all"; if present, it's used for any tooltip
+  // that might be missing.
+  tooltip?: ToggleTooltipType;
 }
 
 /* The specific configuration for a dropdown list; this particular config sets
