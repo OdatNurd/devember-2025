@@ -1,13 +1,14 @@
 /******************************************************************************/
 
 
-import { type GetProps } from '#ui/svelte';
+import type { StateSchema } from '#state/generic';
+import type { ComponentSchema, GetProps } from '#ui/svelte';
 
 
 /******************************************************************************/
 
 
-export interface BoobsBlockSchema {
+export interface BoobsBlockSchema extends StateSchema {
   /* Fields here have their data persisted directly into the stored plugin data
    * file data.json.
    *
@@ -19,14 +20,11 @@ export interface BoobsBlockSchema {
 
 /* This type defines the properties that are expected to be passed to the
  * BoobsBlock Svelte component. */
-export interface BoobsBlockComponent {
+export interface BoobsBlockComponent extends ComponentSchema {
   props: {
     // The source of the code block that we are rendering.
     source: string;
   };
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  exports: { };
 }
 
 /* Helper for the Svelte component script block to type its incoming props */

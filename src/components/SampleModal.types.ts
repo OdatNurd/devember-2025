@@ -18,12 +18,9 @@ export interface SampleModalSchema extends StateSchema {
 
 /* This type defines the properties that are expected to be passed to the
  * SampleCompionent Svelte component and the exports that it provides., */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface SampleModalComponent extends ComponentSchema {
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  props: { };
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  exports: { };
+  // This space intentionally blank.
 }
 
 

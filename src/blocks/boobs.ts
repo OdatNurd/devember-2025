@@ -27,7 +27,7 @@ export class BoobsBlockRenderChild
                                 BoobsBlockComponent> {
 
   /* Return the Svelte component that should be mounted within this view. */
-  getComponent() : Component<BoobsBlockProps, BoobsBlockComponent['exports']> {
+  getComponent() : Component<BoobsBlockProps> {
     return BoobsBlockComponentView;
   }
 

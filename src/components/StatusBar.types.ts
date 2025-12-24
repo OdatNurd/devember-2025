@@ -1,14 +1,15 @@
 /******************************************************************************/
 
 
-import { type GetProps } from '#ui/svelte';
+import type { StateSchema } from '#state/generic';
+import type { ComponentSchema, GetProps } from '#ui/svelte';
 
 
 /******************************************************************************/
 
 
 /* The information that the status bar component stores. */
-export interface StatusBarSchema {
+export interface StatusBarSchema extends StateSchema {
   /* Fields here have their data persisted within the Obsidian workspace as long
    * as the view is open; then it is discarded. *
    *
@@ -21,7 +22,7 @@ export interface StatusBarSchema {
 /* This component schema contains no properties or exports; note that even so
  * the sharedData prop will be injected by the system. */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface StatusBarComponent {
+export interface StatusBarComponent extends ComponentSchema {
   // This space intentionally blank
 }
 

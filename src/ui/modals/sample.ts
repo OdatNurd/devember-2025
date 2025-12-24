@@ -23,7 +23,7 @@ export class SampleModal
   }
 
   /* Return the Svelte component that should be mounted within this view. */
-  getComponent() : Component<SampleModalProps, SampleModalComponent['exports']> {
+  getComponent() : Component<SampleModalProps> {
     return SampleSvelteModal
   };
 

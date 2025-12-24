@@ -1,14 +1,15 @@
 /******************************************************************************/
 
 
-import { type GetProps } from '#ui/svelte';
+import type { StateSchema } from '#state/generic';
+import type { ComponentSchema, GetProps } from '#ui/svelte';
 
 
 /******************************************************************************/
 
 
 /* The sample plugin view uses all of the possible states. */
-export interface SampleViewSchema {
+export interface SampleViewSchema extends StateSchema {
   /* Fields here have their data persisted within the Obsidian workspace as long
    * as the view is open; then it is discarded. */
   session: {
@@ -30,7 +31,7 @@ export interface SampleViewSchema {
 
 /* This type defines the properties that are expected to be passed to the
  * SampleCompionent Svelte component and the exports that it provides., */
-export interface SampleViewComponent {
+export interface SampleViewComponent extends ComponentSchema {
   props: {
     // The title to populate into the top of the component.
     title: string;
