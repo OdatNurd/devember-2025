@@ -142,7 +142,7 @@ export function createSettingsLayout<T>(container: HTMLElement,
 
         // Progress bar control.
         case 'progressbar':
-          addProgressBarControl(setting, managerProxy, item);
+          updateHandler = addProgressBarControl(setting, managerProxy, item);
           break;
 
         // Color picker control.

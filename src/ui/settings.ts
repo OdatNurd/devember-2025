@@ -65,6 +65,7 @@ export class KursvaroSettingTab extends PluginSettingTab {
         name: 'Overall Progress',
         description: 'The description of the overall progress',
         value: async (settings) => settings.mySliderValue,
+        dependencies: ['mySliderValue'],
       },
 
       // Other Settings; a separate group
