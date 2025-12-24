@@ -3,7 +3,8 @@
 
 /* The various distinct kinds of settings that the settings factory supports. */
 export type SettingType = 'heading' | 'text' | 'textarea' | 'integer' | 'float' |
-                          'toggle' | 'dropdown' | 'slider' | 'progressbar';
+                          'toggle' | 'dropdown' | 'slider' | 'progressbar' |
+                          'colorpicker';
 
 /* This "helper" type extracts from the type defines as T all keys that are of
  * the type V. */
@@ -126,6 +127,16 @@ export interface ProgressBarSettingConfig<T> extends BaseSettingConfig {
   value: (settings: T) => Promise<number>;
 }
 
+/* The specific configuration for a color picker.
+ *
+ * This is currently set to assume that the colors come and go as "#RRGGBB"
+ * style color values; later enhancements could make this support other color
+ * systems that the picker works with as needed. */
+export interface ColorPickerSettingConfig<T> extends BaseSettingConfig {
+  type: 'colorpicker';
+  key: KeysMatching<T, string>;
+}
+
 /* Any given setting can be any of the above types. */
 export type SettingConfig<T> = HeaderSettingConfig |
                                TextSettingConfig<T> | TextAreaSettingConfig<T> |
@@ -133,7 +144,9 @@ export type SettingConfig<T> = HeaderSettingConfig |
                                ToggleSettingConfig<T> |
                                StaticDropdownSettingConfig<T> |
                                DynamicDropdownSettingsConfig<T> |
-                               SliderSettingConfig<T> | ProgressBarSettingConfig<T>;
+                               SliderSettingConfig<T> |
+                               ProgressBarSettingConfig<T> |
+                               ColorPickerSettingConfig<T>;
 
 
 /******************************************************************************/

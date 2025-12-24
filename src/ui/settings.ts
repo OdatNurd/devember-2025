@@ -110,6 +110,12 @@ export class KursvaroSettingTab extends PluginSettingTab {
           }
         },
       },
+      {
+        type: 'colorpicker',
+        name: 'Setting #9',
+        description: "Choose any color; it will not be used for a damn thing",
+        key: 'myColorValue',
+      },
     ]);
   }
 }

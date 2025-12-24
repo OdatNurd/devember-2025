@@ -7,6 +7,7 @@ import type { SettingsManager, SettingConfig } from '#factory/settings.types';
 import {
   addTextControl, addTextAreaControl, addNumberControl, addToggleControl,
   addDropdownControl, addSliderControl, addProgressBarControl,
+  addColorPickerControl,
 } from '#factory/settings/index';
 
 
@@ -99,6 +100,11 @@ export function createSettingsLayout<T>(container: HTMLElement,
         // Progress bar control.
         case 'progressbar':
           addProgressBarControl(setting, manager, item);
+          break;
+
+        // Color picker control.
+        case 'colorpicker':
+          addColorPickerControl(setting, manager, item);
           break;
       }
     });

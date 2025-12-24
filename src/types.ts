@@ -19,6 +19,7 @@ export interface KursvaroSettings {
   myDropdownSetting: string;
   myOtherDropdownSetting: string;
   mySliderValue: number;
+  myColorValue: string;
 }
 
 
@@ -62,6 +63,7 @@ const DEFAULT_SETTINGS: KursvaroSettings = {
   myDropdownSetting: 'titties',
   myOtherDropdownSetting: 'boobies',
   mySliderValue: 42,
+  myColorValue: "#696969"
 }
 
 
