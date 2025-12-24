@@ -6,7 +6,7 @@ import type { SettingsManager, SettingConfig } from '#factory/settings.types';
 
 import {
   addTextControl, addTextAreaControl, addNumberControl, addToggleControl,
-  addDropdownControl, addSliderControl,
+  addDropdownControl, addSliderControl, addProgressBarControl,
 } from '#factory/settings/index';
 
 
@@ -94,6 +94,11 @@ export function createSettingsLayout<T>(container: HTMLElement,
         // Slider control.
         case 'slider':
           addSliderControl(setting, manager, item);
+          break;
+
+        // Progress bar control.
+        case 'progressbar':
+          addProgressBarControl(setting, manager, item);
           break;
       }
     });

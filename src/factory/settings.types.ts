@@ -3,7 +3,7 @@
 
 /* The various distinct kinds of settings that the settings factory supports. */
 export type SettingType = 'heading' | 'text' | 'textarea' | 'integer' | 'float' |
-                          'toggle' | 'dropdown' | 'slider';
+                          'toggle' | 'dropdown' | 'slider' | 'progressbar';
 
 /* This "helper" type extracts from the type defines as T all keys that are of
  * the type V. */
@@ -116,6 +116,16 @@ export interface SliderSettingConfig<T> extends BaseSettingConfig {
   step?: number;
 }
 
+/* The specific configuration for a progress bar.
+ *
+ * This does not tie to an actual setting but rather is used for feedback of a
+ * percentage. Hence this does not have a key and instead you must provide a
+ * handler that will produce the appropriate value. */
+export interface ProgressBarSettingConfig<T> extends BaseSettingConfig {
+  type: 'progressbar';
+  value: (settings: T) => Promise<number>;
+}
+
 /* Any given setting can be any of the above types. */
 export type SettingConfig<T> = HeaderSettingConfig |
                                TextSettingConfig<T> | TextAreaSettingConfig<T> |
@@ -123,7 +133,7 @@ export type SettingConfig<T> = HeaderSettingConfig |
                                ToggleSettingConfig<T> |
                                StaticDropdownSettingConfig<T> |
                                DynamicDropdownSettingsConfig<T> |
-                               SliderSettingConfig<T>;
+                               SliderSettingConfig<T> | ProgressBarSettingConfig<T>;
 
 
 /******************************************************************************/

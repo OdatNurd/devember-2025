@@ -51,6 +51,21 @@ export class KursvaroSettingTab extends PluginSettingTab {
         tooltip: ['when on, the setting is on', 'when off, the setting is off'],
         key: 'myToggleSetting',
       },
+      {
+        type: 'slider',
+        name: 'Setting #8',
+        description: 'A slider',
+        key: 'mySliderValue',
+        min: -10,
+        max: 110,
+        step: 1
+      },
+      {
+        type: 'progressbar',
+        name: 'Overall Progress',
+        description: 'The description of the overall progress',
+        value: async (settings) => settings.mySliderValue,
+      },
 
       // Other Settings; a separate group
       {
@@ -95,15 +110,6 @@ export class KursvaroSettingTab extends PluginSettingTab {
           }
         },
       },
-      {
-        type: 'slider',
-        name: 'Setting #8',
-        description: 'A slider',
-        key: 'mySliderValue',
-        min: -10,
-        max: 110,
-        step: 1
-      }
     ]);
   }
 }
