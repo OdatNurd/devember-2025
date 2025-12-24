@@ -18,6 +18,7 @@ export interface KursvaroSettings {
   myToggleSetting: boolean;
   myDropdownSetting: string;
   myOtherDropdownSetting: string;
+  mySliderValue: number;
 }
 
 
@@ -60,6 +61,7 @@ const DEFAULT_SETTINGS: KursvaroSettings = {
   myToggleSetting: true,
   myDropdownSetting: 'titties',
   myOtherDropdownSetting: 'boobies',
+  mySliderValue: 42,
 }
 
 

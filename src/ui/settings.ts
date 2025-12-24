@@ -95,6 +95,15 @@ export class KursvaroSettingTab extends PluginSettingTab {
           }
         },
       },
+      {
+        type: 'slider',
+        name: 'Setting #8',
+        description: 'A slider',
+        key: 'mySliderValue',
+        min: -10,
+        max: 110,
+        step: 1
+      }
     ]);
   }
 }

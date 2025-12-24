@@ -6,7 +6,7 @@ import type { SettingsManager, SettingConfig } from '#factory/settings.types';
 
 import {
   addTextControl, addTextAreaControl, addNumberControl, addToggleControl,
-  addDropdownControl,
+  addDropdownControl, addSliderControl,
 } from '#factory/settings/index';
 
 
@@ -89,6 +89,11 @@ export function createSettingsLayout<T>(container: HTMLElement,
         // Dropdown field; this handles both a static and a dynamic control.
         case 'dropdown':
           addDropdownControl(setting, manager, item);
+          break;
+
+        // Slider control.
+        case 'slider':
+          addSliderControl(setting, manager, item);
           break;
       }
     });

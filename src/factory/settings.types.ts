@@ -3,7 +3,7 @@
 
 /* The various distinct kinds of settings that the settings factory supports. */
 export type SettingType = 'heading' | 'text' | 'textarea' | 'integer' | 'float' |
-                          'toggle' | 'dropdown';
+                          'toggle' | 'dropdown' | 'slider';
 
 /* This "helper" type extracts from the type defines as T all keys that are of
  * the type V. */
@@ -105,13 +105,25 @@ export interface DynamicDropdownSettingsConfig<T> extends BaseSettingConfig {
   loader: () => Promise<Record<string,string>>;
 }
 
+/* The specific configuration for a slider; this is a number value that is
+ * constrained to aa range; this contains the key in the settings object that
+ * represents the value. */
+export interface SliderSettingConfig<T> extends BaseSettingConfig {
+  type: 'slider',
+  key: KeysMatching<T, number>;
+  min?: number;
+  max?: number;
+  step?: number;
+}
+
 /* Any given setting can be any of the above types. */
 export type SettingConfig<T> = HeaderSettingConfig |
                                TextSettingConfig<T> | TextAreaSettingConfig<T> |
                                IntegerSettingConfig<T> | FloatSettingConfig<T> |
                                ToggleSettingConfig<T> |
                                StaticDropdownSettingConfig<T> |
-                               DynamicDropdownSettingsConfig<T>;
+                               DynamicDropdownSettingsConfig<T> |
+                               SliderSettingConfig<T>;
 
 
 /******************************************************************************/
