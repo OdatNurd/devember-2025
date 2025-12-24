@@ -10,6 +10,8 @@ import { SvelteIntegration } from '#ui/svelte';
 import { KursvaroSettingTab } from '#ui/settings';
 import { SampleView, VIEW_TYPE_SAMPLE } from '#ui/views/sample';
 
+import type { SettingsChangeListener } from '#factory/settings.types';
+
 import { registerCommand } from '#factory/commands';
 import { commands } from '#commands/index';
 import { OpenSampleViewCommand } from '#commands/standard/open_view';
@@ -30,6 +32,7 @@ export class KursvaroPlugin extends Plugin {
   state: GenericSavedState<PluginStateSchema>;
   stateCleanup: (() => void) | undefined;
   statusBarIntegration: SvelteIntegration<StatusBarSchema, StatusBarComponent>;
+  private settingsListeners: ((key: keyof KursvaroSettings) => void)[] = [];
 
   async onload() {
     // Before we do anything else, load in our plugin's data file; this sets up
@@ -143,8 +146,21 @@ export class KursvaroPlugin extends Plugin {
   }
 
   /* Persist all of our plugin data, including savings, back to disk. */
-  async savePluginData() {
+  async savePluginData(key?: keyof KursvaroSettings) {
     await this.saveData(this.data);
+
+    if (key !== undefined) {
+      this.settingsListeners.forEach(handler => handler(key))
+    }
+  }
+
+  /* Allow callers to register an interest in knowing when a setting has its
+   * value changed, at the point at which savePluginData() is called.
+   *
+   * The listeners registered here will happen after the data is saved out to
+   * disk. */
+  onSettingsChange(callback: SettingsChangeListener<KursvaroSettings>) {
+    this.settingsListeners.push(callback);
   }
 
   /* This gets invoked whenever it is detected that the data.json file has

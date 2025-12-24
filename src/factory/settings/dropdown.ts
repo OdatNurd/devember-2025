@@ -115,7 +115,7 @@ export function addDropdownControl<T>(setting: Setting,
     dropdown
       .onChange(async (value: string) => {
         (manager.settings[config.key] as string) = value;
-        await manager.savePluginData()
+        await manager.savePluginData(config.key);
       })
       .setDisabled(config.disabled ?? false);
 

@@ -30,7 +30,7 @@ export function addTextAreaControl<T>(setting: Setting,
     .setValue(String(manager.settings[config.key] ?? ''))
     .onChange(async (value: string) => {
       (manager.settings[config.key] as string) = value;
-      await manager.savePluginData()
+      await manager.savePluginData(config.key);
     })
   });
 }

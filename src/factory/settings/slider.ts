@@ -31,7 +31,7 @@ export function addSliderControl<T>(setting: Setting,
     .setValue(Number(manager.settings[config.key] ?? min))
     .onChange(async (value: number) => {
       (manager.settings[config.key] as number) = value;
-      await manager.savePluginData()
+      await manager.savePluginData(config.key);
     })
   );
 }

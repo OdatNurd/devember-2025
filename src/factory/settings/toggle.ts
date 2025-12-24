@@ -41,7 +41,7 @@ export function addToggleControl<T>(setting: Setting,
     .onChange(async (value: boolean) => {
       (manager.settings[config.key] as boolean) = value;
       toggle.setTooltip(getTooltip(value));
-      await manager.savePluginData()
+      await manager.savePluginData(config.key);
     })
   );
 }

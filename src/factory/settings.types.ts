@@ -17,11 +17,16 @@ export type SettingType = 'heading' | 'text' | 'textarea' | 'integer' | 'float' 
  * respond to dependency changes by updating its state (value, options, etc). */
 export type ControlUpdateHandler<T> = (settings: T) => void | Promise<void>;
 
+/* A callback function invoked whenever a setting value has changed and has been
+ * persisted to disk. */
+export type SettingsChangeListener<T> = (key: keyof T) => void;
+
 /* The prototype interface for a class that knows how to get at and set the
  * settings for a specific settings type. */
 export interface SettingsManager<T> {
   settings: T;
-  savePluginData(): Promise<void>
+  savePluginData(key?: keyof T): Promise<void>;
+  onSettingsChange(callback: SettingsChangeListener<T>): void;
 }
 
 /* This interface specifies the fields that are common to all configuration

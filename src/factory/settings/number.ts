@@ -32,7 +32,7 @@ export function addNumberControl<T>(setting: Setting,
       const num = Number(value);
       if (isNaN(num) === false) {
         (manager.settings[config.key] as number) = num;
-        await manager.savePluginData();
+        await manager.savePluginData(config.key);
       }
     });
 

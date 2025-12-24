@@ -32,6 +32,16 @@ export function createSettingsLayout<T>(container: HTMLElement,
   // also cause the group to change.
   let settingGroup = null;
 
+  // Tell our manager to let us know every time a setting changes so that we can
+  // trace the dependency tree and update any settings that depend on that
+  // setting.
+  manager.onSettingsChange(changedKey => {
+    const dependents = dependencyMap.get(changedKey);
+    if (dependents !== undefined) {
+      dependents.forEach(handler => handler(manager.settings));
+    }
+  });
+
   // Iterate over all of the settings in the configured list in order to
   // construct the settings layout. All settings will go into a SettingGroup
   // object. An entry in the settings that represents a heading will start a
@@ -76,78 +86,47 @@ export function createSettingsLayout<T>(container: HTMLElement,
         setting.setClass(item.cssClass)
       }
 
-      // In order to be able to know exactly what setting was actually changed,
-      // create a simple proxy around the manager that we were given; this way
-      // we can intercept changes to specific settings and trigger the update
-      // handlers for them.
-      //
-      // This is inside of the loop so that it can close over the current config
-      // item to know what setting is being updated; a more robust version might
-      // be to adjust the API for savePluginData() so that it knows what setting
-      // is the one that triggered the update.
-      const managerProxy = {
-        ...manager,
-        settings: manager.settings,
-
-        savePluginData: async () => {
-          await manager.savePluginData();
-
-          // Get any dependencies on this particular setting; if there are any,
-          // then trigger the update handlers.
-          if (('key' in item) === false) {
-            return;
-          }
-
-          // If there are any settings that depend on us changing, then invoke
-          // their handlers now with the new settings.
-          const dependents = dependencyMap.get(item.key);
-          if (dependents !== undefined) {
-            dependents.forEach(handler => handler(manager.settings));
-          }
-        }
-      }
-
       // Based on the type of the setting, insert the appropriate control.
       switch (item.type) {
         // Simple text field.
         case 'text':
-          addTextControl(setting, managerProxy, item);
+          addTextControl(setting, manager, item);
           break;
 
         // Simple textarea field.
         case 'textarea':
-          addTextAreaControl(setting, managerProxy, item);
+          addTextAreaControl(setting, manager, item);
           break;
 
         // Simple text field, but treated as a number.
         case 'integer':
         case 'float':
-          addNumberControl(setting, managerProxy, item);
+          addNumberControl(setting, manager, item);
           break;
 
         // Toggle Field; a boolean with an on/off in it.
         case 'toggle':
-          addToggleControl(setting, managerProxy, item);
+          addToggleControl(setting, manager, item);
           break;
 
         // Dropdown field; this handles both a static and a dynamic control.
         case 'dropdown':
-          updateHandler = addDropdownControl(setting, managerProxy, item);
+          updateHandler = addDropdownControl(setting, manager, item);
           break;
 
         // Slider control.
         case 'slider':
-          addSliderControl(setting, managerProxy, item);
+          addSliderControl(setting, manager, item);
           break;
 
         // Progress bar control.
         case 'progressbar':
-          updateHandler = addProgressBarControl(setting, managerProxy, item);
+          updateHandler = addProgressBarControl(setting, manager, item);
           break;
 
         // Color picker control.
         case 'colorpicker':
-          addColorPickerControl(setting, managerProxy, item);
+          addColorPickerControl(setting, manager, item);
           break;
       }
     });
