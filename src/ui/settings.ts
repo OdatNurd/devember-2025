@@ -102,11 +102,19 @@ export class KursvaroSettingTab extends PluginSettingTab {
         name: 'Setting #7',
         description: "Spelling Bee",
         key: 'myOtherDropdownSetting',
-        loader: async () : Promise<Record<string, string>> => {
+        dependencies: ['myToggleSetting'],
+        loader: async (settings) : Promise<Record<string, string>> => {
           await new Promise(resolve => setTimeout(resolve, 2000));
-          return {
-            'boobies': "It is spelled 'Boobies'",
-            'bewbies': "It is spelled 'Bewbies'",
+          if (settings.myToggleSetting) {
+             return {
+              'boobies': "It is spelled 'Boobies' (Toggle ON)",
+              'bewbies': "It is spelled 'Bewbies' (Toggle ON)",
+            };
+          } else {
+             return {
+              'boobies': "It is spelled 'Boobies' (Toggle OFF)",
+              'bewbies': "It is spelled 'Bewbies' (Toggle OFF)",
+            };
           }
         },
       },

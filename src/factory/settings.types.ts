@@ -1,16 +1,21 @@
 /******************************************************************************/
 
 
-/* The various distinct kinds of settings that the settings factory supports. */
-export type SettingType = 'heading' | 'text' | 'textarea' | 'integer' | 'float' |
-                          'toggle' | 'dropdown' | 'slider' | 'progressbar' |
-                          'colorpicker';
-
 /* This "helper" type extracts from the type defines as T all keys that are of
  * the type V. */
 type KeysMatching<T, V> = {
   [K in keyof T]: T[K] extends V ? K : never;
 }[keyof T];
+
+/* The various distinct kinds of settings that the settings factory supports. */
+export type SettingType = 'heading' | 'text' | 'textarea' | 'integer' | 'float' |
+                          'toggle' | 'dropdown' | 'slider' | 'progressbar' |
+                          'colorpicker';
+
+/* The settings handler that adds settings to the page can optionally return a
+ * function of this type to indicate that the specific setting instance can
+ * respond to dependency changes by updating its state (value, options, etc). */
+export type ControlUpdateHandler<T> = (settings: T) => void | Promise<void>;
 
 /* The prototype interface for a class that knows how to get at and set the
  * settings for a specific settings type. */
@@ -19,97 +24,82 @@ export interface SettingsManager<T> {
   savePluginData(): Promise<void>
 }
 
-/* This interface specifies the fields that are common to all configurtion
- * settings regardles of their type. */
-export interface BaseSettingConfig {
+/* This interface specifies the fields that are common to all configuration
+ * settings regardless of their type. */
+export interface BaseSettingConfig<T = unknown> {
   type: SettingType;
   name: string;
   description?: string;
   cssClass?: string;
   disabled?: boolean;
+
+  // Optional list of settings this setting depends on; if any of them changes,
+  // the setup for this setting (if configured) will be executed again.
+  dependencies?: Array<keyof T>;
 };
 
 /* The specific configuration for a header; this has no extra configuration and
- * the defaults tell us eerything we need. */
+ * the defaults tell us everything we need. */
 export interface HeaderSettingConfig extends BaseSettingConfig {
   type: 'heading';
 }
 
-/* The specific configuration for a text value; this contains extra info on the
- * key in the settings object that represents the value, and what the
- * placeholder would be. */
-export interface TextSettingConfig<T> extends BaseSettingConfig {
+/* The specific configuration for a text field. */
+export interface TextSettingConfig<T> extends BaseSettingConfig<T> {
   type: 'text';
   key: KeysMatching<T, string>;
   placeholder?: string;
 }
 
-/* The specific configuration for a textarea value; this contains extra info on
- * the key in the settings object that represents the value, and what the
- * placeholder would be. */
-export interface TextAreaSettingConfig<T> extends BaseSettingConfig {
+/* The specific configuration for a multi-line text field. */
+export interface TextAreaSettingConfig<T> extends BaseSettingConfig<T> {
   type: 'textarea';
   key: KeysMatching<T, string>;
   placeholder?: string;
 }
 
-/* The specific configuration for a numeric integer value; this contains extra
- * info the key in the settings object that represents the value, and what the
- * placeholder would be. */
-export interface IntegerSettingConfig<T> extends BaseSettingConfig {
+/* The specific configuration for a numeric field (integer only). */
+export interface IntegerSettingConfig<T> extends BaseSettingConfig<T> {
   type: 'integer';
   key: KeysMatching<T, number>;
   placeholder?: string;
 }
 
-/* The specific configuration for a numeric float value; this contains extra
- * info the key in the settings object that represents the value, and what the
- * placeholder would be. */
-export interface FloatSettingConfig<T> extends BaseSettingConfig {
+/* The specific configuration for a numeric field (floating point). */
+export interface FloatSettingConfig<T> extends BaseSettingConfig<T> {
   type: 'float';
   key: KeysMatching<T, number>;
   placeholder?: string;
 }
 
-/* When declaring the tooltip for a toggle button, the tooltip can be either a
- * two element array of strings to specify the value to use when the toggle is
- * true and when the toggle is false, or it can be a string that represents the
- * tooltip to use regardless of the current state. */
-type ToggleTooltipType = [trueValue: string, falseValue: string] | string;
-
 /* The specific configuration for a toggle button; this is distinctly boolean;
  * this contains the key in the settings object that represents the value. */
-export interface ToggleSettingConfig<T> extends BaseSettingConfig {
+export interface ToggleSettingConfig<T> extends BaseSettingConfig<T> {
   type: 'toggle';
   key: KeysMatching<T, boolean>;
 
-  // This tooltip is the "catch-all"; if present, it's used for any tooltip
-  // that might be missing.
-  tooltip?: ToggleTooltipType;
+  // Tooltip is either a single string for all cases, or a different tip for
+  // both true and false, to help with what the toggle is for.
+  tooltip?: [trueValue: string, falseValue: string] | string;
 }
 
-/* The specific configuration for a dropdown list; this particular config sets
- * the settings key and requires that you give it the options to provide in the
- * list. */
-export interface StaticDropdownSettingConfig<T> extends BaseSettingConfig {
+/* The specific configuration for a dropdown field (static option list). */
+export interface StaticDropdownSettingConfig<T> extends BaseSettingConfig<T> {
   type: 'dropdown';
   key: KeysMatching<T, string>;
   options: Record<string, string>
 }
 
-/* As above but in this iteration we need to invoke a function in order to
- * gather the options that we want to populate; this is used for lists that do
- * not depend on static data. */
-export interface DynamicDropdownSettingsConfig<T> extends BaseSettingConfig {
+/* The specific configuration for a dropdown field (dynamic option list). */
+export interface DynamicDropdownSettingsConfig<T> extends BaseSettingConfig<T> {
   type: 'dropdown',
   key: KeysMatching<T, string>;
-  loader: () => Promise<Record<string,string>>;
+  loader: (settings: T) => Promise<Record<string,string>>;
 }
 
 /* The specific configuration for a slider; this is a number value that is
- * constrained to aa range; this contains the key in the settings object that
- * represents the value. */
-export interface SliderSettingConfig<T> extends BaseSettingConfig {
+ * constrained to a range and which jumps in a specific step increment. */
+export interface SliderSettingConfig<T> extends BaseSettingConfig<T> {
   type: 'slider',
   key: KeysMatching<T, number>;
   min?: number;
@@ -122,7 +112,7 @@ export interface SliderSettingConfig<T> extends BaseSettingConfig {
  * This does not tie to an actual setting but rather is used for feedback of a
  * percentage. Hence this does not have a key and instead you must provide a
  * handler that will produce the appropriate value. */
-export interface ProgressBarSettingConfig<T> extends BaseSettingConfig {
+export interface ProgressBarSettingConfig<T> extends BaseSettingConfig<T> {
   type: 'progressbar';
   value: (settings: T) => Promise<number>;
 }
@@ -132,7 +122,7 @@ export interface ProgressBarSettingConfig<T> extends BaseSettingConfig {
  * This is currently set to assume that the colors come and go as "#RRGGBB"
  * style color values; later enhancements could make this support other color
  * systems that the picker works with as needed. */
-export interface ColorPickerSettingConfig<T> extends BaseSettingConfig {
+export interface ColorPickerSettingConfig<T> extends BaseSettingConfig<T> {
   type: 'colorpicker';
   key: KeysMatching<T, string>;
 }

@@ -3,7 +3,7 @@
 
 import { DropdownComponent, Setting } from 'obsidian';
 import type {
-  SettingsManager, StaticDropdownSettingConfig, DynamicDropdownSettingsConfig
+  ControlUpdateHandler, SettingsManager, StaticDropdownSettingConfig, DynamicDropdownSettingsConfig
 } from '#factory/settings.types';
 
 
@@ -12,13 +12,18 @@ import type {
 
 /* Given a dropdown component and a configuration option, configure the dropdown
  * to have the required options, which come from a static list within the actual
- * config object itself. */
+ * config object itself, and then ensure that the dropdown is displaying the
+ * value provided.
+ *
+ * The options will be cleared first to ensure that if this gets called again
+ * (we are told we depend on some other setting) that the items won't double up
+ * the options list, since Obsidian appends the new items you give it. */
 function staticDropdownSetup<T>(dropdown: DropdownComponent,
                                 config: StaticDropdownSettingConfig<T>,
-                                _select: HTMLSelectElement, _value: string) {
-  // A one line function to set the internet on fire. With arguments it does not
-  // even use, even! Let the rage bait begin!
+                                select: HTMLSelectElement, value: string) {
+  select.empty();
   dropdown.addOptions(config.options);
+  dropdown.setValue(value);
 }
 
 
@@ -27,9 +32,9 @@ function staticDropdownSetup<T>(dropdown: DropdownComponent,
 
 /* Given a dropdown component and a configuration option, configure the dropdown
  * to have the required options, which come from an async callback that will
- * return the actual config.
+ * return the actual config based on the provided settings.
  *
- * Since this is async, while the callback is runnign this will disable the
+ * Since this is async, while the callback is running this will disable the
  * control and include a single fake option in it that tells the user that it is
  * loading.
  *
@@ -37,7 +42,8 @@ function staticDropdownSetup<T>(dropdown: DropdownComponent,
  * load failed, and will remain disabled so the user can't interact with it. */
 async function dynamicDropdownSetup<T>(dropdown: DropdownComponent,
                                        config: DynamicDropdownSettingsConfig<T>,
-                                       select: HTMLSelectElement, value: string) {
+                                       select: HTMLSelectElement,
+                                       settings: T) {
   // The control might be disabled by config choice, but it needs to
   // also be disabled while we fiddle with it and wait, so store the
   // current state and then disable it.
@@ -45,25 +51,36 @@ async function dynamicDropdownSetup<T>(dropdown: DropdownComponent,
   select.disabled = true;
 
   try {
-    // We need a temporary option to tell the user that the options
-    // are loading.
-    // Add a temporaru option to tell the user that the options are
-    // loading, and then invoke the loader; this can take arbitrary
-    // time.
+    // We need a temporary option to tell the user that the options are loading.
+    select.empty();
     dropdown.addOption('unknown', 'Loading...');
-    const options = await config.loader();
+    dropdown.setValue('unknown');
 
-    // Empty the select and then add in our options and put its state
-    // back.
+    // Invoke the loader, passing the current settings so the options can be
+    // determined based on the state of other fields.
+    const options = await config.loader(settings);
+
+    // Empty the select and then add in our options and put its state back.
     select.empty();
     dropdown.addOptions(options);
     select.disabled = wasDisabled;
+
+    // Determine the value to set. We try to grab the value from settings, but
+    // if the newly loaded options don't contain that value (e.g. the
+    // dependencies changed what is valid), we default to the first available
+    // option so that the display looks correct.
+    let value = (settings[config.key] as string) ?? '';
+    if ((value in options) === false) {
+      const firstKey = Object.keys(options)[0];
+      value = firstKey !== undefined ? firstKey : '';
+    }
+    dropdown.setValue(value);
   } catch (error) {
     // Say in the console why it failed, then insert a fake entry so
     // that the user will see it in the UI too.
     console.error(`unable to load dropdown options: ${error}`);
     select.empty();
-    dropdown.addOption(value, 'Error loading options');
+    dropdown.addOption((settings[config.key] as string) ?? '', 'Error loading options');
   }
 }
 
@@ -80,11 +97,20 @@ async function dynamicDropdownSetup<T>(dropdown: DropdownComponent,
  *
  * This handles the case of both a static dropdown (the options are provided
  * directly in the configuration object) and a dynamic dropdown (the options are
- * gathered via an async callback to allow them to be generated on the fly. */
+ * gathered via an async callback to allow them to be generated on the fly.
+ *
+ * Returns a function that can be called to force the control to update itself
+ * based on the latest settings (e.g. when a dependency changes). */
 export function addDropdownControl<T>(setting: Setting,
                                       manager: SettingsManager<T>,
                                       config: StaticDropdownSettingConfig<T> |
-                                              DynamicDropdownSettingsConfig<T>) {
+                                              DynamicDropdownSettingsConfig<T>) : ControlUpdateHandler<T> {
+  // The function that is responsible for filling out the options in the select
+  // that underlies us whenever the data changes; it needs to be assigned inside
+  // the addDropdown so it can close over the component, but it needs to have a
+  // default value or Typescript will lose its shit on the return value.
+  let updateHandler: ControlUpdateHandler<T> = async () => {};
+
   setting.addDropdown(async (dropdown) => {
     dropdown
       .onChange(async (value: string) => {
@@ -93,23 +119,31 @@ export function addDropdownControl<T>(setting: Setting,
       })
       .setDisabled(config.disabled ?? false);
 
-    // Pull the value that this dropdown is supposed to have, and the
-    // select element that wraps it.
+    // Pull the select element that wraps the dropdown.
     const select = dropdown.selectEl;
-    const value = (manager.settings[config.key] as string) ?? '';
 
-    // Handle the type of dropdown; the determination is whether or not there
-    // are any statically defined options in the config.
-    if ("options" in config) {
-      staticDropdownSetup(dropdown, config, select, value);
-    } else {
-      await dynamicDropdownSetup(dropdown, config, select, value);
-    }
+    // The update handler which knows how to populate the select options; this
+    // has two cases, one for static lists and one for dynamic. For dynamic the
+    // current settings are provided by the dependency system when they invoke
+    // us, so that any relevant values can be gathered from it.
+    //
+    // This is defined inside of here and not at the global level so that it can
+    // close over the added dropdown element used for the setting.
+    updateHandler = async (currentSettings: T) => {
+      if ("options" in config) {
+        const value = (currentSettings[config.key] as string) ?? '';
+        staticDropdownSetup(dropdown, config, select, value);
+      } else {
+        await dynamicDropdownSetup(dropdown, config, select, currentSettings);
+      }
+    };
 
-    // The above adds the options, so this can now set the value; without this
-    // you don't get to see what the current value is.
-    dropdown.setValue(value)
+    // Use the handler we just defined in order to do the initial setup.
+    await updateHandler(manager.settings);
   });
+
+  // Return the handler the factory needs for the dependency system.
+  return updateHandler;
 }
 
 
