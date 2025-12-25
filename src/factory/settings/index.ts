@@ -9,6 +9,8 @@ export { addDropdownControl } from '#factory/settings/dropdown';
 export { addSliderControl } from '#factory/settings/slider';
 export { addProgressBarControl } from '#factory/settings/progressbar';
 export { addColorPickerControl } from '#factory/settings/colorpicker';
+export { addButtonControl } from '#factory/settings/button';
+export { addExtraButtonControl } from '#factory/settings/extrabutton';
 
 
 /******************************************************************************/

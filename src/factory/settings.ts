@@ -7,7 +7,7 @@ import type { ControlUpdateHandler, SettingsManager, SettingRowConfig } from '#f
 import {
   addTextControl, addTextAreaControl, addNumberControl, addToggleControl,
   addDropdownControl, addSliderControl, addProgressBarControl,
-  addColorPickerControl,
+  addColorPickerControl, addButtonControl, addExtraButtonControl,
 } from '#factory/settings/index';
 
 
@@ -134,6 +134,16 @@ export function createSettingsLayout<T>(container: HTMLElement,
           // Color picker control.
           case 'colorpicker':
             addColorPickerControl(setting, manager, item);
+            break;
+
+          // Regular button control.
+          case 'button':
+            addButtonControl(setting, manager, item);
+            break;
+
+          // Extra button control (button with just an icon)
+          case 'extrabutton':
+            addExtraButtonControl(setting, manager, item);
             break;
         }
 

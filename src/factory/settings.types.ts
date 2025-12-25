@@ -10,7 +10,7 @@ type KeysMatching<T, V> = {
 /* The various distinct kinds of settings that the settings factory supports. */
 export type SettingType = 'heading' | 'text' | 'textarea' | 'integer' | 'float' |
                           'toggle' | 'dropdown' | 'slider' | 'progressbar' |
-                          'colorpicker';
+                          'colorpicker' | 'button' | 'extrabutton';
 
 /* The settings handler that adds settings to the page can optionally return a
  * function of this type to indicate that the specific setting instance can
@@ -132,16 +132,32 @@ export interface ColorPickerSettingConfig<T> extends BaseSettingConfig<T> {
   key: KeysMatching<T, string>;
 }
 
+/* The specific configuration for a standard button. */
+export interface ButtonSettingConfig<T> extends BaseSettingConfig<T> {
+  type: 'button',
+  text: string;
+  style?: 'normal' | 'warning' | 'cta';
+  tooltip?: string;
+  icon?: string;
+  click: (settings: T) => Promise<void> | void;
+}
+
+/* The specific configuration for an extra button (no text, just icon). */
+export interface ExtraButtonSettingConfig<T> extends BaseSettingConfig<T> {
+  type: 'extrabutton',
+  tooltip?: string;
+  icon?: string;
+  click: (settings: T) => Promise<void> | void;
+}
+
 /* Any given setting can be any of the above types. */
-export type SettingConfig<T> = HeaderSettingConfig |
-                               TextSettingConfig<T> | TextAreaSettingConfig<T> |
-                               IntegerSettingConfig<T> | FloatSettingConfig<T> |
-                               ToggleSettingConfig<T> |
-                               StaticDropdownSettingConfig<T> |
-                               DynamicDropdownSettingsConfig<T> |
-                               SliderSettingConfig<T> |
-                               ProgressBarSettingConfig<T> |
-                               ColorPickerSettingConfig<T>;
+export type SettingConfig<T> =
+  HeaderSettingConfig | TextSettingConfig<T> | TextAreaSettingConfig<T> |
+  IntegerSettingConfig<T> | FloatSettingConfig<T> | ToggleSettingConfig<T> |
+  StaticDropdownSettingConfig<T> | DynamicDropdownSettingsConfig<T> |
+  SliderSettingConfig<T> | ProgressBarSettingConfig<T> |
+  ColorPickerSettingConfig<T> | ButtonSettingConfig<T> |
+  ExtraButtonSettingConfig<T>;
 
 
 /* A row in the settings page can be either a single settings object as above,

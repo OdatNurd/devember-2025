@@ -32,6 +32,14 @@ export class KursvaroSettingTab extends PluginSettingTab {
       // General Settings
       [
         {
+          type: 'extrabutton',
+          name: 'Setting #1',
+          description: "It's a secret",
+          icon: 'gear',
+          tooltip: 'Are you feeling lucky?',
+          click: (settings) => console.log(settings),
+        },
+        {
           type: 'text',
           name: 'Setting #1',
           description: "It's a secret",
@@ -39,13 +47,24 @@ export class KursvaroSettingTab extends PluginSettingTab {
           key: 'mySetting',
         },
       ],
-      {
-        type: 'textarea',
-        name: 'Setting #2',
-        description: "It's not a secret",
-        placeholder: 'The non-secret goes here',
-        key: 'myOtherSetting',
-      },
+      [
+        {
+          type: 'button',
+          name: 'Setting #2',
+          description: "It's not a secret",
+          style: 'cta',
+          text: 'Call to Action Btn',
+          tooltip: 'The normal button',
+          click: (settings) => console.log(settings),
+        },
+        {
+          type: 'textarea',
+          name: 'Setting #2',
+          description: "It's not a secret",
+          placeholder: 'The non-secret goes here',
+          key: 'myOtherSetting',
+        },
+      ],
       {
         type: 'toggle',
         name: 'Setting #3',
