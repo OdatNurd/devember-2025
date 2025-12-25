@@ -50,15 +50,18 @@ export function createSettingsLayout<T>(container: HTMLElement,
   //
   // If the first item isn't group, we will add one.
   for (const row of settings) {
-    // If this row is starting a new group heading, then create an explicit
-    // SettingGroup for it; this will start grouping all settings into that
-    // particular group.
-    if (row.heading !== undefined) {
+    // If this row doesn't have any items, then it must be setting a heading,
+    // since that is the only other possible option.
+    //
+    // Note that you might want to have this check to see if `heading` exists
+    // but then the type discriminator takes a shit on you. So, don't.
+    if (row.items === undefined) {
       settingGroup = new SettingGroup(container).setHeading(row.heading);
 
       if (row.cssClass !== undefined) {
         settingGroup.addClass(row.cssClass ?? '')
       }
+      continue;
     }
 
     // We are about to process a non-heading setting. If there is not a

@@ -149,17 +149,28 @@ export type SettingConfig<T> =
   ColorPickerSettingConfig<T> | ButtonSettingConfig<T> | ExtraButtonSettingConfig<T>;
 
 
-/* A row in the setting page contains an entry that has the name of the overall
- * setting the row portrays, its description and an optional CSS class to apply
- * to the component.
- *
- * It also has an array of the actual components that should be added to the
- * settings row. */
-export interface SettingRowConfig<T> {
-  // If present, this row starts a new settings section and this text is the
-  // header for that row.
-  heading?: string;
+/* A configuration entry that starts a new visual section/group. Any settings
+ * following this entry will belong to this group until the next header is
+ * encountered in the config. A default nameless header is created for the first
+ * setting if there are instances of this in the config. */
+export interface SettingRowHeaderConfig {
+  heading: string;
+  cssClass?: string;
 
+  // These items appear in setting rows; specifically forbid them to exist in
+  // objects of this shape.
+  name?: never;
+  description?: never;
+  items?: never;
+}
+
+/* A configuration entry row in the setting page that contains an actual
+ * setting. This indicates the name and description of the setting, and an
+ * optional CSS class to apply to the group.
+ *
+ * A list of setting components will be inserted into the row in the order they
+ * appear in the items list. */
+export interface SettingRowItemConfig<T> {
   // The information on the setting this row represents.
   name: string;
   description?: string;
@@ -167,7 +178,14 @@ export interface SettingRowConfig<T> {
 
   // The controls that exist in this row
   items: SettingConfig<T>[];
+
+  // A settings item can never be a header, so forbid it explicitly.
+  heading?: never;
 }
+
+/* A row in the setting page is either a heading row or a setting with one or
+ * more components in it. */
+export type SettingRowConfig<T> = SettingRowHeaderConfig | SettingRowItemConfig<T>;
 
 
 /******************************************************************************/

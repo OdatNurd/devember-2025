@@ -102,8 +102,9 @@ export class KursvaroSettingTab extends PluginSettingTab {
       },
 
       // Other Settings; a separate group
+      { heading: 'Other Settings' },
+
       {
-        heading: 'Other Settings',
         name: 'Setting #4',
         description: "It's a number",
         items: [
