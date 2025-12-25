@@ -2,7 +2,7 @@
 
 
 import { SettingGroup } from 'obsidian';
-import type { ControlUpdateHandler, SettingsManager, SettingConfig } from '#factory/settings.types';
+import type { ControlUpdateHandler, SettingsManager, SettingRowConfig } from '#factory/settings.types';
 
 import {
   addTextControl, addTextAreaControl, addNumberControl, addToggleControl,
@@ -21,7 +21,7 @@ import {
  * This, in theory, makes the settings configuration less unweildy. */
 export function createSettingsLayout<T>(container: HTMLElement,
                                         manager: SettingsManager<T>,
-                                        settings: SettingConfig<T>[]) : void {
+                                        settings: SettingRowConfig<T>[]) : void {
   // This map correlates settings keys with the handler functions that should be
   // invoked whenever that setting changes, so that things can dynamically
   // update.
@@ -49,14 +49,20 @@ export function createSettingsLayout<T>(container: HTMLElement,
   // until a heading group is defined.
   //
   // If the first item isn't group, we will add one.
-  for (const item of settings) {
+  for (const row of settings) {
+    // The item in the settings config can be either a single setting config or
+    // an array of them. If it is not an array of items, then convert it into
+    // an array.
+    const rowItems = (Array.isArray(row) === true ? row : [row]);
+    const leadItem = rowItems[0]
+
     // When an entry is a heading, create an explicit SettingGroup for it and
     // then we're done.
-    if (item.type === 'heading') {
-      settingGroup = new SettingGroup(container).setHeading(item.name);
+    if (leadItem.type === 'heading') {
+      settingGroup = new SettingGroup(container).setHeading(leadItem.name);
 
-      if (item.cssClass !== undefined) {
-        settingGroup.addClass(item.cssClass ?? '')
+      if (leadItem.cssClass !== undefined) {
+        settingGroup.addClass(leadItem.cssClass ?? '')
       }
       continue;
     }
@@ -77,71 +83,73 @@ export function createSettingsLayout<T>(container: HTMLElement,
     settingGroup.addSetting(setting => {
       // Set the setting name and description.
       setting
-        .setName(item.name)
-        .setDesc(item.description ?? '')
+        .setName(leadItem.name)
+        .setDesc(leadItem.description ?? '')
 
       // Include the CSS; this strictly requires a non-empty string so we can't
       // coalesce in a default.
-      if (item.cssClass !== undefined) {
-        setting.setClass(item.cssClass)
+      if (leadItem.cssClass !== undefined) {
+        setting.setClass(leadItem.cssClass)
       }
 
-      // Based on the type of the setting, insert the appropriate control.
-      switch (item.type) {
-        // Simple text field.
-        case 'text':
-          addTextControl(setting, manager, item);
-          break;
+      for (const item of rowItems) {
+        // Based on the type of the setting, insert the appropriate control.
+        switch (item.type) {
+          // Simple text field.
+          case 'text':
+            addTextControl(setting, manager, item);
+            break;
 
-        // Simple textarea field.
-        case 'textarea':
-          addTextAreaControl(setting, manager, item);
-          break;
+          // Simple textarea field.
+          case 'textarea':
+            addTextAreaControl(setting, manager, item);
+            break;
 
-        // Simple text field, but treated as a number.
-        case 'integer':
-        case 'float':
-          addNumberControl(setting, manager, item);
-          break;
+          // Simple text field, but treated as a number.
+          case 'integer':
+          case 'float':
+            addNumberControl(setting, manager, item);
+            break;
 
-        // Toggle Field; a boolean with an on/off in it.
-        case 'toggle':
-          addToggleControl(setting, manager, item);
-          break;
+          // Toggle Field; a boolean with an on/off in it.
+          case 'toggle':
+            addToggleControl(setting, manager, item);
+            break;
 
-        // Dropdown field; this handles both a static and a dynamic control.
-        case 'dropdown':
-          updateHandler = addDropdownControl(setting, manager, item);
-          break;
+          // Dropdown field; this handles both a static and a dynamic control.
+          case 'dropdown':
+            updateHandler = addDropdownControl(setting, manager, item);
+            break;
 
-        // Slider control.
-        case 'slider':
-          addSliderControl(setting, manager, item);
-          break;
+          // Slider control.
+          case 'slider':
+            addSliderControl(setting, manager, item);
+            break;
 
-        // Progress bar control.
-        case 'progressbar':
-          updateHandler = addProgressBarControl(setting, manager, item);
-          break;
+          // Progress bar control.
+          case 'progressbar':
+            updateHandler = addProgressBarControl(setting, manager, item);
+            break;
 
-        // Color picker control.
-        case 'colorpicker':
-          addColorPickerControl(setting, manager, item);
-          break;
+          // Color picker control.
+          case 'colorpicker':
+            addColorPickerControl(setting, manager, item);
+            break;
+        }
+
+        // If this setting type is one that can dynamically update itself and it
+        // also has dependencies, then update our dependency map to know that when
+        // any of those settings change, this settings update handler should be
+        // triggered.
+        if (updateHandler !== undefined && item.dependencies !== undefined) {
+          for (const settingName of item.dependencies) {
+            const handlers = dependencyMap.get(settingName) ?? [];
+            handlers.push(updateHandler);
+            dependencyMap.set(settingName, handlers);
+          }
+        }
       }
     });
-
-    // If this setting type is one that can dynamically update itself and it
-    // also has dependencies, then update our dependency map to know that when
-    // any of those settings change, this settings update handler should be
-    // triggered.
-    if (updateHandler !== undefined && item.dependencies !== undefined) {
-      for (const settingName of item.dependencies) {
-        const handlers = dependencyMap.get(settingName) ?? [];
-        handlers.push(updateHandler);
-        dependencyMap.set(settingName, handlers);
-      }
-    }
   }
 }
 

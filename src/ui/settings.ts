@@ -30,13 +30,15 @@ export class KursvaroSettingTab extends PluginSettingTab {
     // The main settings group.
     createSettingsLayout(this.containerEl, this.plugin, [
       // General Settings
-      {
-        type: 'text',
-        name: 'Setting #1',
-        description: "It's a secret",
-        placeholder: 'The secret goes here',
-        key: 'mySetting',
-      },
+      [
+        {
+          type: 'text',
+          name: 'Setting #1',
+          description: "It's a secret",
+          placeholder: 'The secret goes here',
+          key: 'mySetting',
+        },
+      ],
       {
         type: 'textarea',
         name: 'Setting #2',

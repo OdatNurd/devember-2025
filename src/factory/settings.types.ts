@@ -144,4 +144,12 @@ export type SettingConfig<T> = HeaderSettingConfig |
                                ColorPickerSettingConfig<T>;
 
 
+/* A row in the settings page can be either a single settings object as above,
+ * or an array of them.
+ *
+ * When an array is used, the name and description come from the first of the
+ * settings that appear in the list (or the single item, if it is one). */
+export type SettingRowConfig<T> = SettingConfig<T> | SettingConfig<T>[];
+
+
 /******************************************************************************/
