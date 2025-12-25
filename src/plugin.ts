@@ -10,7 +10,7 @@ import { SvelteIntegration } from '#ui/svelte';
 import { KursvaroSettingTab } from '#ui/settings';
 import { SampleView, VIEW_TYPE_SAMPLE } from '#ui/views/sample';
 
-import type { SettingsChangeListener } from '#factory/settings.types';
+import type { SettingsChangeListener, SettingsManager } from '#factory/settings.types';
 
 import { registerCommand } from '#factory/commands';
 import { commands } from '#commands/index';
@@ -26,7 +26,8 @@ import StatusBarComponentView from '#components/StatusBar.svelte';
 /******************************************************************************/
 
 
-export class KursvaroPlugin extends Plugin {
+export class KursvaroPlugin extends Plugin
+                            implements SettingsManager<KursvaroSettings> {
   data: KursvaroData;
   settings: KursvaroSettings;
   state: GenericSavedState<PluginStateSchema>;
