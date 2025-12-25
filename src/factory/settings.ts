@@ -50,21 +50,15 @@ export function createSettingsLayout<T>(container: HTMLElement,
   //
   // If the first item isn't group, we will add one.
   for (const row of settings) {
-    // The item in the settings config can be either a single setting config or
-    // an array of them. If it is not an array of items, then convert it into
-    // an array.
-    const rowItems = (Array.isArray(row) === true ? row : [row]);
-    const leadItem = rowItems[0]
+    // If this row is starting a new group heading, then create an explicit
+    // SettingGroup for it; this will start grouping all settings into that
+    // particular group.
+    if (row.heading !== undefined) {
+      settingGroup = new SettingGroup(container).setHeading(row.heading);
 
-    // When an entry is a heading, create an explicit SettingGroup for it and
-    // then we're done.
-    if (leadItem.type === 'heading') {
-      settingGroup = new SettingGroup(container).setHeading(leadItem.name);
-
-      if (leadItem.cssClass !== undefined) {
-        settingGroup.addClass(leadItem.cssClass ?? '')
+      if (row.cssClass !== undefined) {
+        settingGroup.addClass(row.cssClass ?? '')
       }
-      continue;
     }
 
     // We are about to process a non-heading setting. If there is not a
@@ -83,16 +77,16 @@ export function createSettingsLayout<T>(container: HTMLElement,
     settingGroup.addSetting(setting => {
       // Set the setting name and description.
       setting
-        .setName(leadItem.name)
-        .setDesc(leadItem.description ?? '')
+        .setName(row.name)
+        .setDesc(row.description ?? '')
 
       // Include the CSS; this strictly requires a non-empty string so we can't
       // coalesce in a default.
-      if (leadItem.cssClass !== undefined) {
-        setting.setClass(leadItem.cssClass)
+      if (row.cssClass !== undefined) {
+        setting.setClass(row.cssClass)
       }
 
-      for (const item of rowItems) {
+      for (const item of row.items) {
         // Based on the type of the setting, insert the appropriate control.
         switch (item.type) {
           // Simple text field.

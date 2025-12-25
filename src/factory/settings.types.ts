@@ -8,7 +8,7 @@ type KeysMatching<T, V> = {
 }[keyof T];
 
 /* The various distinct kinds of settings that the settings factory supports. */
-export type SettingType = 'heading' | 'text' | 'textarea' | 'integer' | 'float' |
+export type SettingType = 'text' | 'textarea' | 'integer' | 'float' |
                           'toggle' | 'dropdown' | 'slider' | 'progressbar' |
                           'colorpicker' | 'button' | 'extrabutton';
 
@@ -33,21 +33,12 @@ export interface SettingsManager<T> {
  * settings regardless of their type. */
 export interface BaseSettingConfig<T = unknown> {
   type: SettingType;
-  name: string;
-  description?: string;
-  cssClass?: string;
   disabled?: boolean;
 
   // Optional list of settings this setting depends on; if any of them changes,
   // the setup for this setting (if configured) will be executed again.
   dependencies?: Array<keyof T>;
 };
-
-/* The specific configuration for a header; this has no extra configuration and
- * the defaults tell us everything we need. */
-export interface HeaderSettingConfig extends BaseSettingConfig {
-  type: 'heading';
-}
 
 /* The specific configuration for a text field. */
 export interface TextSettingConfig<T> extends BaseSettingConfig<T> {
@@ -152,20 +143,31 @@ export interface ExtraButtonSettingConfig<T> extends BaseSettingConfig<T> {
 
 /* Any given setting can be any of the above types. */
 export type SettingConfig<T> =
-  HeaderSettingConfig | TextSettingConfig<T> | TextAreaSettingConfig<T> |
-  IntegerSettingConfig<T> | FloatSettingConfig<T> | ToggleSettingConfig<T> |
-  StaticDropdownSettingConfig<T> | DynamicDropdownSettingsConfig<T> |
-  SliderSettingConfig<T> | ProgressBarSettingConfig<T> |
-  ColorPickerSettingConfig<T> | ButtonSettingConfig<T> |
-  ExtraButtonSettingConfig<T>;
+  TextSettingConfig<T> | TextAreaSettingConfig<T> | IntegerSettingConfig<T> |
+  FloatSettingConfig<T> | ToggleSettingConfig<T> | StaticDropdownSettingConfig<T> |
+  DynamicDropdownSettingsConfig<T> | SliderSettingConfig<T> | ProgressBarSettingConfig<T> |
+  ColorPickerSettingConfig<T> | ButtonSettingConfig<T> | ExtraButtonSettingConfig<T>;
 
 
-/* A row in the settings page can be either a single settings object as above,
- * or an array of them.
+/* A row in the setting page contains an entry that has the name of the overall
+ * setting the row portrays, its description and an optional CSS class to apply
+ * to the component.
  *
- * When an array is used, the name and description come from the first of the
- * settings that appear in the list (or the single item, if it is one). */
-export type SettingRowConfig<T> = SettingConfig<T> | SettingConfig<T>[];
+ * It also has an array of the actual components that should be added to the
+ * settings row. */
+export interface SettingRowConfig<T> {
+  // If present, this row starts a new settings section and this text is the
+  // header for that row.
+  heading?: string;
+
+  // The information on the setting this row represents.
+  name: string;
+  description?: string;
+  cssClass?: string;
+
+  // The controls that exist in this row
+  items: SettingConfig<T>[];
+}
 
 
 /******************************************************************************/
