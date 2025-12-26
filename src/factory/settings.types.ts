@@ -10,7 +10,8 @@ type KeysMatching<T, V> = {
 /* The various distinct kinds of settings that the settings factory supports. */
 export type SettingType = 'text' | 'textarea' | 'integer' | 'float' |
                           'toggle' | 'dropdown' | 'slider' | 'progressbar' |
-                          'colorpicker' | 'button' | 'extrabutton';
+                          'colorpicker' | 'button' | 'extrabutton' |
+                          'dateformat';
 
 /* The settings handler that adds settings to the page can optionally return a
  * function of this type to indicate that the specific setting instance can
@@ -141,12 +142,23 @@ export interface ExtraButtonSettingConfig<T> extends BaseSettingConfig<T> {
   click: (settings: T) => Promise<void> | void;
 }
 
+/* The specific configuration for a MomentJS date format box. The includeHelp
+ * config, if set to true, causes the description to be expanded to also include
+ * help on the format strings and what the format looks like. */
+export interface DateFormatSettingConfig<T> extends BaseSettingConfig<T> {
+  type: 'dateformat';
+  key: KeysMatching<T, string>;
+  defaultFormat: string;
+  includeHelp?: boolean;
+}
+
 /* Any given setting can be any of the above types. */
 export type SettingConfig<T> =
   TextSettingConfig<T> | TextAreaSettingConfig<T> | IntegerSettingConfig<T> |
   FloatSettingConfig<T> | ToggleSettingConfig<T> | StaticDropdownSettingConfig<T> |
   DynamicDropdownSettingsConfig<T> | SliderSettingConfig<T> | ProgressBarSettingConfig<T> |
-  ColorPickerSettingConfig<T> | ButtonSettingConfig<T> | ExtraButtonSettingConfig<T>;
+  ColorPickerSettingConfig<T> | ButtonSettingConfig<T> | ExtraButtonSettingConfig<T> |
+  DateFormatSettingConfig<T>;
 
 
 /* A configuration entry that starts a new visual section/group. Any settings

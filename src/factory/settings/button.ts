@@ -22,7 +22,6 @@ export function addButtonControl<T>(setting: Setting,
                                     manager: SettingsManager<T>,
                                     config: ButtonSettingConfig<T>) {
   setting.addButton(button => {
-    console.log(config);
     button
       .setDisabled(config.disabled ?? false)
       .setButtonText(config.text)

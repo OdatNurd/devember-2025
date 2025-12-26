@@ -8,6 +8,7 @@ import {
   addTextControl, addTextAreaControl, addNumberControl, addToggleControl,
   addDropdownControl, addSliderControl, addProgressBarControl,
   addColorPickerControl, addButtonControl, addExtraButtonControl,
+  addDateFormatControl,
 } from '#factory/settings/index';
 
 
@@ -141,6 +142,11 @@ export function createSettingsLayout<T>(container: HTMLElement,
           // Extra button control (button with just an icon)
           case 'extrabutton':
             addExtraButtonControl(setting, manager, item);
+            break;
+
+          // Date format (with or without help)
+          case 'dateformat':
+            addDateFormatControl(setting, manager, item);
             break;
         }
 

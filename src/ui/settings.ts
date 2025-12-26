@@ -175,6 +175,18 @@ export class KursvaroSettingTab extends PluginSettingTab {
           }
         ]
       },
+      {
+        name: 'Setting #10',
+        description: "Choose a date format that will not be honoured",
+        items: [
+          {
+            type: 'dateformat',
+            key: 'myDateFormat',
+            defaultFormat: 'YYYY-MM-DD',
+            includeHelp: true,
+          }
+        ]
+      },
     ]);
   }
 }
