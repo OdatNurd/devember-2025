@@ -179,6 +179,33 @@ export class KursvaroPlugin extends Plugin
     // const data = Object.assign({}, DEFAULT_DATA, rawData);
     Object.assign(this.state.data, this.data);
   }
+
+  /* This sample method exists solely to verify that the configured buttons in
+   * the settings can invoke methods on the plugin if they need to; here it is
+   * not useful. */
+  doAThing(buttonType: string) {
+    console.log(`the plugin code is handling a ${buttonType} button press`);
+  }
+
+  /* This sample method exists solely to illustrate how the method for dynamic
+   * dropdown population can invoke methods in the plugin to get at the data it
+   * needs. For that reason it is also using the passed settings, which is just
+   * a reference to the settings we already have (but they exist on that
+   * method in case a plugin method is not actualy needed). */
+  async getDynamicDropdownContents(currentSettings: KursvaroSettings): Promise<Record<string, string>>
+  {
+    if (currentSettings.myToggleSetting) {
+       return {
+        'boobies': "It is spelled 'Boobies' (Toggle ON)",
+        'bewbies': "It is spelled 'Bewbies' (Toggle ON)",
+      };
+    } else {
+       return {
+        'boobies': "It is spelled 'Boobies' (Toggle OFF)",
+        'bewbies': "It is spelled 'Bewbies' (Toggle OFF)",
+      };
+    }
+  }
 }
 
 

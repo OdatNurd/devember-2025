@@ -28,7 +28,7 @@ export class KursvaroSettingTab extends PluginSettingTab {
     this.containerEl.empty();
 
     // The main settings group.
-    createSettingsLayout(this.containerEl, this.plugin, [
+    createSettingsLayout(this.containerEl, this.plugin, this.plugin, [
       // General Settings
       {
         name: "Setting #1",
@@ -38,7 +38,10 @@ export class KursvaroSettingTab extends PluginSettingTab {
             type: 'extrabutton',
             icon: 'gear',
             tooltip: 'Are you feeling lucky?',
-            click: (settings) => console.log(settings),
+            click: (plugin, settings) => {
+              plugin.doAThing('extra');
+              console.log(settings);
+            },
           },
           {
             type: 'text',
@@ -56,7 +59,10 @@ export class KursvaroSettingTab extends PluginSettingTab {
             style: 'cta',
             text: 'Call to Action Btn',
             tooltip: 'The normal button',
-            click: (settings) => console.log(settings),
+            click: (plugin, settings) => {
+              plugin.doAThing('normal call to action');
+              console.log(settings);
+            },
           },
           {
             type: 'textarea',
@@ -148,19 +154,9 @@ export class KursvaroSettingTab extends PluginSettingTab {
             type: 'dropdown',
             key: 'myOtherDropdownSetting',
             dependencies: ['myToggleSetting'],
-            loader: async (settings) : Promise<Record<string, string>> => {
+            loader: async (plugin, settings) : Promise<Record<string, string>> => {
               await new Promise(resolve => setTimeout(resolve, 2000));
-              if (settings.myToggleSetting) {
-                 return {
-                  'boobies': "It is spelled 'Boobies' (Toggle ON)",
-                  'bewbies': "It is spelled 'Bewbies' (Toggle ON)",
-                };
-              } else {
-                 return {
-                  'boobies': "It is spelled 'Boobies' (Toggle OFF)",
-                  'bewbies': "It is spelled 'Bewbies' (Toggle OFF)",
-                };
-              }
+              return await plugin.getDynamicDropdownContents(settings);
             },
           }
         ]

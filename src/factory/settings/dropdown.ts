@@ -1,7 +1,7 @@
 /******************************************************************************/
 
 
-import { DropdownComponent, Setting } from 'obsidian';
+import { type Plugin, DropdownComponent, Setting } from 'obsidian';
 import type {
   ControlUpdateHandler, SettingsManager, StaticDropdownSettingConfig, DynamicDropdownSettingsConfig
 } from '#factory/settings.types';
@@ -40,9 +40,10 @@ function staticDropdownSetup<T>(dropdown: DropdownComponent,
  *
  * Additionally on failure the control will get a different entry indicating the
  * load failed, and will remain disabled so the user can't interact with it. */
-async function dynamicDropdownSetup<T>(dropdown: DropdownComponent,
-                                       config: DynamicDropdownSettingsConfig<T>,
+async function dynamicDropdownSetup<T,P extends Plugin>(dropdown: DropdownComponent,
+                                       config: DynamicDropdownSettingsConfig<T,P>,
                                        select: HTMLSelectElement,
+                                       plugin: P,
                                        settings: T) {
   // The control might be disabled by config choice, but it needs to
   // also be disabled while we fiddle with it and wait, so store the
@@ -58,7 +59,7 @@ async function dynamicDropdownSetup<T>(dropdown: DropdownComponent,
 
     // Invoke the loader, passing the current settings so the options can be
     // determined based on the state of other fields.
-    const options = await config.loader(settings);
+    const options = await config.loader(plugin, settings);
 
     // Empty the select and then add in our options and put its state back.
     select.empty();
@@ -101,10 +102,12 @@ async function dynamicDropdownSetup<T>(dropdown: DropdownComponent,
  *
  * Returns a function that can be called to force the control to update itself
  * based on the latest settings (e.g. when a dependency changes). */
-export function addDropdownControl<T>(setting: Setting,
-                                      manager: SettingsManager<T>,
-                                      config: StaticDropdownSettingConfig<T> |
-                                              DynamicDropdownSettingsConfig<T>) : ControlUpdateHandler<T> {
+export function addDropdownControl<T,P extends Plugin>(setting: Setting,
+                                        manager: SettingsManager<T>,
+                                        plugin: P,
+                                        config: StaticDropdownSettingConfig<T> |
+                                                DynamicDropdownSettingsConfig<T,P>
+                                                ) : ControlUpdateHandler<T> {
   // The function that is responsible for filling out the options in the select
   // that underlies us whenever the data changes; it needs to be assigned inside
   // the addDropdown so it can close over the component, but it needs to have a
@@ -134,7 +137,7 @@ export function addDropdownControl<T>(setting: Setting,
         const value = (currentSettings[config.key] as string) ?? '';
         staticDropdownSetup(dropdown, config, select, value);
       } else {
-        await dynamicDropdownSetup(dropdown, config, select, currentSettings);
+        await dynamicDropdownSetup(dropdown, config, select, plugin, currentSettings);
       }
     };
 

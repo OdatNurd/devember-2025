@@ -1,7 +1,7 @@
 /******************************************************************************/
 
 
-import { SettingGroup } from 'obsidian';
+import { type Plugin, SettingGroup } from 'obsidian';
 import type { ControlUpdateHandler, SettingsManager, SettingRowConfig } from '#factory/settings.types';
 
 import {
@@ -20,9 +20,10 @@ import {
  * on an object based configuration.
  *
  * This, in theory, makes the settings configuration less unweildy. */
-export function createSettingsLayout<T>(container: HTMLElement,
+export function createSettingsLayout<T,P extends Plugin>(container: HTMLElement,
                                         manager: SettingsManager<T>,
-                                        settings: SettingRowConfig<T>[]) : void {
+                                        plugin: P,
+                                        settings: SettingRowConfig<T,P>[]) : void {
   // This map correlates settings keys with the handler functions that should be
   // invoked whenever that setting changes, so that things can dynamically
   // update.
@@ -116,7 +117,7 @@ export function createSettingsLayout<T>(container: HTMLElement,
 
           // Dropdown field; this handles both a static and a dynamic control.
           case 'dropdown':
-            updateHandler = addDropdownControl(setting, manager, item);
+            updateHandler = addDropdownControl(setting, manager, plugin, item);
             break;
 
           // Slider control.
@@ -136,12 +137,12 @@ export function createSettingsLayout<T>(container: HTMLElement,
 
           // Regular button control.
           case 'button':
-            addButtonControl(setting, manager, item);
+            addButtonControl(setting, manager, plugin, item);
             break;
 
           // Extra button control (button with just an icon)
           case 'extrabutton':
-            addExtraButtonControl(setting, manager, item);
+            addExtraButtonControl(setting, manager, plugin, item);
             break;
 
           // Date format (with or without help)

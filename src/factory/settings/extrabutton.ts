@@ -1,7 +1,7 @@
 /******************************************************************************/
 
 
-import { Setting } from 'obsidian';
+import { type Plugin, Setting } from 'obsidian';
 import type { SettingsManager, ExtraButtonSettingConfig } from '#factory/settings.types';
 
 
@@ -19,14 +19,16 @@ import type { SettingsManager, ExtraButtonSettingConfig } from '#factory/setting
  * The items common to all settings (name, description, cssClass) will have been
  * added to the setting prior to it being passed here, so this only needs to do
  * the work to handle the specific setting field. */
-export function addExtraButtonControl<T>(setting: Setting,
-                                         manager: SettingsManager<T>,
-                                         config: ExtraButtonSettingConfig<T>) {
+export function addExtraButtonControl<T,P extends Plugin>(
+                                           setting: Setting,
+                                           manager: SettingsManager<T>,
+                                           plugin: P,
+                                           config: ExtraButtonSettingConfig<T,P>) {
   setting.addExtraButton(button => button
     .setDisabled(config.disabled ?? false)
     .setTooltip(config.tooltip ?? '')
     .setIcon(config.icon ?? 'gear')
-    .onClick(() => config.click(manager.settings))
+    .onClick(() => config.click(plugin, manager.settings))
   );
 }
 

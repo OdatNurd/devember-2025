@@ -1,6 +1,12 @@
 /******************************************************************************/
 
 
+import { type Plugin } from 'obsidian';
+
+
+/******************************************************************************/
+
+
 /* This "helper" type extracts from the type defines as T all keys that are of
  * the type V. */
 type KeysMatching<T, V> = {
@@ -88,10 +94,10 @@ export interface StaticDropdownSettingConfig<T> extends BaseSettingConfig<T> {
 }
 
 /* The specific configuration for a dropdown field (dynamic option list). */
-export interface DynamicDropdownSettingsConfig<T> extends BaseSettingConfig<T> {
+export interface DynamicDropdownSettingsConfig<T,P extends Plugin> extends BaseSettingConfig<T> {
   type: 'dropdown',
   key: KeysMatching<T, string>;
-  loader: (settings: T) => Promise<Record<string,string>>;
+  loader: (plugin: P, settings: T) => Promise<Record<string,string>>;
 }
 
 /* The specific configuration for a slider; this is a number value that is
@@ -125,21 +131,21 @@ export interface ColorPickerSettingConfig<T> extends BaseSettingConfig<T> {
 }
 
 /* The specific configuration for a standard button. */
-export interface ButtonSettingConfig<T> extends BaseSettingConfig<T> {
+export interface ButtonSettingConfig<T,P extends Plugin> extends BaseSettingConfig<T> {
   type: 'button',
   text: string;
   style?: 'normal' | 'warning' | 'cta';
   tooltip?: string;
   icon?: string;
-  click: (settings: T) => Promise<void> | void;
+  click: (plugin: P, settings: T) => Promise<void> | void;
 }
 
 /* The specific configuration for an extra button (no text, just icon). */
-export interface ExtraButtonSettingConfig<T> extends BaseSettingConfig<T> {
+export interface ExtraButtonSettingConfig<T,P extends Plugin> extends BaseSettingConfig<T> {
   type: 'extrabutton',
   tooltip?: string;
   icon?: string;
-  click: (settings: T) => Promise<void> | void;
+  click: (plugin: P, settings: T) => Promise<void> | void;
 }
 
 /* The specific configuration for a MomentJS date format box. The includeHelp
@@ -153,11 +159,11 @@ export interface DateFormatSettingConfig<T> extends BaseSettingConfig<T> {
 }
 
 /* Any given setting can be any of the above types. */
-export type SettingConfig<T> =
+export type SettingConfig<T,P extends Plugin> =
   TextSettingConfig<T> | TextAreaSettingConfig<T> | IntegerSettingConfig<T> |
   FloatSettingConfig<T> | ToggleSettingConfig<T> | StaticDropdownSettingConfig<T> |
-  DynamicDropdownSettingsConfig<T> | SliderSettingConfig<T> | ProgressBarSettingConfig<T> |
-  ColorPickerSettingConfig<T> | ButtonSettingConfig<T> | ExtraButtonSettingConfig<T> |
+  DynamicDropdownSettingsConfig<T,P> | SliderSettingConfig<T> | ProgressBarSettingConfig<T> |
+  ColorPickerSettingConfig<T> | ButtonSettingConfig<T,P> | ExtraButtonSettingConfig<T,P> |
   DateFormatSettingConfig<T>;
 
 
@@ -182,14 +188,14 @@ export interface SettingRowHeaderConfig {
  *
  * A list of setting components will be inserted into the row in the order they
  * appear in the items list. */
-export interface SettingRowItemConfig<T> {
+export interface SettingRowItemConfig<T,P extends Plugin> {
   // The information on the setting this row represents.
   name: string;
   description?: string;
   cssClass?: string;
 
   // The controls that exist in this row
-  items: SettingConfig<T>[];
+  items: SettingConfig<T,P>[];
 
   // A settings item can never be a header, so forbid it explicitly.
   heading?: never;
@@ -197,7 +203,7 @@ export interface SettingRowItemConfig<T> {
 
 /* A row in the setting page is either a heading row or a setting with one or
  * more components in it. */
-export type SettingRowConfig<T> = SettingRowHeaderConfig | SettingRowItemConfig<T>;
+export type SettingRowConfig<T,P extends Plugin> = SettingRowHeaderConfig | SettingRowItemConfig<T,P>;
 
 
 /******************************************************************************/
