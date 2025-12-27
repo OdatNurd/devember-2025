@@ -8,7 +8,7 @@ import {
   addTextControl, addTextAreaControl, addNumberControl, addToggleControl,
   addDropdownControl, addSliderControl, addProgressBarControl,
   addColorPickerControl, addButtonControl, addExtraButtonControl,
-  addDateFormatControl,
+  addDateFormatControl, addSearchControl,
 } from '#factory/settings/index';
 
 
@@ -148,6 +148,11 @@ export function createSettingsLayout<T,P extends Plugin>(container: HTMLElement,
           // Date format (with or without help)
           case 'dateformat':
             addDateFormatControl(setting, manager, item);
+            break;
+
+          // Search Field
+          case 'search':
+            addSearchControl(setting, manager, plugin, item);
             break;
         }
 

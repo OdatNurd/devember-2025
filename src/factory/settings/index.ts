@@ -12,6 +12,7 @@ export { addColorPickerControl } from '#factory/settings/colorpicker';
 export { addButtonControl } from '#factory/settings/button';
 export { addExtraButtonControl } from '#factory/settings/extrabutton';
 export { addDateFormatControl } from '#factory/settings/dateformat';
+export { addSearchControl } from '#factory/settings/search';
 
 
 /******************************************************************************/

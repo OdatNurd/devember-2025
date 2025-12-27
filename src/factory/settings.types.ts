@@ -1,7 +1,7 @@
 /******************************************************************************/
 
 
-import { type Plugin } from 'obsidian';
+import type { AbstractInputSuggest, Plugin } from 'obsidian';
 
 
 /******************************************************************************/
@@ -17,7 +17,7 @@ type KeysMatching<T, V> = {
 export type SettingType = 'text' | 'textarea' | 'integer' | 'float' |
                           'toggle' | 'dropdown' | 'slider' | 'progressbar' |
                           'colorpicker' | 'button' | 'extrabutton' |
-                          'dateformat';
+                          'dateformat' | 'search';
 
 /* The settings handler that adds settings to the page can optionally return a
  * function of this type to indicate that the specific setting instance can
@@ -158,13 +158,25 @@ export interface DateFormatSettingConfig<T> extends BaseSettingConfig<T> {
   includeHelp?: boolean;
 }
 
+/* The specific configuration for a Search widget. */
+export interface SearchSettingConfig<T,P extends Plugin> extends BaseSettingConfig<T> {
+  type: 'search';
+  key: KeysMatching<T, string>;
+  placeholder?: string;
+
+  // The constructor for a class that extends AbstractInputSuggest; this will be
+  // created and given the current plugin (from which it can gather the app it
+  // needs) and the element to attach to.
+  handler: new (plugin: P, containerEl: HTMLElement) => AbstractInputSuggest<string>;
+}
+
 /* Any given setting can be any of the above types. */
 export type SettingConfig<T,P extends Plugin> =
   TextSettingConfig<T> | TextAreaSettingConfig<T> | IntegerSettingConfig<T> |
   FloatSettingConfig<T> | ToggleSettingConfig<T> | StaticDropdownSettingConfig<T> |
   DynamicDropdownSettingsConfig<T,P> | SliderSettingConfig<T> | ProgressBarSettingConfig<T> |
   ColorPickerSettingConfig<T> | ButtonSettingConfig<T,P> | ExtraButtonSettingConfig<T,P> |
-  DateFormatSettingConfig<T>;
+  DateFormatSettingConfig<T> | SearchSettingConfig<T,P>;
 
 
 /* A configuration entry that starts a new visual section/group. Any settings

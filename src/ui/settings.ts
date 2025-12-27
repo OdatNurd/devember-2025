@@ -8,6 +8,8 @@ import { type KursvaroSettings } from '#types';
 import { type SettingsManager } from '#factory/settings.types';
 import { createSettingsLayout } from '#factory/settings';
 
+import { SampleSearchClass } from '#ui/search';
+
 
 /******************************************************************************/
 
@@ -103,6 +105,18 @@ export class KursvaroSettingTab extends PluginSettingTab {
             type: 'progressbar',
             value: async (settings) => settings.mySliderValue,
             dependencies: ['mySliderValue'],
+          },
+        ]
+      },
+      {
+        name: 'Setting #11',
+        description: "Some kind of search something or other",
+        items: [
+          {
+            type: 'search',
+            key: 'mySearchValue',
+            placeholder: 'Select a thing',
+            handler: SampleSearchClass,
           },
         ]
       },
