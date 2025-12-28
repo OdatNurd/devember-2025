@@ -11,7 +11,7 @@ import type { KursvaroPlugin } from '#plugin';
 /* This is a sample class (probably to be moved to some other locale in the
  * near future) which will be created and associated with a Search component
  * in the settings configuration. */
-export class SampleSearchClass extends AbstractInputSuggest<string> {
+export class SampleSearchStringClass extends AbstractInputSuggest<string> {
   plugin: KursvaroPlugin;
 
   constructor(plugin: KursvaroPlugin, textInputEl: HTMLInputElement | HTMLDivElement) {
@@ -39,6 +39,41 @@ export class SampleSearchClass extends AbstractInputSuggest<string> {
    * parameterized type. */
   renderSuggestion(value: string, element: HTMLElement): void {
     element.setText(value);
+  }
+}
+
+
+/******************************************************************************/
+
+
+/* As above, but this hack uses numbers. */
+export class SampleSearchNumberClass extends AbstractInputSuggest<number> {
+  plugin: KursvaroPlugin;
+
+  constructor(plugin: KursvaroPlugin, textInputEl: HTMLInputElement | HTMLDivElement) {
+    super(plugin.app, textInputEl);
+    this.plugin = plugin;
+  }
+
+  /* This is invoked whenever the text in the search element is changed; this
+   * allows us to find and return all elements whose values match the query
+   * string, so that the user can select one. */
+  protected getSuggestions(query: string): number[] | Promise<number[]> {
+    const options = [69, 169, 269, 68, 168, 268];
+
+    // Use a lowercase filter to filter our hacky item list by the filter.
+    const searchQuery = query.toLowerCase();
+    const result = options.filter(entry => String(entry).includes(searchQuery));
+
+    // console.log(`the query I got was: '${query}'; returning: `, result);
+    return result;
+  }
+
+  /* This is invoked by the underlying code to populate entries into the search
+   * element. There is no default for this, presumably because this is a
+   * parameterized type. */
+  renderSuggestion(value: number, element: HTMLElement): void {
+    element.setText(String(value));
   }
 }
 

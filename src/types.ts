@@ -21,7 +21,8 @@ export interface KursvaroSettings {
   mySliderValue: number;
   myColorValue: string;
   myDateFormat: string;
-  mySearchValue: string;
+  myStringSearchValue: string;
+  myNumberSearchValue: number;
 }
 
 
@@ -67,7 +68,8 @@ const DEFAULT_SETTINGS: KursvaroSettings = {
   mySliderValue: 42,
   myColorValue: '#696969',
   myDateFormat: 'YYYY-MM-DD',
-  mySearchValue: '',
+  myStringSearchValue: '',
+  myNumberSearchValue: 0,
 }
 
 

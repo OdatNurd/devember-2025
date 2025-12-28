@@ -8,7 +8,7 @@ import { type KursvaroSettings } from '#types';
 import { type SettingsManager } from '#factory/settings.types';
 import { createSettingsLayout } from '#factory/settings';
 
-import { SampleSearchClass } from '#ui/search';
+import { SampleSearchStringClass, SampleSearchNumberClass } from '#ui/search';
 
 
 /******************************************************************************/
@@ -114,9 +114,15 @@ export class KursvaroSettingTab extends PluginSettingTab {
         items: [
           {
             type: 'search',
-            key: 'mySearchValue',
-            placeholder: 'Select a thing',
-            handler: SampleSearchClass,
+            key: 'myStringSearchValue',
+            placeholder: 'Select a string thing',
+            handler: SampleSearchStringClass,
+          },
+          {
+            type: 'search',
+            key: 'myNumberSearchValue',
+            placeholder: 'Select a number thing',
+            handler: SampleSearchNumberClass,
           },
         ]
       },

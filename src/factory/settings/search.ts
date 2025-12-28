@@ -14,10 +14,10 @@ import type { SettingsManager, SearchSettingConfig } from '#factory/settings.typ
  * The items common to all settings (name, description, cssClass) will have been
  * added to the setting prior to it being passed here, so this only needs to do
  * the work to handle the specific setting field. */
-export function addSearchControl<T,P extends Plugin>(setting: Setting,
+export function addSearchControl<T,P extends Plugin, V>(setting: Setting,
                                       manager: SettingsManager<T>,
                                       plugin: P,
-                                      config: SearchSettingConfig<T,P>) {
+                                      config: SearchSettingConfig<T,P,V>) {
   setting.addSearch(search => {
     search
       .setDisabled(config.disabled ?? false)
@@ -35,9 +35,9 @@ export function addSearchControl<T,P extends Plugin>(setting: Setting,
     // the value of the search, so taht the user can tell that they picked it,
     // but we also need to do the work of the onChange handler to persist the
     // change; otherwise nothing will actually see the change.
-    suggestions.onSelect(async (value: string, _evt: MouseEvent | KeyboardEvent) => {
-      search.setValue(value);
-      (manager.settings[config.key] as string) = value;
+    suggestions.onSelect(async (value: V, _evt: MouseEvent | KeyboardEvent) => {
+      search.setValue(String(value));
+      (manager.settings[config.key] as V) = value;
       await manager.savePluginData(config.key);
 
       // Close the popup now that something was selected.

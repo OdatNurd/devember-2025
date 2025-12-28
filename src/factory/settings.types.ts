@@ -158,16 +158,18 @@ export interface DateFormatSettingConfig<T> extends BaseSettingConfig<T> {
   includeHelp?: boolean;
 }
 
-/* The specific configuration for a Search widget. */
-export interface SearchSettingConfig<T,P> extends BaseSettingConfig<T> {
+/* The specific configuration for a Search widget. The search supports any
+ * sort of key type for the search, but it defaults to string since that is a
+ * common use case.  */
+export interface SearchSettingConfig<T,P,V> extends BaseSettingConfig<T> {
   type: 'search';
-  key: KeysMatching<T, string>;
+  key: KeysMatching<T,V>;
   placeholder?: string;
 
   // The constructor for a class that extends AbstractInputSuggest; this will be
   // created and given the current plugin (from which it can gather the app it
   // needs) and the element to attach to.
-  handler: new (plugin: P, containerEl: HTMLElement) => AbstractInputSuggest<string>;
+  handler: new (plugin: P, containerEl: HTMLElement) => AbstractInputSuggest<V>;
 }
 
 /* Any given setting can be any of the above types. */
@@ -176,7 +178,7 @@ export type SettingConfig<T,P> =
   FloatSettingConfig<T> | ToggleSettingConfig<T> | StaticDropdownSettingConfig<T> |
   DynamicDropdownSettingsConfig<T,P> | SliderSettingConfig<T> | ProgressBarSettingConfig<T> |
   ColorPickerSettingConfig<T> | ButtonSettingConfig<T,P> | ExtraButtonSettingConfig<T,P> |
-  DateFormatSettingConfig<T> | SearchSettingConfig<T,P>;
+  DateFormatSettingConfig<T> | SearchSettingConfig<T,P,unknown>;
 
 
 /* A configuration entry that starts a new visual section/group. Any settings
