@@ -1,7 +1,7 @@
 /******************************************************************************/
 
 
-import { Plugin, WorkspaceLeaf, MarkdownView } from 'obsidian';
+import { debounce, Plugin, WorkspaceLeaf, MarkdownView } from 'obsidian';
 
 import  { type KursvaroData, type KursvaroSettings, hydratePluginData, type PluginStateSchema } from '#types';
 import { GenericSavedState, watch } from "#state/generic";
@@ -34,6 +34,15 @@ export class KursvaroPlugin extends Plugin
   stateCleanup: (() => void) | undefined;
   statusBarIntegration: SvelteIntegration<StatusBarSchema, StatusBarComponent>;
   private settingsListeners: ((key: keyof KursvaroSettings) => void)[] = [];
+
+  // Invoking this will schedule a call to the function that will actualy  save
+  // the plugin data to disk, but debounce it so that any calls that arrive
+  // within the set time will just reset the timer. This is used because the
+  // settings page will hammer the living hell out of the save sytem otherwise
+  // currently (for example typing in a text field is a call per character which
+  // is a little bit much).
+  private requestPluginDataSave = debounce(async () => await this.saveData(this.data),
+                                           250, true);
 
   async onload() {
     // Before we do anything else, load in our plugin's data file; this sets up
@@ -148,7 +157,7 @@ export class KursvaroPlugin extends Plugin
 
   /* Persist all of our plugin data, including savings, back to disk. */
   async savePluginData(key?: keyof KursvaroSettings) {
-    await this.saveData(this.data);
+    this.requestPluginDataSave();
 
     if (key !== undefined) {
       this.settingsListeners.forEach(handler => handler(key))
