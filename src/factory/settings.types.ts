@@ -1,12 +1,6 @@
 /******************************************************************************/
 
 
-import type { AbstractInputSuggest } from 'obsidian';
-
-
-/******************************************************************************/
-
-
 /* This "helper" type extracts from the type defines as T all keys that are of
  * the type V. */
 type KeysMatching<T, V> = {
@@ -161,19 +155,57 @@ export interface DateFormatSetting<T> extends BaseSetting<T> {
   includeHelp?: boolean;
 }
 
-/* The specific configuration for a Search widget. The search supports any
- * sort of key type for the search, but it defaults to string since that is a
- * common use case.  */
-export interface SearchSetting<T,P,V> extends BaseSetting<T> {
-  type: 'search';
-  key: KeysMatching<T,V>;
-  placeholder?: string;
+/* A specialized interface for Search Handlers.
+ *
+ * This contract decouples the Settings Factory (which deals with opaque items)
+ * from the Implementation (which deals with typed items).
+ *
+ * We accept 'unknown' items because the factory doesn't care what they are,
+ * only that they can be converted to the value V. */
+export interface SearchSuggest<V> {
+    // Converts an opaque item from the search list into a saveable value.
+    getSettingValue(item: unknown): V;
 
-  // The constructor for a class that extends AbstractInputSuggest; this will be
-  // created and given the current plugin (from which it can gather the app it
-  // needs) and the element to attach to.
-  handler: new (plugin: P, containerEl: HTMLElement) => AbstractInputSuggest<V>;
+    // Optional: Extract display text from the opaque item.
+    getItemText?(item: unknown): string;
+
+    // Optional: Validates and parses raw text input into a saveable value.
+    // If NOT implemented, or returns null, text input changes are IGNORED (not saved).
+    // This allows enforcing "Selection Only" behavior.
+    parseInput?(text: string): V | null;
+
+    // Registers a callback for when an item is selected.
+    onSearchSelect(callback: (item: unknown, evt: MouseEvent | KeyboardEvent) => void): void;
+
+    // Closes the search results.
+    close(): void;
 }
+
+/* The specific configuration for a Search widget. The search requires the
+ * constructor for a class that can produce values of the appropriate type while
+ * still allowing for arbitrary data to be used by the underlying class that
+ * drives the search.
+ *
+ * This is kind of ugly looking, but the notion is that it ensures that whatever
+ * the key type is that you assign to the key, the class that is used to drive
+ * the search must be set to result in values of that type, or the compiler
+ * will yak, which keeps things straight.
+ *
+ * In use, if the key `myKey` was a string, then the type of the handler will
+ * be SearchSuggest<any, string>; the any here indicating that for the
+ * purposes of the config, anything is good, but it needs to be something
+ * concrete at the implementation side.
+ *
+ * There may be a better way to do this than this specific incantation from hell
+ * but I'm kind of tired of fighting it at this point. */
+export type SearchSetting<T,P> = {
+  [K in keyof T]: BaseSetting<T> & {
+    type: 'search';
+    key: K;
+    placeholder?: string;
+    handler: new (plugin: P, containerEl: HTMLElement) => SearchSuggest<T[K]>;
+  }
+}[keyof T];
 
 /* Any given setting can be any of the above types. */
 export type SettingConfig<T,P> =
@@ -181,7 +213,7 @@ export type SettingConfig<T,P> =
   ToggleSetting<T> | StaticDropdownSetting<T> | DynamicDropdownSettings<T,P> |
   SliderSetting<T> | ProgressBarSetting<T> | ColorPickerSetting<T> |
   ButtonSetting<T,P> | ExtraButtonSetting<T,P> | DateFormatSetting<T> |
-  SearchSetting<T,P,unknown>;
+  SearchSetting<T,P>;
 
 /* A configuration entry that starts a new visual section/group. Any settings
  * following this entry will belong to this group until the next header is

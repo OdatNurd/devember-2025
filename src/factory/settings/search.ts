@@ -14,32 +14,66 @@ import type { SettingsManager, SearchSetting } from '#factory/settings.types';
  * The items common to all settings (name, description, cssClass) will have been
  * added to the setting prior to it being passed here, so this only needs to do
  * the work to handle the specific setting field. */
-export function addSearchControl<T,P extends Plugin, V>(
+export function addSearchControl<T,P extends Plugin>(
                                       setting: Setting,
                                       manager: SettingsManager<T>,
                                       plugin: P,
-                                      config: SearchSetting<T,P,V>) {
+                                      config: SearchSetting<T,P>) {
   setting.addSearch(search => {
+    // Create the suggestion object; this ties it to the search input element.
+    const suggestions = new config.handler(plugin, search.inputEl);
+
     search
       .setDisabled(config.disabled ? config.disabled(manager.settings) : false)
       .setPlaceholder(config.placeholder ?? '')
       .setValue(String(manager.settings[config.key] ?? ''))
       .onChange(async (value: string) => {
-        (manager.settings[config.key] as string) = value;
-        await manager.savePluginData(config.key);
+        let isValid = false;
+        let parsed: any = null;
+
+        // Only save manually typed input IF the handler supports parsing it.
+        // This prevents invalid types (e.g. "boobs" in a number field) from
+        // being saved, and allows for enforcement that only searchable values
+        // can be used as the setting value.
+        if (suggestions.parseInput !== undefined) {
+          const parsed = suggestions.parseInput(value);
+          if (parsed !== null && parsed !== undefined) {
+            isValid = true;
+          }
+        }
+
+        if (isValid === true) {
+          search.inputEl.style.textDecoration = 'none';
+
+          (manager.settings[config.key] as any) = parsed;
+          await manager.savePluginData(config.key);
+        } else {
+          // Empty values are not invalid.
+          if (value === '') {
+            search.inputEl.style.textDecoration = 'none';
+          } else {
+            search.inputEl.style.textDecoration = 'underline wavy var(--text-error)';
+          }
+        }
       });
 
-    // Create the suggestion object; this ties it to the search input element.
-    const suggestions = new config.handler(plugin, search.inputEl);
+    // Handle when a new suggestion is selected from the list.
+    // The item is 'unknown' because we don't know the internal structure of
+    // the search class, but we know getSettingValue can handle it.
+    suggestions.onSearchSelect(async (item: unknown, _evt: MouseEvent | KeyboardEvent) => {
+      // Selection is always valid, so clear any previous error styles
+      search.inputEl.style.textDecoration = 'none';
 
-    // Handle when a new suggestion is selected from the list; We need to set
-    // the value of the search, so taht the user can tell that they picked it,
-    // but we also need to do the work of the onChange handler to persist the
-    // change; otherwise nothing will actually see the change.
-    suggestions.onSelect(async (value: V, _evt: MouseEvent | KeyboardEvent) => {
-      search.setValue(String(value));
-      (manager.settings[config.key] as V) = value;
+      const valueToSave = suggestions.getSettingValue(item);
+      manager.settings[config.key] = valueToSave as T[keyof T];
+
       await manager.savePluginData(config.key);
+
+      // When updating the UI, try to use the helper if it exists; if not,
+      // then just convert whatever we were given to a string and use that.
+      const textToDisplay = suggestions.getItemText ? suggestions.getItemText(item) : String(valueToSave);
+
+      search.setValue(textToDisplay);
 
       // Close the popup now that something was selected.
       suggestions.close();
