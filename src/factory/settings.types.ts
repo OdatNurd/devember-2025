@@ -1,7 +1,7 @@
 /******************************************************************************/
 
 
-import type { AbstractInputSuggest, Plugin } from 'obsidian';
+import type { AbstractInputSuggest } from 'obsidian';
 
 
 /******************************************************************************/
@@ -94,7 +94,7 @@ export interface StaticDropdownSettingConfig<T> extends BaseSettingConfig<T> {
 }
 
 /* The specific configuration for a dropdown field (dynamic option list). */
-export interface DynamicDropdownSettingsConfig<T,P extends Plugin> extends BaseSettingConfig<T> {
+export interface DynamicDropdownSettingsConfig<T,P> extends BaseSettingConfig<T> {
   type: 'dropdown',
   key: KeysMatching<T, string>;
   loader: (plugin: P, settings: T) => Promise<Record<string,string>>;
@@ -131,7 +131,7 @@ export interface ColorPickerSettingConfig<T> extends BaseSettingConfig<T> {
 }
 
 /* The specific configuration for a standard button. */
-export interface ButtonSettingConfig<T,P extends Plugin> extends BaseSettingConfig<T> {
+export interface ButtonSettingConfig<T,P> extends BaseSettingConfig<T> {
   type: 'button',
   text: string;
   style?: 'normal' | 'warning' | 'cta';
@@ -141,7 +141,7 @@ export interface ButtonSettingConfig<T,P extends Plugin> extends BaseSettingConf
 }
 
 /* The specific configuration for an extra button (no text, just icon). */
-export interface ExtraButtonSettingConfig<T,P extends Plugin> extends BaseSettingConfig<T> {
+export interface ExtraButtonSettingConfig<T,P> extends BaseSettingConfig<T> {
   type: 'extrabutton',
   tooltip?: string;
   icon?: string;
@@ -159,7 +159,7 @@ export interface DateFormatSettingConfig<T> extends BaseSettingConfig<T> {
 }
 
 /* The specific configuration for a Search widget. */
-export interface SearchSettingConfig<T,P extends Plugin> extends BaseSettingConfig<T> {
+export interface SearchSettingConfig<T,P> extends BaseSettingConfig<T> {
   type: 'search';
   key: KeysMatching<T, string>;
   placeholder?: string;
@@ -171,7 +171,7 @@ export interface SearchSettingConfig<T,P extends Plugin> extends BaseSettingConf
 }
 
 /* Any given setting can be any of the above types. */
-export type SettingConfig<T,P extends Plugin> =
+export type SettingConfig<T,P> =
   TextSettingConfig<T> | TextAreaSettingConfig<T> | IntegerSettingConfig<T> |
   FloatSettingConfig<T> | ToggleSettingConfig<T> | StaticDropdownSettingConfig<T> |
   DynamicDropdownSettingsConfig<T,P> | SliderSettingConfig<T> | ProgressBarSettingConfig<T> |
@@ -200,7 +200,7 @@ export interface SettingRowHeaderConfig {
  *
  * A list of setting components will be inserted into the row in the order they
  * appear in the items list. */
-export interface SettingRowItemConfig<T,P extends Plugin> {
+export interface SettingRowItemConfig<T,P> {
   // The information on the setting this row represents.
   name: string;
   description?: string;
@@ -215,7 +215,7 @@ export interface SettingRowItemConfig<T,P extends Plugin> {
 
 /* A row in the setting page is either a heading row or a setting with one or
  * more components in it. */
-export type SettingRowConfig<T,P extends Plugin> = SettingRowHeaderConfig | SettingRowItemConfig<T,P>;
+export type SettingRowConfig<T,P> = SettingRowHeaderConfig | SettingRowItemConfig<T,P>;
 
 
 /******************************************************************************/
