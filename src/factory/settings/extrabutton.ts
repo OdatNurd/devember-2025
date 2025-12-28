@@ -2,7 +2,7 @@
 
 
 import { type Plugin, Setting } from 'obsidian';
-import type { SettingsManager, ExtraButtonSettingConfig } from '#factory/settings.types';
+import type { SettingsManager, ExtraButtonSetting } from '#factory/settings.types';
 
 
 /******************************************************************************/
@@ -23,7 +23,7 @@ export function addExtraButtonControl<T,P extends Plugin>(
                                            setting: Setting,
                                            manager: SettingsManager<T>,
                                            plugin: P,
-                                           config: ExtraButtonSettingConfig<T,P>) {
+                                           config: ExtraButtonSetting<T,P>) {
   setting.addExtraButton(button => button
     .setDisabled(config.disabled ?? false)
     .setTooltip(config.tooltip ?? '')

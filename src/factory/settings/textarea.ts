@@ -2,7 +2,7 @@
 
 
 import { Setting } from 'obsidian';
-import type { SettingsManager, TextAreaSettingConfig } from '#factory/settings.types';
+import type { SettingsManager, TextAreaSetting } from '#factory/settings.types';
 
 
 /******************************************************************************/
@@ -16,7 +16,7 @@ import type { SettingsManager, TextAreaSettingConfig } from '#factory/settings.t
  * the work to handle the specific setting field. */
 export function addTextAreaControl<T>(setting: Setting,
                                       manager: SettingsManager<T>,
-                                      config: TextAreaSettingConfig<T>) {
+                                      config: TextAreaSetting<T>) {
   setting.addTextArea(text => {
     // Enforce vertical resizing only for the text input because there is
     // something hinky about the way that Obsidian lets you resize it, like it

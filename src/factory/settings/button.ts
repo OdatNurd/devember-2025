@@ -2,7 +2,7 @@
 
 
 import { type Plugin, Setting } from 'obsidian';
-import type { SettingsManager, ButtonSettingConfig } from '#factory/settings.types';
+import type { SettingsManager, ButtonSetting } from '#factory/settings.types';
 
 
 /******************************************************************************/
@@ -22,7 +22,7 @@ export function addButtonControl<T,P extends Plugin>(
                                       setting: Setting,
                                       manager: SettingsManager<T>,
                                       plugin: P,
-                                      config: ButtonSettingConfig<T,P>) {
+                                      config: ButtonSetting<T,P>) {
   setting.addButton(button => {
     button
       .setDisabled(config.disabled ?? false)

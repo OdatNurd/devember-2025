@@ -2,7 +2,7 @@
 
 
 import { Setting } from 'obsidian';
-import type { SettingsManager, DateFormatSettingConfig } from '#factory/settings.types';
+import type { SettingsManager, DateFormatSetting } from '#factory/settings.types';
 
 
 /******************************************************************************/
@@ -21,7 +21,7 @@ import type { SettingsManager, DateFormatSettingConfig } from '#factory/settings
  * uses (which looks very developer centric, but better than nothing). */
 export function addDateFormatControl<T>(setting: Setting,
                                         manager: SettingsManager<T>,
-                                        config: DateFormatSettingConfig<T>) {
+                                        config: DateFormatSetting<T>) {
   const dateDesc = document.createDocumentFragment();
   dateDesc.createEl('br');
   dateDesc.appendText('Preview: ');

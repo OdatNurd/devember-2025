@@ -3,7 +3,7 @@
 
 import { type Plugin, DropdownComponent, Setting } from 'obsidian';
 import type {
-  ControlUpdateHandler, SettingsManager, StaticDropdownSettingConfig, DynamicDropdownSettingsConfig
+  ControlUpdateHandler, SettingsManager, StaticDropdownSetting, DynamicDropdownSettings
 } from '#factory/settings.types';
 
 
@@ -19,7 +19,7 @@ import type {
  * (we are told we depend on some other setting) that the items won't double up
  * the options list, since Obsidian appends the new items you give it. */
 function staticDropdownSetup<T>(dropdown: DropdownComponent,
-                                config: StaticDropdownSettingConfig<T>,
+                                config: StaticDropdownSetting<T>,
                                 select: HTMLSelectElement, value: string) {
   select.empty();
   dropdown.addOptions(config.options);
@@ -40,8 +40,9 @@ function staticDropdownSetup<T>(dropdown: DropdownComponent,
  *
  * Additionally on failure the control will get a different entry indicating the
  * load failed, and will remain disabled so the user can't interact with it. */
-async function dynamicDropdownSetup<T,P extends Plugin>(dropdown: DropdownComponent,
-                                       config: DynamicDropdownSettingsConfig<T,P>,
+async function dynamicDropdownSetup<T,P extends Plugin>(
+                                       dropdown: DropdownComponent,
+                                       config: DynamicDropdownSettings<T,P>,
                                        select: HTMLSelectElement,
                                        plugin: P,
                                        settings: T) {
@@ -102,11 +103,12 @@ async function dynamicDropdownSetup<T,P extends Plugin>(dropdown: DropdownCompon
  *
  * Returns a function that can be called to force the control to update itself
  * based on the latest settings (e.g. when a dependency changes). */
-export function addDropdownControl<T,P extends Plugin>(setting: Setting,
+export function addDropdownControl<T,P extends Plugin>(
+                                        setting: Setting,
                                         manager: SettingsManager<T>,
                                         plugin: P,
-                                        config: StaticDropdownSettingConfig<T> |
-                                                DynamicDropdownSettingsConfig<T,P>
+                                        config: StaticDropdownSetting<T> |
+                                                DynamicDropdownSettings<T,P>
                                                 ) : ControlUpdateHandler<T> {
   // The function that is responsible for filling out the options in the select
   // that underlies us whenever the data changes; it needs to be assigned inside

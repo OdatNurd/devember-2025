@@ -2,7 +2,7 @@
 
 
 import { Setting } from 'obsidian';
-import type { SettingsManager, SliderSettingConfig } from '#factory/settings.types';
+import type { SettingsManager, SliderSetting } from '#factory/settings.types';
 
 
 /******************************************************************************/
@@ -16,7 +16,7 @@ import type { SettingsManager, SliderSettingConfig } from '#factory/settings.typ
  * the work to handle the specific setting field. */
 export function addSliderControl<T>(setting: Setting,
                                     manager: SettingsManager<T>,
-                                    config: SliderSettingConfig<T>) {
+                                    config: SliderSetting<T>) {
   // All options are optional, but the API wants specific values for placeholder
   // resons. If not specified, 0, 100, 'any' is the underlying default (a
   // fractional percentage).

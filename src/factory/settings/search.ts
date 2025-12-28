@@ -2,7 +2,7 @@
 
 
 import { type Plugin, Setting } from 'obsidian';
-import type { SettingsManager, SearchSettingConfig } from '#factory/settings.types';
+import type { SettingsManager, SearchSetting } from '#factory/settings.types';
 
 
 /******************************************************************************/
@@ -14,10 +14,11 @@ import type { SettingsManager, SearchSettingConfig } from '#factory/settings.typ
  * The items common to all settings (name, description, cssClass) will have been
  * added to the setting prior to it being passed here, so this only needs to do
  * the work to handle the specific setting field. */
-export function addSearchControl<T,P extends Plugin, V>(setting: Setting,
+export function addSearchControl<T,P extends Plugin, V>(
+                                      setting: Setting,
                                       manager: SettingsManager<T>,
                                       plugin: P,
-                                      config: SearchSettingConfig<T,P,V>) {
+                                      config: SearchSetting<T,P,V>) {
   setting.addSearch(search => {
     search
       .setDisabled(config.disabled ?? false)

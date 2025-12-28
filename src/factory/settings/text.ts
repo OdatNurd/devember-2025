@@ -2,7 +2,7 @@
 
 
 import { Setting } from 'obsidian';
-import type { SettingsManager, TextSettingConfig } from '#factory/settings.types';
+import type { SettingsManager, TextSetting } from '#factory/settings.types';
 
 
 /******************************************************************************/
@@ -16,7 +16,7 @@ import type { SettingsManager, TextSettingConfig } from '#factory/settings.types
  * the work to handle the specific setting field. */
 export function addTextControl<T>(setting: Setting,
                                   manager: SettingsManager<T>,
-                                  config: TextSettingConfig<T>) {
+                                  config: TextSetting<T>) {
   setting.addText(text => text
     .setDisabled(config.disabled ?? false)
     .setPlaceholder(config.placeholder ?? '')

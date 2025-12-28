@@ -2,7 +2,7 @@
 
 
 import { Setting } from 'obsidian';
-import type { SettingsManager, ColorPickerSettingConfig } from '#factory/settings.types';
+import type { SettingsManager, ColorPickerSetting } from '#factory/settings.types';
 
 
 /******************************************************************************/
@@ -16,7 +16,7 @@ import type { SettingsManager, ColorPickerSettingConfig } from '#factory/setting
  * the work to handle the specific setting field. */
 export function addColorPickerControl<T>(setting: Setting,
                                          manager: SettingsManager<T>,
-                                         config: ColorPickerSettingConfig<T>) {
+                                         config: ColorPickerSetting<T>) {
   setting.addColorPicker(text => text
     .setDisabled(config.disabled ?? false)
     .setValue(String(manager.settings[config.key] ?? ''))

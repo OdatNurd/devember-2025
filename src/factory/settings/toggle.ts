@@ -2,7 +2,7 @@
 
 
 import { Setting } from 'obsidian';
-import type { SettingsManager, ToggleSettingConfig } from '#factory/settings.types';
+import type { SettingsManager, ToggleSetting } from '#factory/settings.types';
 
 
 /******************************************************************************/
@@ -15,8 +15,8 @@ import type { SettingsManager, ToggleSettingConfig } from '#factory/settings.typ
  * added to the setting prior to it being passed here, so this only needs to do
  * the work to handle the specific setting field. */
 export function addToggleControl<T>(setting: Setting,
-                                  manager: SettingsManager<T>,
-                                  config: ToggleSettingConfig<T>) {
+                                    manager: SettingsManager<T>,
+                                    config: ToggleSetting<T>) {
   const getTooltip = (value: boolean): string => {
     // No tooltip was defined.
     if (config.tooltip === undefined) {

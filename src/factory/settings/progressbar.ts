@@ -2,7 +2,7 @@
 
 
 import { Setting } from 'obsidian';
-import type { ControlUpdateHandler, SettingsManager, ProgressBarSettingConfig } from '#factory/settings.types';
+import type { ControlUpdateHandler, SettingsManager, ProgressBarSetting } from '#factory/settings.types';
 
 
 /******************************************************************************/
@@ -17,7 +17,7 @@ import type { ControlUpdateHandler, SettingsManager, ProgressBarSettingConfig } 
  * based on the latest settings (e.g. when a dependency changes). */
 export function addProgressBarControl<T>(setting: Setting,
                                          manager: SettingsManager<T>,
-                                         config: ProgressBarSettingConfig<T>)
+                                         config: ProgressBarSetting<T>)
                                          : ControlUpdateHandler<T> {
 
   // The function that is responsible for updating the progress bar value; it

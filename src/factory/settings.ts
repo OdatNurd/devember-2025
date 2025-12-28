@@ -2,7 +2,7 @@
 
 
 import { type Plugin, SettingGroup } from 'obsidian';
-import type { ControlUpdateHandler, SettingsManager, SettingRowConfig } from '#factory/settings.types';
+import type { ControlUpdateHandler, SettingsManager, SettingRow } from '#factory/settings.types';
 
 import {
   addTextControl, addTextAreaControl, addNumberControl, addToggleControl,
@@ -23,7 +23,7 @@ import {
 export function createSettingsLayout<T,P extends Plugin>(container: HTMLElement,
                                         manager: SettingsManager<T>,
                                         plugin: P,
-                                        settings: SettingRowConfig<T,P>[]) : void {
+                                        settings: SettingRow<T,P>[]) : void {
   // This map correlates settings keys with the handler functions that should be
   // invoked whenever that setting changes, so that things can dynamically
   // update.

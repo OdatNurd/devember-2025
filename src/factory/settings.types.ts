@@ -38,7 +38,7 @@ export interface SettingsManager<T> {
 
 /* This interface specifies the fields that are common to all configuration
  * settings regardless of their type. */
-export interface BaseSettingConfig<T = unknown> {
+export interface BaseSetting<T = unknown> {
   type: SettingType;
   disabled?: boolean;
 
@@ -48,14 +48,14 @@ export interface BaseSettingConfig<T = unknown> {
 };
 
 /* The specific configuration for a text field. */
-export interface TextSettingConfig<T> extends BaseSettingConfig<T> {
+export interface TextSetting<T> extends BaseSetting<T> {
   type: 'text';
   key: KeysMatching<T, string>;
   placeholder?: string;
 }
 
 /* The specific configuration for a multi-line text field. */
-export interface TextAreaSettingConfig<T> extends BaseSettingConfig<T> {
+export interface TextAreaSetting<T> extends BaseSetting<T> {
   type: 'textarea';
   key: KeysMatching<T, string>;
   placeholder?: string;
@@ -65,14 +65,14 @@ export interface TextAreaSettingConfig<T> extends BaseSettingConfig<T> {
 }
 
 /* The specific configuration for a numeric field (integer only). */
-export interface IntegerSettingConfig<T> extends BaseSettingConfig<T> {
+export interface IntegerSetting<T> extends BaseSetting<T> {
   type: 'integer';
   key: KeysMatching<T, number>;
   placeholder?: string;
 }
 
 /* The specific configuration for a numeric field (floating point). */
-export interface FloatSettingConfig<T> extends BaseSettingConfig<T> {
+export interface FloatSetting<T> extends BaseSetting<T> {
   type: 'float';
   key: KeysMatching<T, number>;
   placeholder?: string;
@@ -80,7 +80,7 @@ export interface FloatSettingConfig<T> extends BaseSettingConfig<T> {
 
 /* The specific configuration for a toggle button; this is distinctly boolean;
  * this contains the key in the settings object that represents the value. */
-export interface ToggleSettingConfig<T> extends BaseSettingConfig<T> {
+export interface ToggleSetting<T> extends BaseSetting<T> {
   type: 'toggle';
   key: KeysMatching<T, boolean>;
 
@@ -90,14 +90,14 @@ export interface ToggleSettingConfig<T> extends BaseSettingConfig<T> {
 }
 
 /* The specific configuration for a dropdown field (static option list). */
-export interface StaticDropdownSettingConfig<T> extends BaseSettingConfig<T> {
+export interface StaticDropdownSetting<T> extends BaseSetting<T> {
   type: 'dropdown';
   key: KeysMatching<T, string>;
   options: Record<string, string>
 }
 
 /* The specific configuration for a dropdown field (dynamic option list). */
-export interface DynamicDropdownSettingsConfig<T,P> extends BaseSettingConfig<T> {
+export interface DynamicDropdownSettings<T,P> extends BaseSetting<T> {
   type: 'dropdown',
   key: KeysMatching<T, string>;
   loader: (plugin: P, settings: T) => Promise<Record<string,string>>;
@@ -105,7 +105,7 @@ export interface DynamicDropdownSettingsConfig<T,P> extends BaseSettingConfig<T>
 
 /* The specific configuration for a slider; this is a number value that is
  * constrained to a range and which jumps in a specific step increment. */
-export interface SliderSettingConfig<T> extends BaseSettingConfig<T> {
+export interface SliderSetting<T> extends BaseSetting<T> {
   type: 'slider',
   key: KeysMatching<T, number>;
   min?: number;
@@ -118,7 +118,7 @@ export interface SliderSettingConfig<T> extends BaseSettingConfig<T> {
  * This does not tie to an actual setting but rather is used for feedback of a
  * percentage. Hence this does not have a key and instead you must provide a
  * handler that will produce the appropriate value. */
-export interface ProgressBarSettingConfig<T> extends BaseSettingConfig<T> {
+export interface ProgressBarSetting<T> extends BaseSetting<T> {
   type: 'progressbar';
   value: (settings: T) => Promise<number>;
 }
@@ -128,13 +128,13 @@ export interface ProgressBarSettingConfig<T> extends BaseSettingConfig<T> {
  * This is currently set to assume that the colors come and go as "#RRGGBB"
  * style color values; later enhancements could make this support other color
  * systems that the picker works with as needed. */
-export interface ColorPickerSettingConfig<T> extends BaseSettingConfig<T> {
+export interface ColorPickerSetting<T> extends BaseSetting<T> {
   type: 'colorpicker';
   key: KeysMatching<T, string>;
 }
 
 /* The specific configuration for a standard button. */
-export interface ButtonSettingConfig<T,P> extends BaseSettingConfig<T> {
+export interface ButtonSetting<T,P> extends BaseSetting<T> {
   type: 'button',
   text: string;
   style?: 'normal' | 'warning' | 'cta';
@@ -144,7 +144,7 @@ export interface ButtonSettingConfig<T,P> extends BaseSettingConfig<T> {
 }
 
 /* The specific configuration for an extra button (no text, just icon). */
-export interface ExtraButtonSettingConfig<T,P> extends BaseSettingConfig<T> {
+export interface ExtraButtonSetting<T,P> extends BaseSetting<T> {
   type: 'extrabutton',
   tooltip?: string;
   icon?: string;
@@ -154,7 +154,7 @@ export interface ExtraButtonSettingConfig<T,P> extends BaseSettingConfig<T> {
 /* The specific configuration for a MomentJS date format box. The includeHelp
  * config, if set to true, causes the description to be expanded to also include
  * help on the format strings and what the format looks like. */
-export interface DateFormatSettingConfig<T> extends BaseSettingConfig<T> {
+export interface DateFormatSetting<T> extends BaseSetting<T> {
   type: 'dateformat';
   key: KeysMatching<T, string>;
   defaultFormat: string;
@@ -164,7 +164,7 @@ export interface DateFormatSettingConfig<T> extends BaseSettingConfig<T> {
 /* The specific configuration for a Search widget. The search supports any
  * sort of key type for the search, but it defaults to string since that is a
  * common use case.  */
-export interface SearchSettingConfig<T,P,V> extends BaseSettingConfig<T> {
+export interface SearchSetting<T,P,V> extends BaseSetting<T> {
   type: 'search';
   key: KeysMatching<T,V>;
   placeholder?: string;
@@ -177,18 +177,17 @@ export interface SearchSettingConfig<T,P,V> extends BaseSettingConfig<T> {
 
 /* Any given setting can be any of the above types. */
 export type SettingConfig<T,P> =
-  TextSettingConfig<T> | TextAreaSettingConfig<T> | IntegerSettingConfig<T> |
-  FloatSettingConfig<T> | ToggleSettingConfig<T> | StaticDropdownSettingConfig<T> |
-  DynamicDropdownSettingsConfig<T,P> | SliderSettingConfig<T> | ProgressBarSettingConfig<T> |
-  ColorPickerSettingConfig<T> | ButtonSettingConfig<T,P> | ExtraButtonSettingConfig<T,P> |
-  DateFormatSettingConfig<T> | SearchSettingConfig<T,P,unknown>;
-
+  TextSetting<T> | TextAreaSetting<T> | IntegerSetting<T> | FloatSetting<T> |
+  ToggleSetting<T> | StaticDropdownSetting<T> | DynamicDropdownSettings<T,P> |
+  SliderSetting<T> | ProgressBarSetting<T> | ColorPickerSetting<T> |
+  ButtonSetting<T,P> | ExtraButtonSetting<T,P> | DateFormatSetting<T> |
+  SearchSetting<T,P,unknown>;
 
 /* A configuration entry that starts a new visual section/group. Any settings
  * following this entry will belong to this group until the next header is
  * encountered in the config. A default nameless header is created for the first
  * setting if there are instances of this in the config. */
-export interface SettingRowHeaderConfig {
+export interface SettingRowHeader {
   heading: string;
   cssClass?: string;
 
@@ -205,7 +204,7 @@ export interface SettingRowHeaderConfig {
  *
  * A list of setting components will be inserted into the row in the order they
  * appear in the items list. */
-export interface SettingRowItemConfig<T,P> {
+export interface SettingRowItem<T,P> {
   // The information on the setting this row represents.
   name: string;
   description?: string;
@@ -220,7 +219,7 @@ export interface SettingRowItemConfig<T,P> {
 
 /* A row in the setting page is either a heading row or a setting with one or
  * more components in it. */
-export type SettingRowConfig<T,P> = SettingRowHeaderConfig | SettingRowItemConfig<T,P>;
+export type SettingRow<T,P> = SettingRowHeader | SettingRowItem<T,P>;
 
 
 /******************************************************************************/

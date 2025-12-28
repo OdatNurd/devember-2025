@@ -2,7 +2,7 @@
 
 
 import { Setting } from 'obsidian';
-import type { SettingsManager, IntegerSettingConfig, FloatSettingConfig } from '#factory/settings.types';
+import type { SettingsManager, IntegerSetting, FloatSetting } from '#factory/settings.types';
 
 
 /******************************************************************************/
@@ -20,7 +20,7 @@ import type { SettingsManager, IntegerSettingConfig, FloatSettingConfig } from '
  * the work to handle the specific setting field. */
 export function addNumberControl<T>(setting: Setting,
                                     manager: SettingsManager<T>,
-                                    config: IntegerSettingConfig<T> | FloatSettingConfig<T>) {
+                                    config: IntegerSetting<T> | FloatSetting<T>) {
   setting.addText(text => {
     const input = text.inputEl;
 
