@@ -121,8 +121,7 @@ export function addDropdownControl<T,P extends Plugin>(
       .onChange(async (value: string) => {
         (manager.settings[config.key] as string) = value;
         await manager.savePluginData(config.key);
-      })
-      .setDisabled(config.disabled ?? false);
+      });
 
     // Pull the select element that wraps the dropdown.
     const select = dropdown.selectEl;
@@ -135,6 +134,7 @@ export function addDropdownControl<T,P extends Plugin>(
     // This is defined inside of here and not at the global level so that it can
     // close over the added dropdown element used for the setting.
     updateHandler = async (currentSettings: T) => {
+      dropdown.setDisabled(config.disabled ? config.disabled(currentSettings) : false);
       if ("options" in config) {
         const value = (currentSettings[config.key] as string) ?? '';
         staticDropdownSetup(dropdown, config, select, value);

@@ -40,7 +40,7 @@ export interface SettingsManager<T> {
  * settings regardless of their type. */
 export interface BaseSetting<T = unknown> {
   type: SettingType;
-  disabled?: boolean;
+  disabled?: (settings: T) => boolean;
 
   // Optional list of settings this setting depends on; if any of them changes,
   // the setup for this setting (if configured) will be executed again.

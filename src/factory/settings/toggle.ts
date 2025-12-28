@@ -35,7 +35,7 @@ export function addToggleControl<T>(setting: Setting,
   const initialValue = Boolean(manager.settings[config.key] ?? false);
 
   setting.addToggle(toggle => toggle
-    .setDisabled(config.disabled ?? false)
+    .setDisabled(config.disabled ? config.disabled(manager.settings) : false)
     .setTooltip(getTooltip(initialValue))
     .setValue(initialValue)
     .onChange(async (value: boolean) => {

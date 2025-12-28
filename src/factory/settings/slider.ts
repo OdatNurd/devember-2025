@@ -25,7 +25,7 @@ export function addSliderControl<T>(setting: Setting,
   const step = config.step ?? 'any';
 
   setting.addSlider(slider => slider
-    .setDisabled(config.disabled ?? false)
+    .setDisabled(config.disabled ? config.disabled(manager.settings) : false)
     .setLimits(min, max, step)
     .setDynamicTooltip()
     .setValue(Number(manager.settings[config.key] ?? min))

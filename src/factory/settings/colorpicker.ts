@@ -18,7 +18,7 @@ export function addColorPickerControl<T>(setting: Setting,
                                          manager: SettingsManager<T>,
                                          config: ColorPickerSetting<T>) {
   setting.addColorPicker(text => text
-    .setDisabled(config.disabled ?? false)
+    .setDisabled(config.disabled ? config.disabled(manager.settings) : false)
     .setValue(String(manager.settings[config.key] ?? ''))
     .onChange(async (value: string) => {
       (manager.settings[config.key] as string) = value;

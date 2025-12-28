@@ -26,7 +26,7 @@ export function addNumberControl<T>(setting: Setting,
 
     input.type = 'number';
     text.setPlaceholder(config.placeholder ?? '')
-    .setDisabled(config.disabled ?? false)
+    .setDisabled(config.disabled ? config.disabled(manager.settings) : false)
     .setValue(String(manager.settings[config.key] ?? '0'))
     .onChange(async (value: string) => {
       const num = Number(value);

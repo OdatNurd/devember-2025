@@ -45,7 +45,7 @@ export function addDateFormatControl<T>(setting: Setting,
 
   setting.addMomentFormat(momentFormat => {
     momentFormat
-      .setDisabled(config.disabled ?? false)
+      .setDisabled(config.disabled ? config.disabled(manager.settings) : false)
       .setValue(value !== config.defaultFormat ? value : '')
       .setSampleEl(dateSampleEl)
       .setDefaultFormat(config.defaultFormat)

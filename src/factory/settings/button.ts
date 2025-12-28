@@ -25,7 +25,7 @@ export function addButtonControl<T,P extends Plugin>(
                                       config: ButtonSetting<T,P>) {
   setting.addButton(button => {
     button
-      .setDisabled(config.disabled ?? false)
+      .setDisabled(config.disabled ? config.disabled(manager.settings) : false)
       .setButtonText(config.text)
       .setTooltip(config.tooltip ?? '')
       .onClick(() => config.click(plugin, manager.settings));

@@ -161,6 +161,8 @@ export class KursvaroSettingTab extends PluginSettingTab {
           {
             type: 'dropdown',
             key: 'myDropdownSetting',
+            disabled: settings => !settings.myToggleSetting,
+            dependencies: ['myToggleSetting'],
             options: {
               'titties': "I prefer titties",
               'boobies': "Clearly boobies are better",

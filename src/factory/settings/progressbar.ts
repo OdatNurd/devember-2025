@@ -25,7 +25,7 @@ export function addProgressBarControl<T>(setting: Setting,
   // component.
   let updateHandler: ControlUpdateHandler<T> = async () => {};
 
-  setting.addProgressBar((progressBar) => {
+  setting.addProgressBar(progressBar => {
     // The update handler invokes the user's value function to calculate what
     // the progress bar should show.
     updateHandler = async (currentSettings: T) => {

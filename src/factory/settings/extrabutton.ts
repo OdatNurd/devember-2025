@@ -25,7 +25,7 @@ export function addExtraButtonControl<T,P extends Plugin>(
                                            plugin: P,
                                            config: ExtraButtonSetting<T,P>) {
   setting.addExtraButton(button => button
-    .setDisabled(config.disabled ?? false)
+    .setDisabled(config.disabled ? config.disabled(manager.settings) : false)
     .setTooltip(config.tooltip ?? '')
     .setIcon(config.icon ?? 'gear')
     .onClick(() => config.click(plugin, manager.settings))

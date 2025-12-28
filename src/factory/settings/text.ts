@@ -18,7 +18,7 @@ export function addTextControl<T>(setting: Setting,
                                   manager: SettingsManager<T>,
                                   config: TextSetting<T>) {
   setting.addText(text => text
-    .setDisabled(config.disabled ?? false)
+    .setDisabled(config.disabled ? config.disabled(manager.settings) : false)
     .setPlaceholder(config.placeholder ?? '')
     .setValue(String(manager.settings[config.key] ?? ''))
     .onChange(async (value: string) => {
