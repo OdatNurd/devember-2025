@@ -59,6 +59,9 @@ export interface TextAreaSettingConfig<T> extends BaseSettingConfig<T> {
   type: 'textarea';
   key: KeysMatching<T, string>;
   placeholder?: string;
+  // Optional, but if not given, default to 'none'.
+  resize?: 'none' | 'both' | 'vertical' | 'horizontal';
+  lines?: number;
 }
 
 /* The specific configuration for a numeric field (integer only). */

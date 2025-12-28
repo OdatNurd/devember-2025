@@ -70,6 +70,8 @@ export class KursvaroSettingTab extends PluginSettingTab {
             type: 'textarea',
             placeholder: 'The non-secret goes here',
             key: 'myOtherSetting',
+            lines: 3,
+            resize: 'none',
           },
         ]
       },

@@ -15,23 +15,27 @@ import type { SettingsManager, TextAreaSettingConfig } from '#factory/settings.t
  * added to the setting prior to it being passed here, so this only needs to do
  * the work to handle the specific setting field. */
 export function addTextAreaControl<T>(setting: Setting,
-                                  manager: SettingsManager<T>,
-                                  config: TextAreaSettingConfig<T>) {
+                                      manager: SettingsManager<T>,
+                                      config: TextAreaSettingConfig<T>) {
   setting.addTextArea(text => {
     // Enforce vertical resizing only for the text input because there is
     // something hinky about the way that Obsidian lets you resize it, like it
     // is resizing based on the center of a larger bounding box, and it does not
     // behave like one might expect it to.
-    text.inputEl.style.resize = 'vertical';
+    text.inputEl.style.resize = config.resize ?? 'none';
+
+    if (config.lines !== undefined) {
+      text.inputEl.rows = config.lines;
+    }
 
     text
-    .setDisabled(config.disabled ?? false)
-    .setPlaceholder(config.placeholder ?? '')
-    .setValue(String(manager.settings[config.key] ?? ''))
-    .onChange(async (value: string) => {
-      (manager.settings[config.key] as string) = value;
-      await manager.savePluginData(config.key);
-    })
+      .setDisabled(config.disabled ?? false)
+      .setPlaceholder(config.placeholder ?? '')
+      .setValue(String(manager.settings[config.key] ?? ''))
+      .onChange(async (value: string) => {
+        (manager.settings[config.key] as string) = value;
+        await manager.savePluginData(config.key);
+      })
   });
 }
 
