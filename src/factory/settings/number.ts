@@ -2,7 +2,7 @@
 
 
 import { Setting } from 'obsidian';
-import type { SettingsManager, IntegerSetting, FloatSetting } from '#factory/settings.types';
+import type { ControlUpdateHandler, SettingsManager, IntegerSetting, FloatSetting } from '#factory/settings.types';
 
 
 /******************************************************************************/
@@ -20,14 +20,19 @@ import type { SettingsManager, IntegerSetting, FloatSetting } from '#factory/set
  * the work to handle the specific setting field. */
 export function addNumberControl<T>(setting: Setting,
                                     manager: SettingsManager<T>,
-                                    config: IntegerSetting<T> | FloatSetting<T>) {
+                                    config: IntegerSetting<T> | FloatSetting<T>) : ControlUpdateHandler<T> {
+  let updateHandler: ControlUpdateHandler<T> = async () => {};
+
   setting.addText(text => {
+    updateHandler = async (currentSettings: T) => {
+      text.setDisabled(config.disabled ? config.disabled(currentSettings) : false);
+      text.setValue(String(currentSettings[config.key] ?? '0'));
+    };
+
     const input = text.inputEl;
 
     input.type = 'number';
     text.setPlaceholder(config.placeholder ?? '')
-    .setDisabled(config.disabled ? config.disabled(manager.settings) : false)
-    .setValue(String(manager.settings[config.key] ?? '0'))
     .onChange(async (value: string) => {
       const num = Number(value);
       if (isNaN(num) === false) {
@@ -39,6 +44,7 @@ export function addNumberControl<T>(setting: Setting,
     // If this is not an integer, then we can skip the rest of this; the code
     // above handles floating point by default.
     if (config.type === 'float') {
+      updateHandler(manager.settings);
       return;
     }
 
@@ -79,7 +85,10 @@ export function addNumberControl<T>(setting: Setting,
       document.execCommand('insertText', false, cleaned);
     });
 
+    updateHandler(manager.settings);
   });
+
+  return updateHandler;
 }
 
 

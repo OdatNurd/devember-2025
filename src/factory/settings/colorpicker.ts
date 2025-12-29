@@ -2,7 +2,7 @@
 
 
 import { Setting } from 'obsidian';
-import type { SettingsManager, ColorPickerSetting } from '#factory/settings.types';
+import type { ControlUpdateHandler, SettingsManager, ColorPickerSetting } from '#factory/settings.types';
 
 
 /******************************************************************************/
@@ -16,15 +16,25 @@ import type { SettingsManager, ColorPickerSetting } from '#factory/settings.type
  * the work to handle the specific setting field. */
 export function addColorPickerControl<T>(setting: Setting,
                                          manager: SettingsManager<T>,
-                                         config: ColorPickerSetting<T>) {
-  setting.addColorPicker(text => text
-    .setDisabled(config.disabled ? config.disabled(manager.settings) : false)
-    .setValue(String(manager.settings[config.key] ?? ''))
-    .onChange(async (value: string) => {
-      (manager.settings[config.key] as string) = value;
-      await manager.savePluginData(config.key);
-    })
-  );
+                                         config: ColorPickerSetting<T>) : ControlUpdateHandler<T> {
+  let updateHandler: ControlUpdateHandler<T> = async () => {};
+
+  setting.addColorPicker(text => {
+    updateHandler = async (currentSettings: T) => {
+      text.setDisabled(config.disabled ? config.disabled(currentSettings) : false);
+      text.setValue(String(currentSettings[config.key] ?? ''));
+    };
+
+    text
+      .onChange(async (value: string) => {
+        (manager.settings[config.key] as string) = value;
+        await manager.savePluginData(config.key);
+      });
+
+    updateHandler(manager.settings);
+  });
+
+  return updateHandler;
 }
 
 

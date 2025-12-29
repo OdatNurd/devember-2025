@@ -2,7 +2,7 @@
 
 
 import { type Plugin, Setting } from 'obsidian';
-import type { SettingsManager, SearchSetting } from '#factory/settings.types';
+import type { ControlUpdateHandler, SettingsManager, SearchSetting } from '#factory/settings.types';
 
 
 /******************************************************************************/
@@ -18,15 +18,20 @@ export function addSearchControl<T,P extends Plugin>(
                                       setting: Setting,
                                       manager: SettingsManager<T>,
                                       plugin: P,
-                                      config: SearchSetting<T,P>) {
+                                      config: SearchSetting<T,P>) : ControlUpdateHandler<T> {
+  let updateHandler: ControlUpdateHandler<T> = async () => {};
+
   setting.addSearch(search => {
+    updateHandler = async (currentSettings: T) => {
+      search.setDisabled(config.disabled ? config.disabled(currentSettings) : false);
+      search.setValue(String(currentSettings[config.key] ?? ''));
+    };
+
     // Create the suggestion object; this ties it to the search input element.
     const suggestions = new config.handler(plugin, search.inputEl);
 
     search
-      .setDisabled(config.disabled ? config.disabled(manager.settings) : false)
       .setPlaceholder(config.placeholder ?? '')
-      .setValue(String(manager.settings[config.key] ?? ''))
       .onChange(async (value: string) => {
         let isValid = false;
         let parsed: unknown = null;
@@ -78,7 +83,11 @@ export function addSearchControl<T,P extends Plugin>(
       // Close the popup now that something was selected.
       suggestions.close();
     })
+
+    updateHandler(manager.settings);
   });
+
+  return updateHandler;
 }
 
 

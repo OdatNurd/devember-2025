@@ -2,7 +2,7 @@
 
 
 import { type Plugin, Setting } from 'obsidian';
-import type { SettingsManager, ButtonSetting } from '#factory/settings.types';
+import type { ControlUpdateHandler, SettingsManager, ButtonSetting } from '#factory/settings.types';
 
 
 /******************************************************************************/
@@ -22,10 +22,15 @@ export function addButtonControl<T,P extends Plugin>(
                                       setting: Setting,
                                       manager: SettingsManager<T>,
                                       plugin: P,
-                                      config: ButtonSetting<T,P>) {
+                                      config: ButtonSetting<T,P>) : ControlUpdateHandler<T> {
+  let updateHandler: ControlUpdateHandler<T> = async () => {};
+
   setting.addButton(button => {
+    updateHandler = async (currentSettings: T) => {
+      button.setDisabled(config.disabled ? config.disabled(currentSettings) : false);
+    };
+
     button
-      .setDisabled(config.disabled ? config.disabled(manager.settings) : false)
       .setButtonText(config.text)
       .setTooltip(config.tooltip ?? '')
       .onClick(() => config.click(plugin, manager.settings));
@@ -40,7 +45,11 @@ export function addButtonControl<T,P extends Plugin>(
     } else if (config.style === 'cta') {
       button.setCta();
     }
+
+    updateHandler(manager.settings);
   });
+
+  return updateHandler;
 }
 
 

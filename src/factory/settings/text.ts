@@ -2,7 +2,7 @@
 
 
 import { Setting } from 'obsidian';
-import type { SettingsManager, TextSetting } from '#factory/settings.types';
+import type { ControlUpdateHandler, SettingsManager, TextSetting } from '#factory/settings.types';
 
 
 /******************************************************************************/
@@ -16,16 +16,26 @@ import type { SettingsManager, TextSetting } from '#factory/settings.types';
  * the work to handle the specific setting field. */
 export function addTextControl<T>(setting: Setting,
                                   manager: SettingsManager<T>,
-                                  config: TextSetting<T>) {
-  setting.addText(text => text
-    .setDisabled(config.disabled ? config.disabled(manager.settings) : false)
-    .setPlaceholder(config.placeholder ?? '')
-    .setValue(String(manager.settings[config.key] ?? ''))
-    .onChange(async (value: string) => {
-      (manager.settings[config.key] as string) = value;
-      await manager.savePluginData(config.key);
-    })
-  );
+                                  config: TextSetting<T>) : ControlUpdateHandler<T> {
+  let updateHandler: ControlUpdateHandler<T> = async () => {};
+
+  setting.addText(text => {
+    updateHandler = async (currentSettings: T) => {
+      text.setDisabled(config.disabled ? config.disabled(currentSettings) : false);
+      text.setValue(String(currentSettings[config.key] ?? ''));
+    };
+
+    text
+      .setPlaceholder(config.placeholder ?? '')
+      .onChange(async (value: string) => {
+        (manager.settings[config.key] as string) = value;
+        await manager.savePluginData(config.key);
+      });
+
+    updateHandler(manager.settings);
+  });
+
+  return updateHandler;
 }
 
 

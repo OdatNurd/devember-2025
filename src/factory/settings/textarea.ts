@@ -2,7 +2,7 @@
 
 
 import { Setting } from 'obsidian';
-import type { SettingsManager, TextAreaSetting } from '#factory/settings.types';
+import type { ControlUpdateHandler, SettingsManager, TextAreaSetting } from '#factory/settings.types';
 
 
 /******************************************************************************/
@@ -16,8 +16,15 @@ import type { SettingsManager, TextAreaSetting } from '#factory/settings.types';
  * the work to handle the specific setting field. */
 export function addTextAreaControl<T>(setting: Setting,
                                       manager: SettingsManager<T>,
-                                      config: TextAreaSetting<T>) {
+                                      config: TextAreaSetting<T>) : ControlUpdateHandler<T> {
+  let updateHandler: ControlUpdateHandler<T> = async () => {};
+
   setting.addTextArea(text => {
+    updateHandler = async (currentSettings: T) => {
+      text.setDisabled(config.disabled ? config.disabled(currentSettings) : false);
+      text.setValue(String(currentSettings[config.key] ?? ''));
+    };
+
     // Enforce vertical resizing only for the text input because there is
     // something hinky about the way that Obsidian lets you resize it, like it
     // is resizing based on the center of a larger bounding box, and it does not
@@ -29,14 +36,16 @@ export function addTextAreaControl<T>(setting: Setting,
     }
 
     text
-      .setDisabled(config.disabled ? config.disabled(manager.settings) : false)
       .setPlaceholder(config.placeholder ?? '')
-      .setValue(String(manager.settings[config.key] ?? ''))
       .onChange(async (value: string) => {
         (manager.settings[config.key] as string) = value;
         await manager.savePluginData(config.key);
-      })
+      });
+
+    updateHandler(manager.settings);
   });
+
+  return updateHandler;
 }
 
 

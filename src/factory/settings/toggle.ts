@@ -2,7 +2,7 @@
 
 
 import { Setting } from 'obsidian';
-import type { SettingsManager, ToggleSetting } from '#factory/settings.types';
+import type { ControlUpdateHandler, SettingsManager, ToggleSetting } from '#factory/settings.types';
 
 
 /******************************************************************************/
@@ -16,7 +16,9 @@ import type { SettingsManager, ToggleSetting } from '#factory/settings.types';
  * the work to handle the specific setting field. */
 export function addToggleControl<T>(setting: Setting,
                                     manager: SettingsManager<T>,
-                                    config: ToggleSetting<T>) {
+                                    config: ToggleSetting<T>) : ControlUpdateHandler<T> {
+  let updateHandler: ControlUpdateHandler<T> = async () => {};
+
   const getTooltip = (value: boolean): string => {
     // No tooltip was defined.
     if (config.tooltip === undefined) {
@@ -32,18 +34,26 @@ export function addToggleControl<T>(setting: Setting,
     // CURRENT value of the setting.
     return config.tooltip[value === true ? 0 : 1];
   }
-  const initialValue = Boolean(manager.settings[config.key] ?? false);
 
-  setting.addToggle(toggle => toggle
-    .setDisabled(config.disabled ? config.disabled(manager.settings) : false)
-    .setTooltip(getTooltip(initialValue))
-    .setValue(initialValue)
-    .onChange(async (value: boolean) => {
-      (manager.settings[config.key] as boolean) = value;
+  setting.addToggle(toggle => {
+    updateHandler = async (currentSettings: T) => {
+      const value = Boolean(currentSettings[config.key] ?? false);
+      toggle.setDisabled(config.disabled ? config.disabled(currentSettings) : false);
       toggle.setTooltip(getTooltip(value));
-      await manager.savePluginData(config.key);
-    })
-  );
+      toggle.setValue(value);
+    };
+
+    toggle
+      .onChange(async (value: boolean) => {
+        (manager.settings[config.key] as boolean) = value;
+        toggle.setTooltip(getTooltip(value));
+        await manager.savePluginData(config.key);
+      });
+
+    updateHandler(manager.settings);
+  });
+
+  return updateHandler;
 }
 
 

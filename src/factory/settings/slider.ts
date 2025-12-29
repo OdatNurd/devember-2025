@@ -2,7 +2,7 @@
 
 
 import { Setting } from 'obsidian';
-import type { SettingsManager, SliderSetting } from '#factory/settings.types';
+import type { ControlUpdateHandler, SettingsManager, SliderSetting } from '#factory/settings.types';
 
 
 /******************************************************************************/
@@ -16,7 +16,7 @@ import type { SettingsManager, SliderSetting } from '#factory/settings.types';
  * the work to handle the specific setting field. */
 export function addSliderControl<T>(setting: Setting,
                                     manager: SettingsManager<T>,
-                                    config: SliderSetting<T>) {
+                                    config: SliderSetting<T>) : ControlUpdateHandler<T> {
   // All options are optional, but the API wants specific values for placeholder
   // resons. If not specified, 0, 100, 'any' is the underlying default (a
   // fractional percentage).
@@ -24,16 +24,26 @@ export function addSliderControl<T>(setting: Setting,
   const max = config.max ?? null;
   const step = config.step ?? 'any';
 
-  setting.addSlider(slider => slider
-    .setDisabled(config.disabled ? config.disabled(manager.settings) : false)
-    .setLimits(min, max, step)
-    .setDynamicTooltip()
-    .setValue(Number(manager.settings[config.key] ?? min))
-    .onChange(async (value: number) => {
-      (manager.settings[config.key] as number) = value;
-      await manager.savePluginData(config.key);
-    })
-  );
+  let updateHandler: ControlUpdateHandler<T> = async () => {};
+
+  setting.addSlider(slider => {
+    updateHandler = async (currentSettings: T) => {
+      slider.setDisabled(config.disabled ? config.disabled(currentSettings) : false);
+      slider.setValue(Number(currentSettings[config.key] ?? min));
+    }
+
+    slider
+      .setLimits(min, max, step)
+      .setDynamicTooltip()
+      .onChange(async (value: number) => {
+        (manager.settings[config.key] as number) = value;
+        await manager.savePluginData(config.key);
+      });
+
+    updateHandler(manager.settings);
+  });
+
+  return updateHandler;
 }
 
 

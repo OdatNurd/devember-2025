@@ -2,7 +2,7 @@
 
 
 import { type Plugin, Setting } from 'obsidian';
-import type { SettingsManager, ExtraButtonSetting } from '#factory/settings.types';
+import type { ControlUpdateHandler, SettingsManager, ExtraButtonSetting } from '#factory/settings.types';
 
 
 /******************************************************************************/
@@ -23,13 +23,23 @@ export function addExtraButtonControl<T,P extends Plugin>(
                                            setting: Setting,
                                            manager: SettingsManager<T>,
                                            plugin: P,
-                                           config: ExtraButtonSetting<T,P>) {
-  setting.addExtraButton(button => button
-    .setDisabled(config.disabled ? config.disabled(manager.settings) : false)
-    .setTooltip(config.tooltip ?? '')
-    .setIcon(config.icon ?? 'gear')
-    .onClick(() => config.click(plugin, manager.settings))
-  );
+                                           config: ExtraButtonSetting<T,P>) : ControlUpdateHandler<T> {
+  let updateHandler: ControlUpdateHandler<T> = async () => {};
+
+  setting.addExtraButton(button => {
+    updateHandler = async (currentSettings: T) => {
+      button.setDisabled(config.disabled ? config.disabled(currentSettings) : false);
+    };
+
+    button
+      .setTooltip(config.tooltip ?? '')
+      .setIcon(config.icon ?? 'gear')
+      .onClick(() => config.click(plugin, manager.settings));
+
+    updateHandler(manager.settings);
+  });
+
+  return updateHandler;
 }
 
 

@@ -2,7 +2,7 @@
 
 
 import { Setting } from 'obsidian';
-import type { SettingsManager, DateFormatSetting } from '#factory/settings.types';
+import type { ControlUpdateHandler, SettingsManager, DateFormatSetting } from '#factory/settings.types';
 
 
 /******************************************************************************/
@@ -21,7 +21,7 @@ import type { SettingsManager, DateFormatSetting } from '#factory/settings.types
  * uses (which looks very developer centric, but better than nothing). */
 export function addDateFormatControl<T>(setting: Setting,
                                         manager: SettingsManager<T>,
-                                        config: DateFormatSetting<T>) {
+                                        config: DateFormatSetting<T>) : ControlUpdateHandler<T> {
   const dateDesc = document.createDocumentFragment();
   dateDesc.createEl('br');
   dateDesc.appendText('Preview: ');
@@ -36,17 +36,22 @@ export function addDateFormatControl<T>(setting: Setting,
       }
   });
 
-
-  // The initial value; if the setting does not have a value, assume that the
-  // value is the default value. When we set it in, if the value is the default
-  // we put the empty string in the control, since the control treats an empty
-  // like the default. This makes for a better experience for the user.
-  const value = String(manager.settings[config.key] ?? config.defaultFormat);
+  let updateHandler: ControlUpdateHandler<T> = async () => {};
 
   setting.addMomentFormat(momentFormat => {
+    updateHandler = async (currentSettings: T) => {
+      // The initial value; if the setting does not have a value, assume that the
+      // value is the default value. When we set it in, if the value is the default
+      // we put the empty string in the control, since the control treats an empty
+      // like the default. This makes for a better experience for the user.
+      const value = String(currentSettings[config.key] ?? config.defaultFormat);
+
+      momentFormat.setDisabled(config.disabled ? config.disabled(currentSettings) : false);
+      momentFormat.setValue(value !== config.defaultFormat ? value : '');
+      momentFormat.updateSample();
+    };
+
     momentFormat
-      .setDisabled(config.disabled ? config.disabled(manager.settings) : false)
-      .setValue(value !== config.defaultFormat ? value : '')
       .setSampleEl(dateSampleEl)
       .setDefaultFormat(config.defaultFormat)
       .onChange(async (value: string) => {
@@ -65,7 +70,11 @@ export function addDateFormatControl<T>(setting: Setting,
     if (config.includeHelp === true) {
       setting.descEl.appendChild(dateDesc);
     }
+
+    updateHandler(manager.settings);
   });
+
+  return updateHandler;
 }
 
 

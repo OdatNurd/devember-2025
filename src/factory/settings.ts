@@ -96,23 +96,23 @@ export function createSettingsLayout<T,P extends Plugin>(container: HTMLElement,
         switch (item.type) {
           // Simple text field.
           case 'text':
-            addTextControl(setting, manager, item);
+            updateHandler = addTextControl(setting, manager, item);
             break;
 
           // Simple textarea field.
           case 'textarea':
-            addTextAreaControl(setting, manager, item);
+            updateHandler = addTextAreaControl(setting, manager, item);
             break;
 
           // Simple text field, but treated as a number.
           case 'integer':
           case 'float':
-            addNumberControl(setting, manager, item);
+            updateHandler = addNumberControl(setting, manager, item);
             break;
 
           // Toggle Field; a boolean with an on/off in it.
           case 'toggle':
-            addToggleControl(setting, manager, item);
+            updateHandler = addToggleControl(setting, manager, item);
             break;
 
           // Dropdown field; this handles both a static and a dynamic control.
@@ -122,7 +122,7 @@ export function createSettingsLayout<T,P extends Plugin>(container: HTMLElement,
 
           // Slider control.
           case 'slider':
-            addSliderControl(setting, manager, item);
+            updateHandler = addSliderControl(setting, manager, item);
             break;
 
           // Progress bar control.
@@ -132,27 +132,27 @@ export function createSettingsLayout<T,P extends Plugin>(container: HTMLElement,
 
           // Color picker control.
           case 'colorpicker':
-            addColorPickerControl(setting, manager, item);
+            updateHandler = addColorPickerControl(setting, manager, item);
             break;
 
           // Regular button control.
           case 'button':
-            addButtonControl(setting, manager, plugin, item);
+            updateHandler = addButtonControl(setting, manager, plugin, item);
             break;
 
           // Extra button control (button with just an icon)
           case 'extrabutton':
-            addExtraButtonControl(setting, manager, plugin, item);
+            updateHandler = addExtraButtonControl(setting, manager, plugin, item);
             break;
 
           // Date format (with or without help)
           case 'dateformat':
-            addDateFormatControl(setting, manager, item);
+            updateHandler = addDateFormatControl(setting, manager, item);
             break;
 
           // Search Field
           case 'search':
-            addSearchControl(setting, manager, plugin, item);
+            updateHandler = addSearchControl(setting, manager, plugin, item);
             break;
         }
 
