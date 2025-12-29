@@ -5,7 +5,7 @@
 
   // Get props, populating in with today's year and month if the user foolishly
   // does not provide any.
-  const today = new Date()
+  const today = new Date();
   let {
     year = today.getFullYear(),
     month = today.getMonth() + 1,
@@ -21,27 +21,33 @@
   let daysInMonth = $derived(new Date(year, month, 0).getDate());
   let startDayOfWeek = $derived(new Date(year, month-1, 1).getDay());
 
+  // Determine if the calendar grid we're about to render matches the actual
+  // month and year; if so we know we may need to handle one of the days
+  // specially to mark it as today.
+  let isCurrentMonthGrid = $derived(year === today.getFullYear() && month === (today.getMonth() + 1));
+
   // Get a set of cells that represent all of the days of the month. In order to
-  // ease the display of things, this starts the array with some number of
-  // entries that contain null, which indicates days from the previous month
-  // (e.g. if the month starts on a Monday, the first entry is null). The
-  // $derived.by makes the function re-execute every time the date changes.
+  // ease the display, this calculates the total number of elements needed to
+  // fill out all of the weeks or partial weeks in the month, fills them with
+  // null, and then only populates the ones that are actual days with the number
+  // of the day.
+  //
+  // This allows us to identify grid elements that have no day attached to them.
+  // The $derived.by makes the function re-execute every time the date changes.
   let calendarCells = $derived.by(() => {
-    const cells: (number | null)[] = [];
+    // Calculate the total number of weeks the calendar needs to cover; this
+    // gives us a full week to start by using the starting day of the week in
+    // this month as an offset and adding in the total number of days in the
+    // month, and dividing by 7. From there we can extrapolate the total number
+    // of cells, so that the grid is square.
+    const totalWeeks = Math.ceil((startDayOfWeek + daysInMonth) / 7);
 
-    // Include the adding elements for the days at the start of the calendar
-    // that are for the previous month.
-    for (let i = 0 ; i < startDayOfWeek ; i++) {
-      cells.push(null);
-    }
-
-    // Insert the cells for the actual days now.
-    for (let i = 1 ; i <= daysInMonth ; i++) {
-      cells.push(i);
-    }
-
-    while (cells.length % 7 !== 0) {
-      cells.push(null);
+    // Allocate the cells and fill them with nulls. Once that is done we can
+    // fill in all of the slots that refer to a day as the actual number;
+    // anything left as a null will be rendered as an empty cell.
+    const cells: (number | null)[] = new Array(totalWeeks * 7).fill(null);
+    for (let i = 1; i <= daysInMonth; i++) {
+      cells[startDayOfWeek + i - 1] = i;
     }
 
     return cells;
@@ -63,8 +69,12 @@
       <div class="day-name">{day}</div>
     {/each}
 
-    {#each calendarCells as day (day)}
-      <div class="day-cell" class:is-empty={day === null}>
+    {#each calendarCells as day, i (i)}
+      <div
+        class="day-cell"
+        class:is-empty={day === null}
+        class:is-today={isCurrentMonthGrid && day === today.getDate()}
+      >
         {day ?? ''}
       </div>
     {/each}
@@ -145,4 +155,9 @@
     background-color: var(--background-primary-alt);
   }
 
+  .day-cell.is-today {
+    background-color: var(--background-modifier-hover);
+    color: var(--text-accent);
+    font-weight: 900;
+  }
 </style>
