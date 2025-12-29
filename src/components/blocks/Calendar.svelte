@@ -3,10 +3,13 @@
 
   const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+  // Get props, populating in with today's year and month if the user foolishly
+  // does not provide any.
+  const today = new Date()
   let {
-    year = 2025,
-    month = 12,
-    name = 'Test Calendar',
+    year = today.getFullYear(),
+    month = today.getMonth() + 1,
+    name = 'Unnamed',
 
     // sharedState,
   }: CalendarBlockProps = $props();
