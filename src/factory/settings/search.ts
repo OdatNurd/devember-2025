@@ -29,14 +29,14 @@ export function addSearchControl<T,P extends Plugin>(
       .setValue(String(manager.settings[config.key] ?? ''))
       .onChange(async (value: string) => {
         let isValid = false;
-        let parsed: any = null;
+        let parsed: unknown = null;
 
         // Only save manually typed input IF the handler supports parsing it.
         // This prevents invalid types (e.g. "boobs" in a number field) from
         // being saved, and allows for enforcement that only searchable values
         // can be used as the setting value.
         if (suggestions.parseInput !== undefined) {
-          const parsed = suggestions.parseInput(value);
+          parsed = suggestions.parseInput(value);
           if (parsed !== null && parsed !== undefined) {
             isValid = true;
           }
@@ -45,7 +45,7 @@ export function addSearchControl<T,P extends Plugin>(
         if (isValid === true) {
           search.inputEl.style.textDecoration = 'none';
 
-          (manager.settings[config.key] as any) = parsed;
+          (manager.settings[config.key] as unknown) = parsed;
           await manager.savePluginData(config.key);
         } else {
           // Empty values are not invalid.
