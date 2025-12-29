@@ -23,18 +23,29 @@ export function addDateFormatControl<T>(setting: Setting,
                                         manager: SettingsManager<T>,
                                         config: DateFormatSetting<T>) : ControlUpdateHandler<T> {
   const dateDesc = document.createDocumentFragment();
-  dateDesc.createEl('br');
-  dateDesc.appendText('Preview: ');
-  const dateSampleEl = dateDesc.createEl('b', 'u-pop');
-  dateDesc.appendText(' ');
-  dateDesc.createEl('a', {
-      text: '\u{1F6C8}',
-      attr: {
-        href: 'https://momentjs.com/docs/#/displaying/format/',
-        target: '_blank',
-        title: 'Format Help'
-      }
-  });
+
+  // Create a container and populate it with the help text that can possibly be
+  // displayed into the descriptionof the control if asked for.
+  const container = dateDesc.createEl('span');
+  container.innerHTML = `
+    <br>
+    Format Preview: <b class="u-pop"></b>
+  `;
+
+  // In order to work we need to pull the element that represents the date
+  // sample out.
+  const dateSampleEl = container.querySelector('b') as HTMLElement;
+
+  // If help was requested, we should first add in an extrabutton to the
+  // settings which allows the user to easily get to the help. By adding it
+  // first, it goes to the left of the input field.
+  if (config.includeHelp === true) {
+    setting.addExtraButton(btn => {
+      btn.setIcon('help-circle')
+         .setTooltip('Format Help')
+         .onClick(() => window.open('https://momentjs.com/docs/#/displaying/format/'));
+    });
+  }
 
   let updateHandler: ControlUpdateHandler<T> = async () => {};
 
