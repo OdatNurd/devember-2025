@@ -76,9 +76,9 @@
         class:is-empty={day === null}
         class:is-today={isCurrentMonthGrid && day === today.getDate()}
       >
-        {day ?? ''}
+        <div class="day-number">{day ?? ''}</div>
         <div class="day-indicators">
-          {#if day !== null && markedDays.contains(day)}
+          {#if day !== null && markedDays.includes(day)}
             <div class="day-marker"></div>
           {/if}
         </div>
@@ -154,7 +154,6 @@
     background-color: var(--background-primary);
     min-height: 3rem;
     padding: 4px;
-    text-align: right;
     font-size: 0.9em;
   }
 
@@ -168,12 +167,20 @@
     font-weight: 900;
   }
 
+  .day-number {
+    text-align: right;
+    position: relative;
+    z-index: 2;
+  }
+
   .day-indicators {
     position: absolute;
     top: 8px;
     left: 8px;
+    right: 1.8em;
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     gap: 4px;
   }
 
