@@ -26,21 +26,58 @@ export class CalendarBlockRenderChild
     return CalendarBlockComponentView;
   }
 
+  /* Treats the source from the code block as a series of "key=value" type lines
+   * and parses them out, using recognized keys to set props and ignoring all
+   * other keys in the source block. */
+  parseSource() : CalendarBlockComponent['props'] {
+    const props : CalendarBlockComponent['props'] = {}
+
+    // Iterate over all of the lines in the source
+    for (const line of this.source.split('\n')) {
+      // Lines with no '=' can't be part of a key, so skip them.
+      if (line.includes('=') === false) {
+        continue;
+      }
+
+      // Using '=' as the split, gather the key and value portion; we need to
+      // capture potentially many values, in case it has an embedded '='
+      const [keyPart, ...valueParts] = line.split('=');
+      const key = keyPart.trim();
+      const value = (valueParts.join('=')).trimStart();
+
+      // A helper because I am a stupid old man that cares about making software
+      // do redundant work for no reason other than it looks nicer in the code.
+      const stringToNumber = (value: string) => {
+        const result = parseInt(value);
+        return isNaN(result) ? undefined : result;
+      }
+
+      // Handle the key appropriately.
+      switch (key) {
+        case 'courseName':
+          props.name = value;
+          break;
+
+        case 'year':
+          props.year = stringToNumber(value);
+          break;
+
+        case 'month':
+          props.month = stringToNumber(value);
+          break;
+
+        default:
+          console.log(`unknown calendar key '${key.trim()}'`);
+          break;
+      }
+    }
+
+    return props;
+  }
+
   /* Return the properties to be used when the component is mounted. */
   getComponentProps() : CalendarBlockComponent['props'] {
-    // In the world of ultra hack, assume that the input is a comma separated
-    // string and do conversions; if any of the numbers are not numbers, then we
-    // will pass undefined and that will trigger the component to use the
-    // component from today's date instead (this also works for the name).
-    const [ name, yearPart, monthPart ] = this.source.split(',');
-    const year = parseInt(yearPart);
-    const month = parseInt(monthPart);
-
-    return {
-      year: isNaN(year) ? undefined : year,
-      month: isNaN(month) ? undefined : month,
-      name
-    }
+    return this.parseSource();
   }
 
   /* Return the default data to be shared into the shared state that our

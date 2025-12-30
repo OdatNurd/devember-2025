@@ -7,9 +7,9 @@
   // does not provide any.
   const today = new Date();
   let {
+    name = 'Unnamed Course',
     year = today.getFullYear(),
     month = today.getMonth() + 1,
-    name = 'Unnamed',
 
     // sharedState,
   }: CalendarBlockProps = $props();
