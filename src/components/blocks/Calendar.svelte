@@ -10,6 +10,7 @@
     name = 'Unnamed Course',
     year = today.getFullYear(),
     month = today.getMonth() + 1,
+    markedDays = [],
 
     // sharedState,
   }: CalendarBlockProps = $props();
@@ -76,6 +77,9 @@
         class:is-today={isCurrentMonthGrid && day === today.getDate()}
       >
         {day ?? ''}
+        {#if day !== null && markedDays.contains(day)}
+          <div class="day-marker"></div>
+        {/if}
       </div>
     {/each}
   </div>
@@ -144,6 +148,7 @@
   }
 
   .day-cell {
+    position: relative;
     background-color: var(--background-primary);
     min-height: 3rem;
     padding: 4px;
@@ -159,5 +164,15 @@
     background-color: var(--background-modifier-hover);
     color: var(--text-accent);
     font-weight: 900;
+  }
+
+  .day-marker {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--text-accent);
   }
 </style>

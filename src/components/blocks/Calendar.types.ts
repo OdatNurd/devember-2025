@@ -25,6 +25,10 @@ export interface CalendarBlockComponent extends ComponentSchema {
 
     // The name of this calendar
     name?: string;
+
+    // If provided, all days in the calendar page that match a day in this array
+    // will have a marker dot applied to them.
+    markedDays?: number[];
   };
 }
 

@@ -66,6 +66,12 @@ export class CalendarBlockRenderChild
           props.month = stringToNumber(value);
           break;
 
+        case 'markedDays':
+          props.markedDays = value.split(',')
+                               .map(v => stringToNumber(v))
+                               .filter(v => v !== undefined);
+          break;
+
         default:
           console.log(`unknown calendar key '${key.trim()}'`);
           break;
