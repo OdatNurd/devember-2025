@@ -1,6 +1,7 @@
 /******************************************************************************/
 
 
+import { parseYaml } from 'obsidian';
 import { type Component } from 'svelte';
 import { type KursvaroPlugin } from '#plugin';
 
@@ -26,59 +27,22 @@ export class CalendarBlockRenderChild
     return CalendarBlockComponentView;
   }
 
-  /* Treats the source from the code block as a series of "key=value" type lines
-   * and parses them out, using recognized keys to set props and ignoring all
-   * other keys in the source block. */
+  /* Treats the source from the code block as YAML frontmatter and parses it
+   * in order to gather the properties for the calendar; any and all paramters
+   * could be undefined. */
   parseSource() : CalendarBlockComponent['props'] {
-    const props : CalendarBlockComponent['props'] = {}
-
-    // Iterate over all of the lines in the source
-    for (const line of this.source.split('\n')) {
-      // Lines with no '=' can't be part of a key, so skip them.
-      if (line.includes('=') === false) {
-        continue;
-      }
-
-      // Using '=' as the split, gather the key and value portion; we need to
-      // capture potentially many values, in case it has an embedded '='
-      const [keyPart, ...valueParts] = line.split('=');
-      const key = keyPart.trim();
-      const value = (valueParts.join('=')).trimStart();
-
-      // A helper because I am a stupid old man that cares about making software
-      // do redundant work for no reason other than it looks nicer in the code.
-      const stringToNumber = (value: string) => {
-        const result = parseInt(value);
-        return isNaN(result) ? undefined : result;
-      }
-
-      // Handle the key appropriately.
-      switch (key) {
-        case 'courseName':
-          props.name = value;
-          break;
-
-        case 'year':
-          props.year = stringToNumber(value);
-          break;
-
-        case 'month':
-          props.month = stringToNumber(value);
-          break;
-
-        case 'markedDays':
-          props.markedDays = value.split(',')
-                               .map(v => stringToNumber(v))
-                               .filter(v => v !== undefined);
-          break;
-
-        default:
-          console.log(`unknown calendar key '${key.trim()}'`);
-          break;
-      }
+    try {
+      const data = parseYaml(this.source);
+      return {
+            name: data?.courseName,
+            year: data?.year,
+            month: data?.month,
+            markedDays: data?.markedDays
+        };
+    } catch (error) {
+      console.log(`invalid calendar block: ${error}`);
+      return {}
     }
-
-    return props;
   }
 
   /* Return the properties to be used when the component is mounted. */
