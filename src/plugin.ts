@@ -137,6 +137,9 @@ export class KursvaroPlugin extends Plugin
     if (this.stateCleanup !== undefined) {
       this.stateCleanup();
     }
+
+    // Unmount the status bar component
+    this.statusBarIntegration.unmount();
   }
 
   /* This handles the loading of our simple plugin data, which is persisted for
