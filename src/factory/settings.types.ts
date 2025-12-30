@@ -27,7 +27,7 @@ export type SettingsChangeListener<T> = (key: keyof T) => void;
 export interface SettingsManager<T> {
   settings: T;
   savePluginData(key?: keyof T): Promise<void>;
-  onSettingsChange(callback: SettingsChangeListener<T>): void;
+  onSettingsChange(callback: SettingsChangeListener<T>): () => void;
 }
 
 /* This interface specifies the fields that are common to all configuration

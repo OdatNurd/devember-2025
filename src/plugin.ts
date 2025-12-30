@@ -168,9 +168,18 @@ export class KursvaroPlugin extends Plugin
    * value changed, at the point at which savePluginData() is called.
    *
    * The listeners registered here will happen after the data is saved out to
-   * disk. */
+   * disk.
+   *
+   * This returns a function which will remove the callback provided from the
+   * list of listeners. */
   onSettingsChange(callback: SettingsChangeListener<KursvaroSettings>) {
     this.settingsListeners.push(callback);
+
+    // Return a cleanup function that will remove this listener when it's
+    // invoked.
+    return () => {
+      this.settingsListeners = this.settingsListeners.filter(listener => listener !== callback);
+    };
   }
 
   /* This gets invoked whenever it is detected that the data.json file has

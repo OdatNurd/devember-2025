@@ -19,6 +19,7 @@ import { SampleSearchStringClass, SampleSearchNumberClass } from '#ui/search';
  * structure. */
 export class KursvaroSettingTab extends PluginSettingTab {
   plugin: KursvaroPlugin & SettingsManager<KursvaroSettings>;
+  cleanupListeners?: () => void;
 
   constructor(plugin: KursvaroPlugin) {
     super(plugin.app, plugin);
@@ -29,8 +30,13 @@ export class KursvaroSettingTab extends PluginSettingTab {
     // settings we defined last time.
     this.containerEl.empty();
 
+    // If we have been run before, clean up the listeners we had; this should
+    // never actually be needed but this is here just in case somehow display()
+    // gets called more than once while the settings page is open.
+    this.cleanupListeners?.();
+
     // The main settings group.
-    createSettingsLayout(this.containerEl, this.plugin, this.plugin, [
+    this.cleanupListeners = createSettingsLayout(this.containerEl, this.plugin, this.plugin, [
       // General Settings
       {
         name: "Setting #1",
@@ -208,6 +214,10 @@ export class KursvaroSettingTab extends PluginSettingTab {
         ]
       },
     ]);
+  }
+
+  hide() : void {
+    this.cleanupListeners?.();
   }
 }
 

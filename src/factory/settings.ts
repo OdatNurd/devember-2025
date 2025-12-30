@@ -19,11 +19,17 @@ import {
  * element (presumed to be the element in a PluginSettingsTab instance) based
  * on an object based configuration.
  *
- * This, in theory, makes the settings configuration less unweildy. */
+ * This, in theory, makes the settings configuration less unweildy.
+ *
+ * In order to tie things together, the settings page needs to associate some
+ * event listeners with settings changes. The return value here is a cleanup
+ * that, when invoked, will clean up those listeners. You must pair a call to
+ * this function with a call to the cleanup function once the settings page is
+ * no longer needed. */
 export function createSettingsLayout<T,P extends Plugin>(container: HTMLElement,
                                         manager: SettingsManager<T>,
                                         plugin: P,
-                                        settings: SettingRow<T,P>[]) : void {
+                                        settings: SettingRow<T,P>[]) : () => void {
   // This map correlates settings keys with the handler functions that should be
   // invoked whenever that setting changes, so that things can dynamically
   // update.
@@ -37,7 +43,7 @@ export function createSettingsLayout<T,P extends Plugin>(container: HTMLElement,
   // Tell our manager to let us know every time a setting changes so that we can
   // trace the dependency tree and update any settings that depend on that
   // setting.
-  manager.onSettingsChange(changedKey => {
+  const cleanupListeners = manager.onSettingsChange(changedKey => {
     const dependents = dependencyMap.get(changedKey);
     if (dependents !== undefined) {
       dependents.forEach(handler => handler(manager.settings));
@@ -170,6 +176,10 @@ export function createSettingsLayout<T,P extends Plugin>(container: HTMLElement,
       }
     });
   }
+
+  // Return a cleanup function which, when called, will clean up the listeners
+  // added here.
+  return () => cleanupListeners();
 }
 
 
