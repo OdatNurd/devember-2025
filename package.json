@@ -28,6 +28,7 @@
     "#factory/*": "./src/factory/*.ts",
     "#modals/*": "./src/modals/*.ts",
     "#plugin": "./src/plugin.ts",
+    "#settings": "./src/settings-config.ts",
     "#state/*": "./src/state/*.svelte.ts",
     "#types": "./src/types.ts",
     "#ui/*": "./src/ui/*.ts",
