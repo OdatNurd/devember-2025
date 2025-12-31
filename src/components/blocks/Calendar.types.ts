@@ -1,6 +1,7 @@
 /******************************************************************************/
 
 
+import type { KursvaroData } from '#types';
 import type { StateSchema } from '#state/generic';
 import type { ComponentSchema, GetProps } from '#ui/svelte';
 
@@ -10,9 +11,8 @@ import type { ComponentSchema, GetProps } from '#ui/svelte';
 
 /* The stored data for the calendar block is empty; it does not need any session
  * data, any ephemeral data, or any plugin data. */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface CalendarBlockSchema extends StateSchema {
-
+  data: KursvaroData
 }
 
 /* This type defines the properties that are expected to be passed to the

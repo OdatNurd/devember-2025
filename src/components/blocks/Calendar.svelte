@@ -13,7 +13,7 @@
     markedDays = [],
     allowNav = false,
 
-    // sharedState,
+    sharedState,
   }: CalendarBlockProps = $props();
 
   // Capture the name of the month we were given; note that the date constructor
@@ -99,7 +99,7 @@
         <div class="day-number">{day ?? ''}</div>
         <div class="day-indicators">
           {#if day !== null && markedDays.includes(day)}
-            <div class="day-marker"></div>
+            <div class="day-marker" style:background-color={sharedState.data.settings.myColorValue}></div>
           {/if}
         </div>
       </div>
