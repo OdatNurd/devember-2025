@@ -37,7 +37,8 @@ export class CalendarBlockRenderChild
             name: data?.courseName,
             year: data?.year,
             month: data?.month,
-            markedDays: data?.markedDays
+            markedDays: data?.markedDays,
+            allowNav: data?.allowNav,
         };
     } catch (error) {
       console.log(`invalid calendar block: ${error}`);

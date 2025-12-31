@@ -11,6 +11,7 @@
     year = today.getFullYear(),
     month = today.getMonth() + 1,
     markedDays = [],
+    allowNav = false,
 
     // sharedState,
   }: CalendarBlockProps = $props();
@@ -54,11 +55,30 @@
     return cells;
   });
 
-  // console.log(monthName, daysInMonth, startDayOfWeek);
-  // console.log(calenderCells);
+  // Change the current month by some number of months forward or backward. If
+  // the month wraps around the end of the year, then the year changes too.
+  function changeMonth(delta: number) {
+    let newMonth = month + delta;
+    if (newMonth > 12) {
+      newMonth = 1;
+      year++;
+    } else if (newMonth < 1) {
+      newMonth = 12;
+      year--;
+    }
+
+    month = newMonth;
+  }
 </script>
 
 <div class="calendar-container">
+  {#if allowNav === true}
+    <div class="nav">
+      <button class="nav-button" onclick={() => changeMonth(-1)}> &lt; </button>
+      <input  class="nav-input"  type="number" bind:value={year} />
+      <button class="nav-button" onclick={() => changeMonth(+1)}> &gt; </button>
+    </div>
+  {/if}
   <div class="header">
     <div class="header-left">{year}</div>
     <div class="header-center">{name}</div>
@@ -190,4 +210,30 @@
     border-radius: 50%;
     background-color: var(--text-accent);
   }
+
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+  }
+
+  .nav-button {
+    border-radius: 4px;
+    background-color: var(--interactive-normal);
+    color: var(--text-accent);
+    font-size: 1.1em;
+    font-weight: bold;
+  }
+
+  .nav-input   {
+    width: 4rem;
+    text-align: center;
+    border-radius: 4px;
+    background-color: var(--interactive-normal);
+    color: var(--text-accent);
+    font-size: 1.1em;
+    font-weight: bold;
+  }
+
 </style>

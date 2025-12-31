@@ -29,6 +29,10 @@ export interface CalendarBlockComponent extends ComponentSchema {
     // If provided, all days in the calendar page that match a day in this array
     // will have a marker dot applied to them.
     markedDays?: number[];
+
+    // When true, the calendar will have navigation controls to allow you to
+    // alter the date it's showing.
+    allowNav?: boolean
   };
 }
 
