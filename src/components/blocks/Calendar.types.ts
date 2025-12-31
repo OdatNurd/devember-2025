@@ -15,6 +15,11 @@ export interface CalendarBlockSchema extends StateSchema {
   data: KursvaroData
 }
 
+/* Defines the hierarchical structure for marking days. The top level has a year
+ * as a key, with a value that is a similar structure to what's seen here. That
+ * structure has months as a key, which associates to a list of days. */
+export type MarkedDaysTree = Record<number, Record<number, number[]>>;
+
 /* This type defines the properties that are expected to be passed to the
  * CalendarBlock Svelte component. */
 export interface CalendarBlockComponent extends ComponentSchema {
@@ -26,9 +31,10 @@ export interface CalendarBlockComponent extends ComponentSchema {
     // The name of this calendar
     name?: string;
 
-    // If provided, all days in the calendar page that match a day in this array
-    // will have a marker dot applied to them.
-    markedDays?: number[];
+    // If provided, this object provides a mapping of what year/month/day
+    // combinations should be marked on the calendar. This is a tree; see the
+    // comments on the type for details.
+    markedDays?: MarkedDaysTree;
 
     // When true, the calendar will have navigation controls to allow you to
     // alter the date it's showing.

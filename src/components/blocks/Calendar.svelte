@@ -10,7 +10,7 @@
     name = 'Unnamed Course',
     year = $bindable(today.getFullYear()),
     month = $bindable(today.getMonth() + 1),
-    markedDays = [],
+    markedDays = {},
     allowNav = false,
 
     sharedState,
@@ -98,7 +98,7 @@
       >
         <div class="day-number">{day ?? ''}</div>
         <div class="day-indicators">
-          {#if day !== null && markedDays.includes(day)}
+          {#if day !== null && markedDays[year]?.[month]?.includes(day)}
             <div class="day-marker" style:background-color={sharedState.data.settings.myColorValue}></div>
           {/if}
         </div>
