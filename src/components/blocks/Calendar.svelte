@@ -8,8 +8,8 @@
   const today = new Date();
   let {
     name = 'Unnamed Course',
-    year = today.getFullYear(),
-    month = today.getMonth() + 1,
+    year = $bindable(today.getFullYear()),
+    month = $bindable(today.getMonth() + 1),
     markedDays = [],
     allowNav = false,
 
