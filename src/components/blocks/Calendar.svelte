@@ -10,7 +10,7 @@
     name = 'Unnamed Course',
     year = $bindable(today.getFullYear()),
     month = $bindable(today.getMonth() + 1),
-    markedDays = {},
+    markedDays = [],
     allowNav = false,
 
     sharedState,
@@ -69,6 +69,19 @@
 
     month = newMonth;
   }
+
+  // Given a marked days type, return back the color to be used for it.
+  function getMarkerColor(type: string): string {
+    // If there isn't a type, or it's the default type, then use the color
+    // setting as we always have.
+    if (type === 'default' || type === undefined) {
+      return sharedState.data.settings.myColorValue;
+    }
+
+    // For now, assume that the type IS the color; this means it has to be a
+    // valid CSS color string or similar.
+    return type;
+  }
 </script>
 
 <div class="calendar-container">
@@ -98,8 +111,15 @@
       >
         <div class="day-number">{day ?? ''}</div>
         <div class="day-indicators">
-          {#if day !== null && markedDays[year]?.[month]?.includes(day)}
-            <div class="day-marker" style:background-color={sharedState.data.settings.myColorValue}></div>
+          {#if day !== null}
+            {#each markedDays as group}
+              {#if group.dates[year]?.[month]?.includes(day)}
+                <div
+                  class="day-marker"
+                  style:background-color={getMarkerColor(group.type)}
+                ></div>
+              {/if}
+            {/each}
           {/if}
         </div>
       </div>

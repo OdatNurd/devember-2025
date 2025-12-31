@@ -20,6 +20,12 @@ export interface CalendarBlockSchema extends StateSchema {
  * structure has months as a key, which associates to a list of days. */
 export type MarkedDaysTree = Record<number, Record<number, number[]>>;
 
+/* Represents a distinct set of marked days with a specific type (color). */
+export interface MarkedDayGroup {
+    type: string;
+    dates: MarkedDaysTree;
+}
+
 /* This type defines the properties that are expected to be passed to the
  * CalendarBlock Svelte component. */
 export interface CalendarBlockComponent extends ComponentSchema {
@@ -34,7 +40,7 @@ export interface CalendarBlockComponent extends ComponentSchema {
     // If provided, this object provides a mapping of what year/month/day
     // combinations should be marked on the calendar. This is a tree; see the
     // comments on the type for details.
-    markedDays?: MarkedDaysTree;
+    markedDays?: MarkedDayGroup[];
 
     // When true, the calendar will have navigation controls to allow you to
     // alter the date it's showing.
