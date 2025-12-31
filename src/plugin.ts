@@ -45,10 +45,8 @@ export class KursvaroPlugin extends Plugin
                                            250, true);
 
   async onload() {
-    // Before we do anything else, load in our plugin's data file; this sets up
-    // both our cached version of the data as well as the settings information.
-    this.data = await this.loadPluginData();
-    this.settings = this.data.settings;
+    // Before we do anything else, load in our plugin's data file.
+    const data = await this.loadPluginData();
 
     // Now create the master state tracking object for the plugin data; this is
     // used to ensure that anything that touches the plugin data will see when
@@ -58,12 +56,21 @@ export class KursvaroPlugin extends Plugin
     // write it back to disk, so that anything that touches this version of
     // the data will cause a save to occur.
     this.state = new GenericSavedState<PluginStateSchema>({
-      data: this.data,
+      data,
       ephemeral: { modalClicks: 0 }
     });
+
+    // Ensure that our local aliases for data and settings are pointing to the
+    // reactive versions inside of the state object; this ensures that if they
+    // are modified by components, everything that cares gets updated.
+    this.data = this.state.data;
+    this.settings = this.state.data.settings;
+
     this.stateCleanup = watch(this.state, {
       onDataChange: (data: PluginStateSchema['data']) => {
         console.log('saving plugin data due to a change');
+        // Update the data reference in case the change replaced the object
+        // entirely, although generally we expect deep mutations to occur.
         this.data = data;
         this.savePluginData();
       },
@@ -190,15 +197,14 @@ export class KursvaroPlugin extends Plugin
   async onExternalSettingsChange() {
     console.log('data.json has changed on disk; reloading');
 
-    // Load in new data and update our handles to it.
+    // Load in new data and update the state object with it.
     const newData = await this.loadPluginData();
-    this.data = newData;
-    this.settings = this.data.settings;
+    Object.assign(this.state.data, newData);
 
-    // Ensure that the state tracking variable is also updated with the data,
-    // which will ensure that any mounted components see the update.
-    // const data = Object.assign({}, DEFAULT_DATA, rawData);
-    Object.assign(this.state.data, this.data);
+    // Ensure that our local aliases for data and settings are updated to what
+    // is present in the new version.
+    this.data = this.state.data;
+    this.settings = this.state.data.settings;
   }
 
   /* This sample method exists solely to verify that the configured buttons in
