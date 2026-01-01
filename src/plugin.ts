@@ -221,7 +221,7 @@ export class KursvaroPlugin extends Plugin
    * method in case a plugin method is not actualy needed). */
   async getDynamicDropdownContents(currentSettings: KursvaroSettings): Promise<Record<string, string>>
   {
-    if (currentSettings.myToggleSetting) {
+    if (currentSettings.toggleValue) {
        return {
         'option1': 'Option 1 (Toggle ON)',
         'option2': 'Option 2 (Toggle ON)',

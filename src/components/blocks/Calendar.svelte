@@ -76,7 +76,7 @@
     // If there isn't a type, or it's the default type, then use the color
     // setting as we always have.
     if (type === 'default' || type === undefined) {
-      return sharedState.data.settings.myColorValue;
+      return sharedState.data.settings.colorValueOne;
     }
 
     // For now, assume that the type IS the color; this means it has to be a

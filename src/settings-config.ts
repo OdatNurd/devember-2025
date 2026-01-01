@@ -31,7 +31,7 @@ export const getSettingsLayout = (): SettingRow<KursvaroSettings, KursvaroPlugin
       {
         type: 'text',
         placeholder: 'Sample view panel title',
-        key: 'mySetting',
+        key: 'textValue',
       },
     ]
   },
@@ -52,7 +52,7 @@ export const getSettingsLayout = (): SettingRow<KursvaroSettings, KursvaroPlugin
       {
         type: 'textarea',
         placeholder: 'Long form content',
-        key: 'myOtherSetting',
+        key: 'textAreaValue',
         lines: 3,
         resize: 'none',
       },
@@ -65,7 +65,7 @@ export const getSettingsLayout = (): SettingRow<KursvaroSettings, KursvaroPlugin
       {
         type: 'integer',
         placeholder: 'Enter an integer value',
-        key: 'myThirdSetting',
+        key: 'integerValue',
       },
     ]
   },
@@ -76,7 +76,7 @@ export const getSettingsLayout = (): SettingRow<KursvaroSettings, KursvaroPlugin
       {
         type: 'float',
         placeholder: 'Enter a floating point value',
-        key: 'myFloatSetting',
+        key: 'floatValue',
       },
     ]
   },
@@ -89,13 +89,13 @@ export const getSettingsLayout = (): SettingRow<KursvaroSettings, KursvaroPlugin
     items: [
       {
         type: 'search',
-        key: 'myStringSearchValue',
+        key: 'stringSearchValue',
         placeholder: 'Select a string thing',
         handler: SampleSearchStringClass,
       },
       {
         type: 'search',
-        key: 'myNumberSearchValue',
+        key: 'numberSearchValue',
         placeholder: 'Select a number thing',
         handler: SampleSearchNumberClass,
       },
@@ -107,7 +107,7 @@ export const getSettingsLayout = (): SettingRow<KursvaroSettings, KursvaroPlugin
     items: [
       {
         type: 'dateformat',
-        key: 'myDateFormat',
+        key: 'dateFormatValue',
         defaultFormat: 'YYYY-MM-DD',
         includeHelp: true,
       }
@@ -119,7 +119,7 @@ export const getSettingsLayout = (): SettingRow<KursvaroSettings, KursvaroPlugin
     items: [
       {
         type: 'colorpicker',
-        key: 'myColorValue',
+        key: 'colorValueOne',
       }
     ]
   },
@@ -132,7 +132,7 @@ export const getSettingsLayout = (): SettingRow<KursvaroSettings, KursvaroPlugin
     items: [
       {
         type: 'slider',
-        key: 'mySliderValue',
+        key: 'sliderValue',
         min: 0,
         max: 100,
         step: 1
@@ -145,8 +145,8 @@ export const getSettingsLayout = (): SettingRow<KursvaroSettings, KursvaroPlugin
     items: [
       {
         type: 'progressbar',
-        value: async (settings) => settings.mySliderValue,
-        dependencies: ['mySliderValue'],
+        value: async (settings) => settings.sliderValue,
+        dependencies: ['sliderValue'],
       },
     ]
   },
@@ -157,7 +157,7 @@ export const getSettingsLayout = (): SettingRow<KursvaroSettings, KursvaroPlugin
       {
         type: 'toggle',
         tooltip: ['First dropdown enabled', 'First dropdown disabled'],
-        key: 'myToggleSetting',
+        key: 'toggleValue',
       },
     ]
   },
@@ -167,13 +167,13 @@ export const getSettingsLayout = (): SettingRow<KursvaroSettings, KursvaroPlugin
     items: [
       {
         type: 'dropdown',
-        key: 'myDropdownSetting',
-        disabled: settings => !settings.myToggleSetting,
+        key: 'staticOptionValue',
+        disabled: settings => !settings.toggleValue,
+        dependencies: ['toggleValue'],
         options: {
           'option1': 'Option 1',
           'option2': 'Option 2',
         },
-        dependencies: ['myToggleSetting'],
       },
     ]
   },
@@ -183,8 +183,8 @@ export const getSettingsLayout = (): SettingRow<KursvaroSettings, KursvaroPlugin
     items: [
       {
         type: 'dropdown',
-        key: 'myOtherDropdownSetting',
-        dependencies: ['myToggleSetting'],
+        key: 'dynamicOptionValue',
+        dependencies: ['toggleValue'],
         loader: async (plugin, settings) : Promise<Record<string, string>> => {
           // Simulate that it took a bit of time to get the values
           await new Promise(resolve => setTimeout(resolve, 500));

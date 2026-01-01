@@ -11,18 +11,18 @@ import { type StateSchema } from "#state/generic";
  * persisted into the vault in a data.json file in .obsidian/plugins/plugin-name
  * if any of them are changed from the defaults outlined below. */
 export interface KursvaroSettings {
-  mySetting: string;
-  myOtherSetting: string;
-  myThirdSetting: number;
-  myFloatSetting: number;
-  myToggleSetting: boolean;
-  myDropdownSetting: string;
-  myOtherDropdownSetting: string;
-  mySliderValue: number;
-  myColorValue: string;
-  myDateFormat: string;
-  myStringSearchValue: string;
-  myNumberSearchValue: number;
+  textValue: string;
+  textAreaValue: string;
+  integerValue: number;
+  floatValue: number;
+  toggleValue: boolean;
+  staticOptionValue: string;
+  dynamicOptionValue: string;
+  sliderValue: number;
+  colorValueOne: string;
+  dateFormatValue: string;
+  stringSearchValue: string;
+  numberSearchValue: number;
 }
 
 
@@ -58,18 +58,18 @@ export interface PluginStateSchema extends StateSchema {
 /* This sets the default values for all of our settings; these are used as the
  * source of settings if there is no data.json file. */
 const DEFAULT_SETTINGS: KursvaroSettings = {
-  mySetting: 'default',
-  myOtherSetting: 'poop',
-  myThirdSetting: 69,
-  myFloatSetting: 4.20,
-  myToggleSetting: true,
-  myDropdownSetting: 'titties',
-  myOtherDropdownSetting: 'boobies',
-  mySliderValue: 42,
-  myColorValue: '#696969',
-  myDateFormat: 'YYYY-MM-DD',
-  myStringSearchValue: '',
-  myNumberSearchValue: 0,
+  textValue: '',
+  textAreaValue: '',
+  integerValue: 0,
+  floatValue: 0.0,
+  toggleValue: true,
+  staticOptionValue: '',
+  dynamicOptionValue: '',
+  sliderValue: 0,
+  colorValueOne: '#000000',
+  dateFormatValue: 'YYYY-MM-DD',
+  stringSearchValue: '',
+  numberSearchValue: 0,
 }
 
 

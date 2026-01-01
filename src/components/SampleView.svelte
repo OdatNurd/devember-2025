@@ -29,7 +29,7 @@
 </script>
 
 <div class="view-thing">
-  <h2>{sharedState.data.settings.mySetting}</h2>
+  <h2>{sharedState.data.settings.textValue || 'Untitled'}</h2>
 
   <hr>
 
