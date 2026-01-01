@@ -1,5 +1,6 @@
 <script lang="ts">
-  import type { CalendarBlockProps } from '#components/blocks/Calendar.types';
+  import { setIcon } from 'obsidian';
+  import { type CalendarBlockProps } from '#components/blocks/Calendar.types';
 
   const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -82,14 +83,29 @@
     // valid CSS color string or similar.
     return type;
   }
+
+  // Return a factory function for use in @attach that will set the icon inside
+  // of the element that it is attached to.
+  function setObsidianIcon(iconName: string) {
+    return (element: HTMLElement) => {
+      setIcon(element, iconName);
+      return () => element.empty();
+    }
+  }
 </script>
 
 <div class="calendar-container">
   {#if allowNav === true}
     <div class="nav">
-      <button class="nav-button" onclick={() => changeMonth(-1)}> &lt; </button>
-      <input  class="nav-input"  type="number" bind:value={year} />
-      <button class="nav-button" onclick={() => changeMonth(+1)}> &gt; </button>
+      <button {@attach setObsidianIcon('chevrons-left')}
+        onclick={() => changeMonth(-1)}
+        title="Previous Month"
+        class="nav-button"></button>
+      <input bind:value={year} type="number" class="nav-input" />
+      <button {@attach setObsidianIcon('chevrons-right')}
+        onclick={() => changeMonth(+1)}
+        title="Next Month"
+        class="nav-button"></button>
     </div>
   {/if}
   <div class="header">
