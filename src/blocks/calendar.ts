@@ -5,7 +5,7 @@ import { parseYaml } from 'obsidian';
 import { type Component } from 'svelte';
 import { type KursvaroPlugin } from '#plugin';
 
-import { BaseSvelteRenderChild } from '#blocks//base';
+import { BaseSvelteRenderChild } from '#blocks/base';
 
 import type { CalendarBlockSchema, CalendarBlockComponent, CalendarBlockProps, MarkedDayGroup, MarkedDaysTree } from '#components/blocks/Calendar.types';
 import CalendarBlockComponentView from '#components/blocks/Calendar.svelte';

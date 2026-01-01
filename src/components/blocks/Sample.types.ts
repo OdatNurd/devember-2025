@@ -8,7 +8,7 @@ import type { ComponentSchema, GetProps } from '#ui/svelte';
 /******************************************************************************/
 
 
-export interface BoobsBlockSchema extends StateSchema {
+export interface SampleBlockSchema extends StateSchema {
   /* Fields here have their data persisted directly into the stored plugin data
    * file data.json.
    *
@@ -19,8 +19,8 @@ export interface BoobsBlockSchema extends StateSchema {
 }
 
 /* This type defines the properties that are expected to be passed to the
- * BoobsBlock Svelte component. */
-export interface BoobsBlockComponent extends ComponentSchema {
+ * SampleBlock Svelte component. */
+export interface SampleBlockComponent extends ComponentSchema {
   props: {
     // The source of the code block that we are rendering.
     source: string;
@@ -28,7 +28,7 @@ export interface BoobsBlockComponent extends ComponentSchema {
 }
 
 /* Helper for the Svelte component script block to type its incoming props */
-export type BoobsBlockProps = GetProps<BoobsBlockSchema, BoobsBlockComponent>;
+export type SampleBlockProps = GetProps<SampleBlockSchema, SampleBlockComponent>;
 
 
 /******************************************************************************/

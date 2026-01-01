@@ -2,7 +2,7 @@
 
 
 import { type BlockConfig } from '#factory/blocks.types';
-import { BoobsBlockRenderChild } from '#blocks/boobs';
+import { SampleBlockRenderChild } from '#blocks/sample';
 import { CalendarBlockRenderChild } from '#blocks/calendar';
 
 
@@ -12,8 +12,8 @@ import { CalendarBlockRenderChild } from '#blocks/calendar';
 /* Our list of code blocks. */
 export const blocks : BlockConfig[] = [
   {
-    language: 'boobs',
-    handlerClass: BoobsBlockRenderChild,
+    language: 'sample',
+    handlerClass: SampleBlockRenderChild,
   },
   {
     language: 'calendar',

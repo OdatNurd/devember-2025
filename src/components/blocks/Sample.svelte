@@ -1,16 +1,14 @@
 <script lang="ts">
-  import type { BoobsBlockProps } from '#components/blocks/Boobs.types';
+  import type { SampleBlockProps } from '#components/blocks/Sample.types';
 
   let {
     source = '',
     sharedState,
-  }: BoobsBlockProps = $props();
+  }: SampleBlockProps = $props();
 
 </script>
 
 <div class="code-block-thing">
-  ( • )( • )ԅ(‾⌣‾ԅ)
-  <hr>
   {source}
   <hr>
   {sharedState.data.content}
