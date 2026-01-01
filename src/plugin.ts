@@ -211,7 +211,7 @@ export class KursvaroPlugin extends Plugin
    * the settings can invoke methods on the plugin if they need to; here it is
    * not useful. */
   doAThing(buttonType: string) {
-    console.log(`the plugin code is handling a ${buttonType} button press`);
+    console.log(`the plugin code is handling the ${buttonType} button press`);
   }
 
   /* This sample method exists solely to illustrate how the method for dynamic
@@ -223,13 +223,13 @@ export class KursvaroPlugin extends Plugin
   {
     if (currentSettings.myToggleSetting) {
        return {
-        'boobies': "It is spelled 'Boobies' (Toggle ON)",
-        'bewbies': "It is spelled 'Bewbies' (Toggle ON)",
+        'option1': 'Option 1 (Toggle ON)',
+        'option2': 'Option 2 (Toggle ON)',
       };
     } else {
        return {
-        'boobies': "It is spelled 'Boobies' (Toggle OFF)",
-        'bewbies': "It is spelled 'Bewbies' (Toggle OFF)",
+        'option1': 'Option 1 (Toggle OFF)',
+        'option2': 'Option 2 (Toggle OFF)',
       };
     }
   }
