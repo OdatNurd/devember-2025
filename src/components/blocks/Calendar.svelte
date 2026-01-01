@@ -73,15 +73,24 @@
 
   // Given a marked days type, return back the color to be used for it.
   function getMarkerColor(type: string): string {
-    // If there isn't a type, or it's the default type, then use the color
-    // setting as we always have.
-    if (type === 'default' || type === undefined) {
-      return sharedState.data.settings.colorValueOne;
-    }
+    switch (type) {
+      case 'courseOne':
+      case 'default':
+      case undefined:
+        return sharedState.data.settings.colorValueOne;
 
-    // For now, assume that the type IS the color; this means it has to be a
-    // valid CSS color string or similar.
-    return type;
+      case 'courseTwo':
+        return sharedState.data.settings.colorValueTwo;
+
+      case 'courseThree':
+        return sharedState.data.settings.colorValueThree;
+
+      // If the type is provided but not known, then just use it directly; here
+      // we assume it's a valid value to be applied as a background color, such
+      // as a CSS color name or so on/
+      default:
+        return type;
+    }
   }
 
   // Return a factory function for use in @attach that will set the icon inside

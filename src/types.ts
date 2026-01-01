@@ -20,6 +20,8 @@ export interface KursvaroSettings {
   dynamicOptionValue: string;
   sliderValue: number;
   colorValueOne: string;
+  colorValueTwo: string;
+  colorValueThree: string;
   dateFormatValue: string;
   stringSearchValue: string;
   numberSearchValue: number;
@@ -67,6 +69,8 @@ const DEFAULT_SETTINGS: KursvaroSettings = {
   dynamicOptionValue: '',
   sliderValue: 0,
   colorValueOne: '#000000',
+  colorValueTwo: '#808080',
+  colorValueThree: '#FFFFFF',
   dateFormatValue: 'YYYY-MM-DD',
   stringSearchValue: '',
   numberSearchValue: 0,

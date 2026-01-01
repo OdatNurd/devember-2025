@@ -120,7 +120,15 @@ export const getSettingsLayout = (): SettingRow<KursvaroSettings, KursvaroPlugin
       {
         type: 'colorpicker',
         key: 'colorValueOne',
-      }
+      },
+      {
+        type: 'colorpicker',
+        key: 'colorValueTwo',
+      },
+      {
+        type: 'colorpicker',
+        key: 'colorValueThree',
+      },
     ]
   },
 
