@@ -1,6 +1,6 @@
 <script lang="ts">
   import { untrack } from 'svelte';
-  import { type SampleViewProps } from '#components/SampleView.types';
+  import { type SampleViewProps } from '#components/views/SampleView.types';
 
   // The incoming state object that contains the data that we share with the
   // code upstream of us; they will be notified when things here change.

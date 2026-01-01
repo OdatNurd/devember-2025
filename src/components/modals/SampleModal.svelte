@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { SampleModalProps } from '#components/SampleModal.types';
+  import type { SampleModalProps } from '#components/modals/SampleModal.types';
 
   let {
     sharedState,

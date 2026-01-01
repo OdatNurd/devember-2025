@@ -36,8 +36,8 @@ export function addSearchControl<T,P extends Plugin>(
         let isValid = false;
         let parsed: unknown = null;
 
-        // Only save manually typed input IF the handler supports parsing it.
-        // This prevents invalid types (e.g. "boobs" in a number field) from
+        // Only save manually typed input if the handler supports parsing it.
+        // This prevents invalid types (e.g. "text" in a number field) from
         // being saved, and allows for enforcement that only searchable values
         // can be used as the setting value.
         if (suggestions.parseInput !== undefined) {

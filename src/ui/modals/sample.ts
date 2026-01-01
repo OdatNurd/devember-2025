@@ -6,9 +6,9 @@ import { type KursvaroPlugin } from '#plugin';
 
 import { BaseSvelteModal } from '#ui/modals/base';
 
-import type { SampleModalSchema, SampleModalComponent, SampleModalProps } from '#components/SampleModal.types';
+import type { SampleModalSchema, SampleModalComponent, SampleModalProps } from '#components/modals/SampleModal.types';
 
-import SampleSvelteModal from '#components/SampleModal.svelte';
+import SampleSvelteModal from '#components/modals/SampleModal.svelte';
 
 
 /******************************************************************************/

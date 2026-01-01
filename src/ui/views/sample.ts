@@ -7,9 +7,9 @@ import { type KursvaroPlugin } from '#plugin';
 
 import { BaseSvelteItemView } from '#ui/views/base';
 
-import type { SampleViewSchema, SampleViewComponent, SampleViewProps } from '#components/SampleView.types';
+import type { SampleViewSchema, SampleViewComponent, SampleViewProps } from '#components/views/SampleView.types';
 
-import SampleSvelteView from '#components/SampleView.svelte';
+import SampleSvelteView from '#components/views/SampleView.svelte';
 
 
 /******************************************************************************/
