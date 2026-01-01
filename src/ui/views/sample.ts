@@ -54,9 +54,7 @@ export class SampleView
 
   /* Return the properties to be used when the component is mounted. */
   getComponentProps(): SampleViewComponent['props'] {
-    return {
-      title: this.plugin.settings.mySetting,
-    };
+    return { };
   }
 
   /* Return the default data to be shared into the shared state that our

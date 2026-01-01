@@ -128,7 +128,7 @@
         <div class="day-number">{day ?? ''}</div>
         <div class="day-indicators">
           {#if day !== null}
-            {#each markedDays as group}
+            {#each markedDays as group, i (i)}
               {#if group.dates[year]?.[month]?.includes(day)}
                 <div
                   class="day-marker"

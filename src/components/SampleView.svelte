@@ -4,7 +4,7 @@
 
   // The incoming state object that contains the data that we share with the
   // code upstream of us; they will be notified when things here change.
-  let { title = 'Untitled', sharedState } : SampleViewProps = $props();
+  let { sharedState } : SampleViewProps = $props();
 
   // Grab a copy of the initial value of the shared state; this takes a ride
   // through untrack to ensure that this does not get updated when the content
@@ -29,7 +29,7 @@
 </script>
 
 <div class="view-thing">
-  <h2>{title}</h2>
+  <h2>{sharedState.data.settings.mySetting}</h2>
 
   <hr>
 
